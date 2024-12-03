@@ -59,9 +59,13 @@ float get_RPM_from_Hz(float Hz) {
 void setup() {
   Serial.begin(115200);
   Serial.println("\nuStepper S32 - Test");
+  
+
+  mpu.Initialize();  // Initialization of MPU
+  mpu.Calibrate();   // Calibration - LED will blink until calibration is done !
+  stepper.encoder.setHome(-mpu.GetAngZ());
   stepper.setup();                 //Initialize uStepper S32
   stepper.checkOrientation(30.0);  //Check orientation of motor connector with +/- 30 microsteps movement
-
   //stepper.setRPM(-100);				 //Set speed to -100
   stepper.setCurrent(100);    // set motor current as percentage
   stepper.setHoldCurrent(0);  // set holding current as percentage
@@ -80,27 +84,20 @@ float rpm = 0;
 float Hz = 0;
 
 void loop() {
-  char cmd;
+  //char cmd;
 
-  float value;
-
-
-  // put your main code here, to run repeatedly:
+  // Get Serial Message
   if (Serial.available() > 0) {
+    float value;
     char command[COMMAND_SIZE];
     Serial.readBytesUntil(10, command, COMMAND_SIZE);
-
     Serial.print("cmd: ");
     Serial.println(command);
-
     value = atof(command);
-
     Serial.print("data: ");
     Serial.println(value);
 
-
-
-
+    // Parse command
     if (value == 0) {
       stepper.stop(HARD);
       Serial.println("stop cmd received");
@@ -113,6 +110,7 @@ void loop() {
     }
   }
 
+  // Interlocks/safety code
   if (stepper.isStalled()) {
     Serial.println("Motor Has Stalled");
     stepper.setBrakeMode(FREEWHEELBRAKE);
@@ -120,7 +118,14 @@ void loop() {
     rpm = 0;
   }
 
-  if (printDelay.millisDelay(print_delay_mS)) {
+  // Gather Accellerometer data
+mpu.Execute();
+
+float Xacc = mpu.GetAccX();
+  // Program Text Output
+
+ // if (printDelay.millisDelay(print_delay_mS)) {
+  if (Xacc == 0){
     float actualRPM = stepper.getDriverRPM();
     float actualHz = actualRPM / 60.0;
     char printBuffer[128];
@@ -129,13 +134,30 @@ void loop() {
     char a_hz_buf[8];
     char a_rpm_buf[8];
 
+    char accX_buf[8];
+    char accY_buf[8];
+    char accZ_buf[8];
+
+    char gyroX_buf[8];
+    char gyroY_buf[8];
+    char gyroZ_buf[8];
+
+    dtostrf(Xacc, 2, 2, accX_buf);
+    dtostrf(mpu.GetAccY(), 2, 2, accY_buf);
+    dtostrf(mpu.GetAccZ(), 2, 2, accZ_buf);
+    dtostrf(mpu.GetGyroX(), 2, 2, gyroX_buf);
+    dtostrf(mpu.GetGyroY(), 2, 2, gyroY_buf);
+    dtostrf(mpu.GetGyroZ(), 2, 2, gyroZ_buf);
+
+
+
     dtostrf(Hz, 3, 3, hz_buf);
     dtostrf(rpm, 3, 3, rpm_buf);
 
     dtostrf(actualHz, 3, 3, a_hz_buf);
     dtostrf(actualRPM, 3, 3, a_rpm_buf);
 
-    sprintf(printBuffer, "set_Hz: %4s, Reported_Hz: %4s, Set_RPM: %4s, reported_rpm: %4s, Position, ", hz_buf, a_hz_buf, rpm_buf, a_rpm_buf);
+    sprintf(printBuffer, "set_Hz: %4s, Reported_Hz: %4s, Set_RPM: %4s, reported_rpm: %4s, Acc:%6s,%6s,%6s, Gyro:%6s,%6s,%6s ", hz_buf, a_hz_buf, rpm_buf, a_rpm_buf,accX_buf,accY_buf,accZ_buf,gyroX_buf,gyroY_buf,gyroZ_buf);
 #if PRINT_PERIODIC_UPDATES == true
     Serial.println(printBuffer);
 #endif
