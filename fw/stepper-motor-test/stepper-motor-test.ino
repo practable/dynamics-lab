@@ -60,7 +60,7 @@ float get_RPM_from_Hz(float Hz) {
 
 void setup() {
   Serial.begin(115200);
-
+  delay(1000);
   Serial.println("\nuStepper S32 - Test");
 
 
@@ -74,7 +74,7 @@ void setup() {
 
   Serial.print("Current Encoder Pos: ");
   Serial.println(stepper.encoder.getAngleRaw());
-  while (1) { ; }
+ // while (1) { ; }
 
 
 
