@@ -35,15 +35,46 @@ float cal_minus_acc = 0;
 
 // do one full revolution then go back to lowest val
 void find_home() {
+  Serial.println("Finding Home");
   bool home_found = false;
   int16_t hall_sensor_val;
+  bool finding_center = true;
+  int16_t low_point = (uint16_t)~0 >> 1;  // set low-pouint to maximum value (could hard code high value but this is more fun)
+  float low_angle;
+  stepper.setMaxVelocity(400);
+  stepper.setMaxAcceleration(2000);
+  stepper.moveAngle(365);
+
+
+  while (finding_center) {
+    Serial.print("angle moved: ");
+    Serial.println(stepper.angleMoved());
+    hall_sensor_val = analogRead(HALL_SENSOR_PIN);
+    if (hall_sensor_val <= low_point) {
+      low_point = hall_sensor_val;
+      Serial.print("New Low Point Recorded: ");
+      Serial.print(low_point);
+      low_angle = stepper.encoder.getAngleRaw();
+      Serial.print(" angle: ");
+      Serial.println(low_angle);
+    }
+    if (stepper.angleMoved() >= 360 || stepper.angleMoved() <= -360) {
+      Serial.println("ending init rotation");
+      finding_center = false;
+    }
+  }
+
   while (!home_found) {
     hall_sensor_val = analogRead(HALL_SENSOR_PIN);
     Serial.println(hall_sensor_val);
-    if (hall_sensor_val < HALL_SENSOR_LOW_TRIGGER) {
+    if (hall_sensor_val == low_point) {
       stepper.stop();
       home_found = true;
+      Serial.print("Home Found, Angle: ");
+      Serial.println(stepper.encoder.getAngleRaw());
       stepper.encoder.setHome();
+      Serial.print("Resetting Home, Angle: ");
+      Serial.println(stepper.encoder.getAngleRaw());
       delay(100);
     } else {
       //stepper.moveSteps(10);
@@ -54,13 +85,13 @@ void find_home() {
 
 void setup() {
   Serial.begin(115200);
-  delay(1000);  // for stability
+  delay(100);  // for stability
   Serial.println("\nuStepper S32 - Test");
-  delay(1000);  // for UI
+  // delay(1000);  // for UI
 
   mpu.Initialize();                                                // Initialization of MPU
   mpu.Calibrate();                                                 // Calibration - LED will blink until calibration is done !
-  delay(3000);                                                     // for calibration
+                                                                   // delay(3000);                                                     // for calibration
   stepper.setup(NORMAL, 400, 10, 0.2, 0.0, 16, false, 0, 50, 30);  //Initialize uStepper S32
   //stepper.setCurrent(100);     // set motor current as percentage not useable unless current jumper placed in I-PWM position
   stepper.setHoldCurrent(1);  // set holding current as percentage
