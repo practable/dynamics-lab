@@ -1,42 +1,4 @@
-/********************************************************************************************
-* 	    	File:  continous.ino                                                              *
-*		    Version:    2.3.0                                          						    *
-*      	Date: 		October 7th, 2023 	                                    			*
-*       Author:  Thomas Hørring Olsen                                                       *
-*  Description:  Continous Example Sketch!                                                  *
-*                This example demonstrates how the library can be used to make the motorrun *
-*                continously, in both directions and making it stop an ongoing movement.    *
-*                                                                                           *
-* For more information, check out the documentation:                                        *
-*    http://ustepper.com/docs/usteppers/html/index.html                                     *
-*                                                                                           *
-*                                                                                           *
-*********************************************************************************************
-*	(C) 2023                                                                                  *
-*                                                                                           *
-*	uStepper ApS                                                                              *
-*	www.ustepper.com                                                                          *
-*	administration@ustepper.com                                                               *
-*                                                                                           *
-*	The code contained in this file is released under the following open source license:      *
-*                                                                                           *
-*			Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International               *
-*                                                                                           *
-* 	The code in this file is provided without warranty of any kind - use at own risk!       *
-* 	neither uStepper ApS nor the author, can be held responsible for any damage             *
-* 	caused by the use of the code contained in this file !                                  *
-*                                                                                           *
-*                                                                                           *
-********************************************************************************************/
 
-/*
-*      Continous Example Sketch!
-*
-* This example demonstrates how the library can be used to make the motorrun continously,
-* in both directions and making it stop an ongoing movement.
-* For more information, check out the documentation:
-* http://ustepper.com/docs/usteppers/html/index.html
-*/
 #include <UstepperS32.h>
 UstepperS32 stepper;
 #include "TinyMPU6050.h"
@@ -46,6 +8,12 @@ autoDelay printDelay;
 
 #define PRINT_RATE_Hz 2
 #define PRINT_PERIODIC_UPDATES true
+
+#define HALL_SENSOR_PIN A4
+#define HALL_SENSOR_LOW_TRIGGER 295   // home state is triggered when hall sensor returns lower than this value
+#define HALL_SENSOR_HIGH_TRIGGER 700  // estimate for backwards magnet
+
+#define HALL_NORMALLY_HIGH true  // define if normally high, triggered by low pulse (true) or normally low triggered by high pulse (false)
 
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
 
@@ -64,92 +32,40 @@ float cal_minus_angle;
 float cal_plus_acc = 0;
 float cal_minus_acc = 0;
 
+
+// do one full revolution then go back to lowest val
+void find_home() {
+  bool home_found = false;
+  int16_t hall_sensor_val;
+  while (!home_found) {
+    hall_sensor_val = analogRead(HALL_SENSOR_PIN);
+    Serial.println(hall_sensor_val);
+    if (hall_sensor_val < HALL_SENSOR_LOW_TRIGGER) {
+      stepper.stop();
+      home_found = true;
+      stepper.encoder.setHome();
+      delay(100);
+    } else {
+      //stepper.moveSteps(10);
+      stepper.setRPM(120);
+    }
+  }
+}
+
 void setup() {
   Serial.begin(115200);
-  delay(1000);
+  delay(1000);  // for stability
   Serial.println("\nuStepper S32 - Test");
+  delay(1000);  // for UI
 
-
-  mpu.Initialize();  // Initialization of MPU
-  mpu.Calibrate();   // Calibration - LED will blink until calibration is done !
-  delay(3000);
+  mpu.Initialize();                                                // Initialization of MPU
+  mpu.Calibrate();                                                 // Calibration - LED will blink until calibration is done !
+  delay(3000);                                                     // for calibration
   stepper.setup(NORMAL, 400, 10, 0.2, 0.0, 16, false, 0, 50, 30);  //Initialize uStepper S32
   //stepper.setCurrent(100);     // set motor current as percentage not useable unless current jumper placed in I-PWM position
   stepper.setHoldCurrent(1);  // set holding current as percentage
 
-
-  // Here need  to figure out the current encoder position
-
-  // Serial.print("Current Encoder Pos Raw: ");
-  // Serial.println(stepper.encoder.getAngleRaw());
-
-
-  //  Serial.print("Current Encoder Pos : ");
-  //  Serial.println(stepper.encoder.getAngle());
-
-  //  delay(5000);
-
-
-  //  stepper.setBrakeMode(FREEWHEELBRAKE);
-  stepper.setRPM(200);
-
-  delay(2000);
-  //while (!calibrated) {
-  for (int i = 0; i < 10000; i++) {
-    mpu.Execute();
-    float accX = mpu.GetAccX();
-    Serial.print("accX: ");
-    Serial.println(accX);
-    if (accX > cal_plus_acc) {
-      cal_plus_acc = accX;
-      cal_plus_angle = CONVERTENCODERRAWTOANGLE(stepper.encoder.getAngleRaw());
-    }
-    if (accX < cal_minus_angle) {
-      cal_minus_acc = accX;
-      cal_minus_angle = CONVERTENCODERRAWTOANGLE(stepper.encoder.getAngleRaw());
-    }
-    // Serial.print(CONVERTENCODERRAWTOANGLE(stepper.encoder.getAngleRaw()));
-    //  Serial.print(" <- Raw  cooked -> ");
-    //  Serial.println(CONVERTENCODERRAWTOANGLE(stepper.encoder.getAngle()));
-  }
-  stepper.stop();
-  stepper.setBrakeMode(FREEWHEELBRAKE);
-  delay(3000);
-  Serial.print("Cal Plus Angle: ");
-  Serial.println(cal_plus_angle);
-
-  Serial.print("Cal Minus Angle: ");
-  Serial.println(cal_minus_angle);
-
-  delay(2000);
-  Serial.println("Setting Home: ");
-  // stepper.encoder.setHome(cal_plus_angle);
-  Serial.println("Moving Home: ");
-  bool home = false;
-  float angle;
-
-  while (!home) {
-    angle = CONVERTENCODERRAWTOANGLE(stepper.encoder.getAngleRaw());
-    Serial.print(angle);
-    Serial.print(" ~= ");
-    Serial.println(cal_plus_angle + 50.0);
-    if (angle > ((cal_plus_angle + 50.0) - 0.3) && angle < ((cal_plus_angle + 50.0) + 0.3)) {
-      home = true;
-      Serial.println("found home");
-      stepper.encoder.setHome();
-    }
-    stepper.moveSteps(3);
-  }
-
-
-
-  // stepper.moveToAngle(-10.0);
-  delay(200);
-
-
-
-  //  Serial.print("Magnet Detected, for realseasis?  ");
-  //  Serial.println(stepper.encoder.detectMagnet());
+  find_home();
 
   Serial.print("Current Encoder Pos (raw): ");
   Serial.println(stepper.encoder.getAngleRaw());
@@ -158,18 +74,6 @@ void setup() {
   Serial.println(stepper.encoder.getAngle());
 
 
-  // stepper.encoder.setHome();
-
-  //while(stepper.encoder.getAngle() != 0){
-
-  //}
-
-
-
-
-
-  // stepper.checkOrientation(30.0);  //Check orientation of motor connector with +/- 30 microsteps movement
-  //stepper.setRPM(-100);				 //Set speed to -100
 
   stepper.stop();
   Serial.print("To Run Motor, enter speed in Hz between 0 and ~20\n");
