@@ -47,7 +47,7 @@ void find_home() {
       delay(100);
     } else {
       //stepper.moveSteps(10);
-      stepper.setRPM(120);
+      stepper.setRPM(60);
     }
   }
 }
