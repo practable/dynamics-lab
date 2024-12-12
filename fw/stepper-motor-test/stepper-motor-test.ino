@@ -41,8 +41,10 @@ void find_home() {
   bool finding_center = true;
   int16_t low_point = (uint16_t)~0 >> 1;  // set low-pouint to maximum value (could hard code high value but this is more fun)
   float low_angle;
-  stepper.setMaxVelocity(400);
-  stepper.setMaxAcceleration(2000);
+  stepper.setMaxVelocity(800);
+  stepper.setMaxAcceleration(4000);
+  hall_sensor_val = analogRead(HALL_SENSOR_PIN);   // get these up front
+  low_angle = stepper.encoder.getAngleRaw();
   stepper.moveAngle(365);
 
 
