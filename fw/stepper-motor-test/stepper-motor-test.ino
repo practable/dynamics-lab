@@ -5,8 +5,9 @@ UstepperS32 stepper;
 MPU6050 mpu;
 #include <autoDelay.h>
 autoDelay printDelay;
+autoDelay stallDelay;
 
-#define PRINT_RATE_Hz 2
+#define PRINT_RATE_Hz 5
 #define PRINT_PERIODIC_UPDATES true
 
 #define HALL_SENSOR_PIN A4
@@ -17,6 +18,19 @@ autoDelay printDelay;
 
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
 #define STEPPER_HOLD_CURRENT 0
+
+#define COMMAND_SIZE 64
+
+// this is definatly better done as a timer
+// Stall count limit never reaches above 5 as position changes just enough to clear stall warning
+#define STALL_COUNT_LIMIT 5  // Limit for typical number of stall events before triggering stall reset behaviour
+// Variables to track total number of stalls and limit users to a defined number per time period
+#define STALL_OPPORTUNITIES 3    // number of times stall reset behaivour can be triggered before motor is limited
+#define STALL_COOL_DOWN_PERIOD 15   // cool down period to reset the number of triggered stalls
+// When limit is reached, automatic stall guard is implemented by limiting how long the motor can stay in stall condition
+#define PROTECT_STALL_COUNT_LIMIT 2   // Limit for number of stall events that trigger stall reset behaviour if protection mode has been activated
+
+bool ping_mode = false;  // temporary flag to keep data output while doing a servo "ping"
 
 uint32_t print_delay_mS = 1000 / PRINT_RATE_Hz;
 
@@ -36,6 +50,37 @@ float cal_minus_acc = 0;
 // used in homing algorithm
 int16_t low_point;
 float low_angle;
+
+//setBrakeMode(uint8_t mode, float brakeCurrent = 25.0);
+
+
+
+//char command[COMMAND_SIZE];
+
+
+float rpm = 0;
+float Hz = 0;
+
+uint32_t last_rotation_mS;
+uint32_t current_rotation_mS;
+
+uint16_t last_encoder_pos = 0;  // used to independently detect stall
+
+
+
+// Variables to keep track of a stall as it happens
+bool stall_detected = false;
+uint16_t stallCount = 0;
+
+
+
+
+
+int16_t stall_total = 0;
+
+uint16_t current_stall_limit = STALL_COUNT_LIMIT;  // this variable is used by check stall status and updated by  stall_manager();
+// Maybe this is better implemented as a timer rather than a count
+
 
 
 
@@ -105,15 +150,64 @@ void move_home() {
   }
 }
 
+float encode_rpm;
+float encode_pos;
+// Function to track stall status
+void check_stall_status() {
+  encode_rpm = stepper.encoder.getRPM();
+  encode_pos = stepper.encoder.getAngle();
+  uint16_t current_encoder_pos = stepper.encoder.getAngleRaw();
+  if (current_encoder_pos == last_encoder_pos && rpm != 0) {
+    stallCount++;
+    if (stallCount > 1) {
+      Serial.print("Motor Stall Detected No: ");  // detection of momentary stall does not trigger stall protection behaviour
+      Serial.println(stallCount);
+    }
+    if (stallCount >= current_stall_limit) {  // If several stalls detected then stall protection kicks in
+      stepper.stop(HARD);
+      stepper.setRPM(0);
+      Hz = 0;
+      rpm = 0;
+      //find_home();   // see if actually required
+      Serial.println("Stall Limit Reached, Motor Resetting");
+      if (stall_total >= STALL_OPPORTUNITIES) {
+        Serial.println("Too many stalls, stall limitation applied");
+      }
+      move_home();
+      stallCount = 0;
+      stall_total++;  // add one to the total stalls
+    }
+  } else {
+    stallCount = 0;
+  }
+  last_encoder_pos = current_encoder_pos;
+}
+
+
+// Keeps track of how many stalls have been triggered over the cool down period and limits the length of time allowed for a stall if limit has been reached
+//
+void stall_manager() {
+  if (stall_total >= STALL_OPPORTUNITIES) {           // If too many stalls have been triggered
+    current_stall_limit = PROTECT_STALL_COUNT_LIMIT;  // set the stall limit to the protected leve
+  } else {
+    current_stall_limit = STALL_COUNT_LIMIT;  // else set to max level
+  }
+  if (stallDelay.minutesDelay(STALL_COOL_DOWN_PERIOD)) {  // If cool down period has elapsed
+    if (stall_total > 0) {                                // If stalls have happened
+      stall_total--;                                      // Remove one stall_total every cool-down period
+    }
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   delay(100);  // for stability
   Serial.println("\nuStepper S32 - Test");
   // delay(1000);  // for UI
 
-  mpu.Initialize();                                                // Initialization of MPU
-  mpu.Calibrate();                                                 // Calibration - LED will blink until calibration is done !
-                                                                   // delay(3000);                                                     // for calibration
+  mpu.Initialize();                                                   // Initialization of MPU
+  mpu.Calibrate();                                                    // Calibration - LED will blink until calibration is done !
+                                                                      // delay(3000);                                                     // for calibration
   stepper.setup(NORMAL, 400, 10, 0.2, 0.0, 16, true, false, 100, 1);  //Initialize uStepper S32
   //stepper.setCurrent(100);     // set motor current as percentage not useable unless current jumper placed in I-PWM position
   stepper.setHoldCurrent(STEPPER_HOLD_CURRENT);  // set holding current as percentage
@@ -137,27 +231,8 @@ void setup() {
 }
 
 
-//setBrakeMode(uint8_t mode, float brakeCurrent = 25.0);
 
 
-#define COMMAND_SIZE 64
-//char command[COMMAND_SIZE];
-
-
-float rpm = 0;
-float Hz = 0;
-
-uint32_t last_rotation_mS;
-uint32_t current_rotation_mS;
-
-uint16_t last_encoder_pos = 0;  // used to independently detect stall
-
-bool ping_mode = true;  // temporary flag to keep data output while doing a servo "ping"
-
-bool stall_detected = false;
-uint16_t stallCount = 0;
-
-#define STALL_COUNT_LIMIT 5
 
 void loop() {
   //char cmd;
@@ -169,6 +244,7 @@ void loop() {
     Serial.readBytesUntil(10, command, COMMAND_SIZE);
     Serial.print("\ncmd: ");
     Serial.println(command);
+    Serial.println();
 
 
 
@@ -188,50 +264,19 @@ void loop() {
     } else if (value > 0 || value < 0) {
       Hz = value;
       rpm = get_RPM_from_Hz(Hz);
-      stepper.setRPM(rpm*-1);            // invert movement so clockwise is positive 
+      stepper.setRPM(rpm * -1);  // invert movement so clockwise is positive
     }
   }
 
-  float encode_rpm = stepper.encoder.getRPM();
-  float encode_pos = stepper.encoder.getAngle();
-  uint16_t current_encoder_pos = stepper.encoder.getAngleRaw();
-  if (current_encoder_pos == last_encoder_pos && rpm != 0) {
-    stallCount++;
-    if (stallCount > 1) {
-      Serial.print("Motor Stall Detected No: ");
-      Serial.println(stallCount);
-    }
-    if (stallCount >= STALL_COUNT_LIMIT) {
-      stepper.stop(HARD);
-      stepper.setRPM(0);
-      Hz = 0;
-      rpm = 0;
-      //find_home();   // see if actually required
-      move_home();
-      stallCount = 0;
-    }
-  } else {
-    stallCount = 0;
-  }
-  last_encoder_pos = current_encoder_pos;
 
-  // Independent Timing Check
+  // Function to track stall status
+  check_stall_status();
+
+  // Function to track total stalls per period
+  stall_manager();
 
 
 
-  // Interlocks/safety code
-  // if (stepper.isStalled()) {
-  //   Serial.println("Motor Has Stalled, stopping movement & re-calibrating");
-  //   stepper.stop(HARD);
-  //    delay(2000);
-  //    stepper.clearStall();
-  //    delay(100);
-  //    find_home();
-  //    move_home();
-  //    stepper.setBrakeMode(FREEWHEELBRAKE);
-  //    Hz = 0;
-  //    rpm = 0;
-  // }
 
 
 
@@ -263,23 +308,23 @@ void loop() {
 
       dtostrf(encode_pos, 1, 1, pos_buf);
       // dtostrf(Xacc, 2, 2, accX_buf); //mpu.GetAccX()
-      dtostrf(mpu.GetAccX(), 1, 1, accX_buf);
-      dtostrf(mpu.GetAccY(), 1, 1, accY_buf);
-      dtostrf(mpu.GetAccZ(), 1, 1, accZ_buf);
-      dtostrf(mpu.GetGyroX(), 1, 1, gyroX_buf);
-      dtostrf(mpu.GetGyroY(), 1, 1, gyroY_buf);
-      dtostrf(mpu.GetGyroZ(), 1, 1, gyroZ_buf);
+      dtostrf(mpu.GetAccX(), 2, 2, accX_buf);
+      dtostrf(mpu.GetAccY(), 2, 2, accY_buf);
+      dtostrf(mpu.GetAccZ(), 2, 2, accZ_buf);
+      dtostrf(mpu.GetGyroX(), 2, 2, gyroX_buf);
+      dtostrf(mpu.GetGyroY(), 2, 2, gyroY_buf);
+      dtostrf(mpu.GetGyroZ(), 2, 2, gyroZ_buf);
 
-      Serial.println(accX_buf);
+      // Serial.println(accX_buf);
 
 
-      dtostrf(Hz, 3, 3, hz_buf);
-      dtostrf(rpm, 3, 3, rpm_buf);
+      dtostrf(Hz, 2, 2, hz_buf);
+      dtostrf(rpm, 2, 2, rpm_buf);
 
-      dtostrf(actualHz, 3, 3, a_hz_buf);
-      dtostrf(encode_rpm, 3, 3, a_rpm_buf);
+      dtostrf(actualHz, 2, 2, a_hz_buf);
+      dtostrf(encode_rpm, 2, 2, a_rpm_buf);
 
-      sprintf(printBuffer, "pos: %5s ,set_Hz: %4s, rep_Hz: %4s, set_RPM: %4s, rep_rpm: %4s, acc:%4s,%4s,%4s, gyro:%4s,%4s,%4s ", pos_buf, hz_buf, a_hz_buf, rpm_buf, a_rpm_buf, accX_buf, accY_buf, accZ_buf, gyroX_buf, gyroY_buf, gyroZ_buf);
+      sprintf(printBuffer, "pos: %6s ,set_Hz: %6s, rep_Hz: %6s, set_RPM: %6s, rep_rpm: %6s, acc: %6s, %6s, %6s, gyro: %6s, %6s, %6s ", pos_buf, hz_buf, a_hz_buf, rpm_buf, a_rpm_buf, accX_buf, accY_buf, accZ_buf, gyroX_buf, gyroY_buf, gyroZ_buf);
 #if PRINT_PERIODIC_UPDATES == true
       Serial.println(printBuffer);
 #endif
