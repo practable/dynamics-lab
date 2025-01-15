@@ -17,7 +17,7 @@ autoDelay stallDelay;
 #define HALL_NORMALLY_HIGH true  // define if normally high, triggered by low pulse (true) or normally low triggered by high pulse (false)
 
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
-#define STEPPER_HOLD_CURRENT 10
+#define STEPPER_HOLD_CURRENT 10  // percent
 
 #define COMMAND_SIZE 64
 
@@ -31,7 +31,7 @@ autoDelay stallDelay;
 #define PROTECT_STALL_COUNT_LIMIT 2  // Limit for number of stall events that trigger stall reset behaviour if protection mode has been activated
 
 #define MAX_MOTOR_STEPS_S 800
-#define MAX_MOTOR_ACC_STEPS_S_S 4000
+#define MAX_MOTOR_ACC_STEPS_S_S 800
 
 bool ping_mode = false;  // temporary flag to keep data output while doing a servo "ping"
 
@@ -94,7 +94,7 @@ void find_home() {
 
   int16_t hall_sensor_val;
   bool finding_center = true;
-  low_point = (uint16_t)~0 >> 1;  // set low-pouint to maximum value (could hard code high value but this is more fun)
+  low_point = (uint16_t)~0 >> 1;  // set low-point to maximum value (could hard code high value but this is more fun)
 
   stepper.setMaxVelocity(800);
   stepper.setMaxAcceleration(4000);
@@ -128,10 +128,10 @@ int16_t move_home() {
   uint32_t start_time_mS = millis();
   bool home_found = false;
   int16_t hall_sensor_val;
-  //  Serial.println("Moving Home, please stand by..");
+    Serial.println("Moving Home, please stand by..");
   while (!home_found) {
     hall_sensor_val = analogRead(HALL_SENSOR_PIN);  // measure the hall sensor
-                                                    // Serial.println(hall_sensor_val);
+   Serial.println(hall_sensor_val);
     // timeout clause here to exit loop if home cannot be found (two functions can be written into their own loop with the output of this function as the escape clause)
     if (millis() - start_time_mS >= HOMING_TIMEOUT_S * 1000) {
       Serial.println("move_home() timeout");
@@ -296,10 +296,10 @@ void loop() {
 
 
   // Function to track stall status
-  // check_stall_status();
+   check_stall_status();
 
   // Function to track total stalls per period
-  // stall_manager();
+   stall_manager();
 
 
 
@@ -313,8 +313,8 @@ void loop() {
   // Program Text Output
 
   if (rpm > 0.0 || rpm < 0.0 || ping_mode) {  // If the motor has commanded movement, or ping mode is active
- //   if (printDelay.millisDelay(print_delay_mS)) {
-if (printDelay.secondsDelay(5)) {
+    if (printDelay.millisDelay(print_delay_mS)) {
+//if (printDelay.secondsDelay()) {
       // if (Xacc == 0){
       // float actualRPM = stepper.getDriverRPM();
       float encode_rpm = stepper.encoder.getRPM();
