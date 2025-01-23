@@ -128,10 +128,10 @@ int16_t move_home() {
   uint32_t start_time_mS = millis();
   bool home_found = false;
   int16_t hall_sensor_val;
-    Serial.println("Moving Home, please stand by..");
+  Serial.println("Moving Home, please stand by..");
   while (!home_found) {
     hall_sensor_val = analogRead(HALL_SENSOR_PIN);  // measure the hall sensor
-   Serial.println(hall_sensor_val);
+    Serial.println(hall_sensor_val);
     // timeout clause here to exit loop if home cannot be found (two functions can be written into their own loop with the output of this function as the escape clause)
     if (millis() - start_time_mS >= HOMING_TIMEOUT_S * 1000) {
       Serial.println("move_home() timeout");
@@ -145,7 +145,7 @@ int16_t move_home() {
       home_found = true;
       Serial.print("Home Found, Angle: ");
       Serial.println(stepper.encoder.getAngleRaw());
-      stepper.moveAngle(180);  // this method seems to be under performing by factor of 10!
+      stepper.moveAngle(174);  // this method seems to be under performing by factor of 10!
       while (stepper.getMotorState(POSITION_REACHED)) {
         ;  // wait for motor to reach position
       }
@@ -296,10 +296,10 @@ void loop() {
 
 
   // Function to track stall status
-   check_stall_status();
+  check_stall_status();
 
   // Function to track total stalls per period
-   stall_manager();
+  stall_manager();
 
 
 
@@ -314,7 +314,7 @@ void loop() {
 
   if (rpm > 0.0 || rpm < 0.0 || ping_mode) {  // If the motor has commanded movement, or ping mode is active
     if (printDelay.millisDelay(print_delay_mS)) {
-//if (printDelay.secondsDelay()) {
+      //if (printDelay.secondsDelay()) {
       // if (Xacc == 0){
       // float actualRPM = stepper.getDriverRPM();
       float encode_rpm = stepper.encoder.getRPM();
@@ -357,7 +357,7 @@ void loop() {
       //sprintf(printBuffer, "%6s, %6s, %6s, %6s, %6s, %6s, %6s ", pos_buf, accX_buf, accY_buf, accZ_buf, gyroX_buf, gyroY_buf, gyroZ_buf);
       // sprintf(printBuffer, "%6s, %6s, %6s,", accX_buf, accY_buf, accZ_buf);
 #if PRINT_PERIODIC_UPDATES == true
-        Serial.println(printBuffer);
+      Serial.println(printBuffer);
 #endif
     }
   }

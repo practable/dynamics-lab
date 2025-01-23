@@ -1,24 +1,60 @@
+/*  globals.h
+      Define all user set values, global constants, global vars, included libraries and global objects
+
+      Imogen Heard
+      25/01/2025
+*/
 
 
-
-// Add included external libraries here
-//#include <PCA9685.h>
+// Add included external libraries here (at the top of globals.h)
 #include <Wire.h>
 #include <SPI.h>
-#include <SD.h>
 #include <stdlib.h>
 #include <autoDelay.h>  //https://github.com/PanGalacticTech/autoDelay_library
+#include <UstepperS32.h>
+#include "TinyMPU6050.h"
+
+
+// Program Attributes
+#define EXPERIMENT_NAME         "dynamics-lab"
+#define FIRMWARE_VERSION        "V0.0.0"
+#define DEVELOPER               "Imogen-Heard"
+
+// Hardware Definitions
+#define HALL_SENSOR_PIN         A4
+#define HALL_NORMALLY_HIGH      true  // define if normally high, triggered by low pulse (true) or normally low triggered by high pulse (false)
+
+// User Options & program config
+#define PRINT_RATE_Hz           40
+#define PRINT_PERIODIC_UPDATES  true
+#define ENCODE_RAW_ANGLE_OFFSET 0.0
+#define STEPPER_HOLD_CURRENT    10  // percent
+#define MAX_MOTOR_STEPS_S 800
+#define MAX_MOTOR_ACC_STEPS_S_S 800
+
+
+// Stall Detection Options
+// this is definatly better done as a timer
+// Stall count limit never reaches above 5 as position changes just enough to clear stall warning
+#define STALL_COUNT_LIMIT 5  // Limit for typical number of stall events before triggering stall reset behaviour
+// Variables to track total number of stalls and limit users to a defined number per time period
+#define STALL_OPPORTUNITIES 3      // number of times stall reset behaivour can be triggered before motor is limited
+#define STALL_COOL_DOWN_PERIOD 15  // cool down period to reset the number of triggered stalls
+// When limit is reached, automatic stall guard is implemented by limiting how long the motor can stay in stall condition
+#define PROTECT_STALL_COUNT_LIMIT 2  // Limit for number of stall events that trigger stall reset behaviour if protection mode has been activated
 
 
 
-#define EXPERIMENT_NAME "dynamics-lab"
-#define FIRMWARE_VERSION "V0.0.0"
-#define DEVELOPER "Imogen-Heard"
 
-// User Options & config
-#define DEBUG_STATES false
-#define DEBUG_STATE_MACHINE false
-#define COMMAND_HINTS false
+
+#define COMMAND_SIZE 64  // what command find better description
+
+
+// Debugging Options
+#define DEBUG_STATES            false
+#define DEBUG_STATE_MACHINE     false
+#define COMMAND_HINTS           false
+
 
 
 
@@ -28,94 +64,20 @@
 
 // Create objects
 jsonMessenger jsonRX;  // create a json messenger object to handle commands received over Serial connection
-//File sdFile;           // SD card file object
-autoDelay printDelay;  // Delay object for timing functions
-//PCA9685 bank_A;        // PWM-controller objects
-//PCA9685 bank_B;
+autoDelay printDelay;  // Delay object for printing periodic JSON messages
+
+UstepperS32 stepper;
+MPU6050 mpu;
 
 
-#define JSON_SD_DOC_SIZE 2000
-StaticJsonDocument<JSON_SD_DOC_SIZE> jsonSDdoc;  // takes the JSON saved on the SD card and recalls it into RAM
-
-#define ARRAY_ROW 2
-#define ARRAY_COL 2
-
-//#define COL 5
-//#define ROW 5   // TODO make these the same!
-
-
-const char *pwm_filename = "pwm.txt";
-uint16_t brightness = 0;
-#define MAX_PWM_VAL 255
-#define MIN_OFFSET_VAL -255
-//#define MID_POINT 2048
-
-uint16_t global_speed = 0;
-
-#define BANK_A_ADDRESS 0x7F
-#define BANK_B_ADDRESS 0x7E
-
-#define PWM_FREQUENCY 1500
-                          //{A0, A1, B0, B1}
-const int16_t pwm_pins[4] = {9, 3, 6, 5};  // pins chosen for intercompatability with arduino uno
-#define NUM_PWM_CHANNELS 4
-
-bool calibration_mode = false;   // in calibration mode, no interpolation is done so values can be edited directly
+// Global Variables
+uint32_t print_delay_mS = 1000 / PRINT_RATE_Hz;
 
 
 
-// Define 5x5 array/matrix for storing PWM vals
-// Vertical Axis is A to E
-// Hoz Axis 0 to 4
-// Dont think these ever get used
-#define r_A 0
-#define r_B 1
-#define r_C 2
-#define r_D 3
-#define r_E 4
-
-// Working holding array that stores the current offsets
-int16_t PWM_array[ARRAY_ROW][ARRAY_COL] = {
-  { 0, 0 },
-  { 0, 0 }
-};
-
-uint16_t lower_bound_speed;
-int16_t lower_array[ARRAY_ROW][ARRAY_COL] ={ 
-  { 0, 0 },
-  { 0, 0 }
-};
-
-uint16_t upper_bound_speed;
-int16_t upper_array[ARRAY_ROW][ARRAY_COL] ={ 
-  { 0, 0 },
-  { 0, 0 }
-};
-
-int16_t interpolated_array[ARRAY_ROW][ARRAY_COL] = {
-  { 0, 0 },
-  { 0, 0 }
-};
 
 
-
-const int16_t blank_matrix[ARRAY_ROW][ARRAY_COL] = {
-  { 0, 0 },
-  { 0, 0 }
-};
-
-
-
-char ch_name_array[][2] = {
-  "A",
-  "B",
-  "C",
-  "D",
-  "E"
-};
-
-
-// Add included internal header files here
+// Add included internal header files here (at the bottom of globals.h)
 #include "sdFunctions.h"
 #include "matrixFunctions.h"
 #include "pwmController.h"
