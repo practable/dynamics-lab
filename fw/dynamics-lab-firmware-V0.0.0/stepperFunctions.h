@@ -69,6 +69,7 @@ int16_t step_move_home() {
       return 0;
     }
   }
+}
 
 
 // wraps previous two functions together into a reliable structure
