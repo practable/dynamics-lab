@@ -7,6 +7,9 @@ Imogen Heard
 
 
 */
+#pragma once
+
+#include <ArduinoJson.h>
 
 
 // Define the valid states for the state machine with an enum
@@ -15,19 +18,21 @@ typedef enum {
   STATE_WAIT,
   STATE_STOP,
   STATE_START,
-  STATE_SET_SPEED,
-  STATE_SET_OFFSET,
-  STATE_SET_CAL,
-  STATE_SET_RUN,
-  STATE_SAVE,
-  STATE_DELETE,
-  STATE_PRINT,
-  STATE_GET,
+  STATE_SET_SPEED_HZ,
+  STATE_SET_SPEED_RPM,
+  STATE_HOME,
+  STATE_CALIBRATE,
+  STATE_FREEWHEEL,
+  STATE_BRAKE,
+  STATE_GOTO,
+  STATE_SAMPLERATE,
+  STATE_STARTSTREAM,
+  STATE_STOPSTREAM,
+  STATE_PING,
   STATE_HELP,
-  NUM_STATES
+  NUM_STATES  // Guard value lets us get the total number of states without manually counting
 } StateType;
 
-//int NUM_STATES = 5;  // Not needed
 
 // Then we define two variables to hold the current state enum, and the previous state enum. Holding both these values allows us to compare them as we enter a state,
 // to see if it is the first time we have entered the state.
@@ -44,14 +49,17 @@ char stateNames[][17] = {
   "STATE_WAIT",
   "STATE_STOP",
   "STATE_START",
-  "STATE_SET_SPEED",
-  "STATE_SET_OFFSET",
-  "STATE_SET_CAL",
-  "STATE_SET_RUN",
-  "STATE_SAVE",
-  "STATE_DELETE",
-  "STATE_PRINT",
-  "STATE_GET",
+  "STATE_SET_SPEED_HZ",
+  "STATE_SET_SPEED_RPM",
+  "STATE_HOME",
+  "STATE_CALIBRATE",
+  "STATE_FREEWHEEL",
+  "STATE_BRAKE",
+  "STATE_GOTO",
+  "STATE_SAMPLERATE",
+  "STATE_STARTSTREAM",
+  "STATE_STOPSTREAM",
+  "STATE_PING",
   "STATE_HELP"
 };
 
@@ -61,15 +69,20 @@ void sm_state_init(void);
 void sm_state_wait(void);
 void sm_state_stop(void);
 void sm_state_start(void);
-void sm_state_set_speed(jsonStateData stateData);
-void sm_state_set_offset(jsonStateData stateData);
-void sm_state_set_cal(void);
-void sm_state_set_run(void);
-void sm_state_save(void);
-void sm_state_delete(jsonStateData stateData);
-void sm_state_print(jsonStateData stateData);
-void sm_state_get(jsonStateData stateData);
+void sm_state_set_speed_hz(jsonStateData stateData);
+void sm_state_set_speed_rpm(jsonStateData stateData);
+void sm_state_home(void);
+void sm_state_calibrate(void);
+void sm_state_freewheel(void);
+void sm_state_brake(void);
+void sm_state_goto(jsonStateData stateData);
+void sm_state_samplerate(jsonStateData stateData);
+void sm_state_start_stream(jsonStateData stateData);
+void sm_state_stop_stream(void);
+void sm_state_ping(void);
 void sm_state_help(void);
+
+
 
 
 
@@ -100,20 +113,15 @@ void sm_state_init() {
 
 
 void print_cmds() {
-  Serial.println(F("{\"cmd\":\"Set offset for fan (at current speed)  -> \"}"));
   Serial.println(F("   {\"A0\": -255 to 255}"));
   Serial.println(F("   {\"C3\": -255 to 255}"));
-  Serial.println(F("{\"cmd\":\"Set Global Fan Speed  -> \"}"));
   Serial.println(F("   {\"speed\": 0 to 255}"));
-  Serial.println(F("{\"cmd\":\"Start & Stop Fans  -> \"}"));
   Serial.println(F("   {\"start\":0}"));
   Serial.println(F("   {\"stop\":0}"));
-  Serial.println(F("{\"cmd\":\"Set Operational Modes ->\"}"));
   Serial.println(F("   {\"cal\":\"\"}"));
   Serial.println(F("   {\"run\":\"\"}"));
-  Serial.println(F("{\"cmd\":\"View/Save/Delete Data ->\"}"));
   Serial.println(F("   {\"save\":\"\"}"));      // save current PWM_array to SD card
-  Serial.println(F("   {\"del\":0 to 255}"));  // delete entry for {value} key from SD card
+  Serial.println(F("   {\"del\":0 to 255}"));   // delete entry for {value} key from SD card
   Serial.println(F("   {\"print\":\"all\"}"));  // Print all JSON data on SD card
   Serial.println(F("   {\"print\":\"pwm\"}"));  // Print current PWM_array
   Serial.println(F("   {\"get\": 0 to 255}"));  // get record for {value} key from SD card
@@ -146,8 +154,10 @@ void sm_state_stop(void) {
 #endif
     lastState = smState;
   }
-  set_global_pwm(0);
-  std::cout << "{\"cmd\":\"stop\",\"speed\":\"" << 0 << "\"}" <<std::endl;
+  // stepper.stop(HARD);
+  //  //stepper.setRPM(0);
+  step_rpm = 0;
+  step_hz = 0;
   smState = STATE_WAIT;
 }
 
@@ -160,163 +170,190 @@ void sm_state_start(void) {
 #endif
     lastState = smState;
   }
-  if (calibration_mode) {
-    std::cout << "{\"cmd\":\"start\",\"mode\":\"cal\",\"speed\":\"" << global_speed << "\"}" <<std::endl;
-    update_pwm_with_array(PWM_array);
-  } else {
-    std::cout << "{\"cmd\":\"start\",\"mode\":\"run\",\"speed\":\"" << global_speed <<"\"}" <<std::endl;
-    get_interpolated_matrix(global_speed);
-    update_pwm_with_array(interpolated_array);
-  }
+  //  //stepper.setRPM(step_rpm * -1);  // invert movement so clockwise is positive
   smState = STATE_WAIT;
 }
+
+
+
+
 
 // Set the Global Speed
-void sm_state_set_speed(jsonStateData stateData) {
+void sm_state_set_speed_hz(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
-    Serial.println(F("state: SET_SPEED"));
+    Serial.println(F("state: SET_SPEED_HZ"));
 #endif
     lastState = smState;
   }
-  if (stateData.numeric >= 0 && stateData.numeric <= MAX_PWM_VAL) {
-    global_speed = stateData.numeric;
-    // Here it should make PWM array update with the existing matrix if it exists, or blank matrix
-    // if it does not
-    // this should ONLY affect operation during calibration mode
-    if (calibration_mode) {
-      extract_int_array_from_sd(global_speed, PWM_array);
-      print_2d_named_array(PWM_array, "pwm_array");
-    }
-    std::cout << "{\"set\":\"speed\",\"to\":\"" << global_speed << "\"}" << std::endl;
+  if (stateData.floatData < (-1 * MAX_HZ) || stateData.floatData > MAX_HZ) {  // if value is out of range, reject
+    set_error(false, -10, "Requested Hz value out of bounds", WARNING, "set_speed_hz");
+    print_json_status(true);
   } else {
-    std::cout << "{\"speed\":\"out of range\",\"still set to\":" << global_speed << "}" << std::endl;
+    step_hz = stateData.floatData;
+ //   step_rpm = get_RPM_from_Hz(step_hz);
+    clear_error(-10);
   }
   smState = STATE_WAIT;
 }
 
 
 
-void sm_state_set_offset(jsonStateData stateData) {
+void sm_state_set_speed_rpm(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
-    Serial.println(F("state: SET_OFFSET"));
+    Serial.println(F("state: SET_SPEED_RPM"));
 #endif
     lastState = smState;
   }
-
-  const char* cmd = jsonRX.getCMDkey(stateData.cmdState);  // look up the cstring for the command by using the cmdState enum I feel like the entire point of using ENUMs is being totally lost by doing this, but it is working
-  uint16_t row = int(cmd[0] - 'A');                        // This turns the text passed from JSON into numbers
-  uint16_t col = int(cmd[1] - '0');
-
-  // std::cout << "row: " << row << " col: " << col << " data: " << stateData.numeric << std::endl;
-  // Serial.println("Old Array: ");
-  // print_2d_array(PWM_array);
-  if (!calibration_mode) {
-    Serial.println(F("{\"WARNING\":\"not in calibration mode, no offset applied\"}"));
+  if (stateData.floatData < (-1 * MAX_RPM) || stateData.floatData > MAX_RPM) {  // if value is out of range, reject
+    set_error(false, -10, "Requested RPM value out of bounds", WARNING, "set_speed_rpm");
+    print_json_status(true);
   } else {
-    if (stateData.numeric < MIN_OFFSET_VAL|| stateData.numeric > MAX_PWM_VAL) {
-      Serial.println(F("{\"WARNING\":\"offset out of range\"}"));
-    } else {
-      if (update_2d_array(row, col, stateData.numeric)) {
-        Serial.println(F("{\"success\":\"new offset applied\"}"));
-      }
-    }
-    //Serial.println("New Array: ");
-    print_2d_named_array(PWM_array, "new_array");
-    //open_write_file(PWM_array);
+    step_rpm = stateData.floatData;
+ //   step_hz = get_Hz_from_RPM(step_rpm);
+    clear_error(-10);
   }
   smState = STATE_WAIT;
 }
 
 
 
-void sm_state_set_cal(void) {
+
+
+
+// Send motor to home position
+void sm_state_home(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
-    Serial.println(F("state: SET_CAL"));
+    Serial.println(F("state: HOME"));
 #endif
     lastState = smState;
   }
-  std::cout << "{\"mode\":\"cal\",\"speed\":\"" << global_speed << "\"}" <<std::endl;
-  extract_int_array_from_sd(global_speed, PWM_array);  // get the current matrix for global speed
-  print_2d_named_array(PWM_array, "pwm_array");
-  calibration_mode = true;
+//  step_move_home();
   smState = STATE_WAIT;
 }
 
-void sm_state_set_run(void) {
+void sm_state_calibrate(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
-    Serial.println(F("state: SET_RUN"));
+    Serial.println(F("state: CALIBRATET"));
 #endif
     lastState = smState;
   }
-  calibration_mode = false;
-  std::cout << "{\"mode\":\"run\",\"speed\":\"" << global_speed << "\"}" <<std::endl;
+//  step_find_home();
+ // step_move_home();
   smState = STATE_WAIT;
 }
 
-void sm_state_save(void) {
+
+
+
+
+
+
+
+void sm_state_freewheel(void) {
+  if (lastState != smState) {
+#if DEBUG_STATES == true
+    Serial.println(F("state: FREEWHEEL"));
+#endif
+    lastState = smState;
+  }
+ // stepper.setBrakeMode(FREEWHEELBRAKE);
+  smState = STATE_WAIT;
+}
+
+
+
+void sm_state_brake(void) {
+  if (lastState != smState) {
+#if DEBUG_STATES == true
+    Serial.println(F("state: BRAKE"));
+#endif
+    lastState = smState;
+  }
+//  stepper.setBrakeMode(COOLBRAKE);
+  smState = STATE_WAIT;
+}
+
+
+
+
+
+
+
+
+void sm_state_goto(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
     Serial.println(F("state: SAVE"));
 #endif
     lastState = smState;
   }
-  if (!calibration_mode) {
-    Serial.println(F("{\"WARNING\":\"Not in calibration mode, action blocked\"}"));
-  } else {
-    write_json_to_SD(global_speed, PWM_array);
-    char speedName[8];
-    sprintf(speedName, "%i", global_speed);
-    print_2d_named_array(PWM_array, speedName);
-  }
+//  stepper.moveToAngle(jsonStateData.floatData);
   smState = STATE_WAIT;
 }
 
 
-void sm_state_delete(jsonStateData stateData) {
+
+
+
+void sm_state_ping(void){
   if (lastState != smState) {
 #if DEBUG_STATES == true
     Serial.println(F("state: SAVE"));
 #endif
     lastState = smState;
   }
-  delete_json_entry(stateData.numeric);
-  smState = STATE_WAIT;
-}
-
-
-
-
-void sm_state_print(jsonStateData stateData) {
-  if (lastState != smState) {
-#if DEBUG_STATES == true
-    Serial.println(F("state: PRINT"));
-#endif
-    lastState = smState;
-  }
-  if (strcmp(stateData.msg, "all") == 0) {
-    print_all_memory();
-  } else if (strcmp(stateData.msg, "pwm") == 0) {
-    print_2d_named_array(PWM_array, "pwm_array");
+  if (servo_pos) {
+    servo.goMin();
+    servo_pos = false;
   } else {
-    Serial.println(F("{\"WARNING\":\"unable to parse cmd:{value}\"}"));
+    servo.goMax();
+    servo_pos = true;
   }
-  Serial.println();
+  smState = STATE_WAIT;
+}
+//TODO: Go to stream data snapshot mode?
+
+
+
+
+void sm_state_samplerate(jsonStateData stateData) {
+  if (lastState != smState) {
+#if DEBUG_STATES == true
+    Serial.println(F("state: SAMPLERATE"));
+#endif
+    lastState = smState;
+  }
+
+  smState = STATE_WAIT;
+}
+
+void sm_state_start_stream(jsonStateData stateData) {
+  if (lastState != smState) {
+#if DEBUG_STATES == true
+    Serial.println(F("state: STARTSTREAM"));
+#endif
+    lastState = smState;
+  }
+  streaming_active = true;
+//  streaming_timer_mS = jsonStateData.numeric;
   smState = STATE_WAIT;
 }
 
 
-void sm_state_get(jsonStateData stateData) {
+
+void sm_state_stop_stream(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
-    Serial.println(F("state: GET"));
+    Serial.println(F("state: STOPSTREAM"));
 #endif
     lastState = smState;
   }
-  print_record(stateData.numeric);
+  streaming_active = false;
+  streaming_timer_mS = 0;
   smState = STATE_WAIT;
 }
 
@@ -336,6 +373,7 @@ void sm_state_help(void) {
 
 
 // Finally define the state machine function
+// Automatically generate the switch case from the list of ENUM states and list of functions! -> https://github.com/ImogenWren/switch-case-generator
 void sm_Run(jsonStateData stateData) {
   if (smState < NUM_STATES) {
 #if DEBUG_STATE_MACHINE == true
@@ -358,29 +396,38 @@ void sm_Run(jsonStateData stateData) {
       case STATE_START:
         sm_state_start();
         break;
-      case STATE_SET_SPEED:
-        sm_state_set_speed(stateData);
+      case STATE_SET_SPEED_HZ:
+        sm_state_set_speed_hz(stateData);
         break;
-      case STATE_SET_OFFSET:
-        sm_state_set_offset(stateData);
+      case STATE_SET_SPEED_RPM:
+        sm_state_set_speed_rpm(stateData);
         break;
-      case STATE_SET_CAL:
-        sm_state_set_cal();
+      case STATE_HOME:
+        sm_state_home();
         break;
-      case STATE_SET_RUN:
-        sm_state_set_run();
+      case STATE_CALIBRATE:
+        sm_state_calibrate();
         break;
-      case STATE_SAVE:
-        sm_state_save();
+      case STATE_FREEWHEEL:
+        sm_state_freewheel();
         break;
-      case STATE_DELETE:
-        sm_state_delete(stateData);
+      case STATE_BRAKE:
+        sm_state_brake();
         break;
-      case STATE_PRINT:
-        sm_state_print(stateData);
+      case STATE_GOTO:
+        sm_state_goto(stateData);
         break;
-      case STATE_GET:
-        sm_state_get(stateData);
+      case STATE_SAMPLERATE:
+        sm_state_samplerate(stateData);
+        break;
+      case STATE_STARTSTREAM:
+        sm_state_start_stream(stateData);
+        break;
+      case STATE_STOPSTREAM:
+        sm_state_stop_stream();
+        break;
+      case STATE_PING:
+        sm_state_ping();
         break;
       case STATE_HELP:
         sm_state_help();

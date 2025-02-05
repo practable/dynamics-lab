@@ -15,8 +15,13 @@ Imogen Heard
 #ifndef jsonConfig_h
 #define jsonConfig_h
 
+#ifdef __AVR__
+#include <ArduinoSTL.h>  // [Arduino Library Manager][Modified Version -> https://github.com/ImogenWren/ArduinoSTL]
+#pragma "ArduinoSTL Libary Included"
+#elif defined(STM32)|| defined(ARDUINO_ARCH_STM32)
+#pragma "STM32 STL Library Included in STM Arduino Core"
+#endif
 
-#include <ArduinoSTL.h>  // [Arduino Library Manager]
 #include <map>           // [std::map]
 
 
@@ -175,7 +180,7 @@ struct jsonStateData {
   jsonStates cmdState;  // The command state enum to tell state machine what state to go to next
   dataTypes data_type;  // The type of data being passed along with structure (though state should know what data to expect anyway), this could be removed to save space
   int16_t numeric;      // empty generic data slots for each data type
-  float data;
+  float floatData;
   char msg[JSON_MSG_LENGTH];
   bool cmd_received;  // Flag set true by jsonLoop when cmd is received
 };

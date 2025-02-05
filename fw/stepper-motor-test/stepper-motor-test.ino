@@ -133,7 +133,7 @@ int16_t move_home() {
     hall_sensor_val = analogRead(HALL_SENSOR_PIN);  // measure the hall sensor
     Serial.println(hall_sensor_val);
     // timeout clause here to exit loop if home cannot be found (two functions can be written into their own loop with the output of this function as the escape clause)
-    if (millis() - start_time_mS >= HOMING_TIMEOUT_S * 1000) {
+    if (millis() - start_time_mS >= (HOMING_TIMEOUT_S * 1000)) {
       Serial.println("move_home() timeout");
       /// Serial.println("Moving to Angle 0");
       //stepper.moveToAngle(0);  //

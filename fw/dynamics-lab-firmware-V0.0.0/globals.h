@@ -5,45 +5,54 @@
       25/01/2025
 */
 
+#pragma once
 
 // Add included external libraries here (at the top of globals.h)
 #include <Wire.h>
 #include <SPI.h>
 #include <stdlib.h>
-#include <autoDelay.h>  //https://github.com/PanGalacticTech/autoDelay_library
-#include <UstepperS32.h>
-#include "TinyMPU6050.h"
-
+#include <autoDelay.h>  // https://github.com/PanGalacticTech/autoDelay_library
+//#include <UstepperS32.h>        // Arduino Library Manager (with additional boards manager ) https://raw.githubusercontent.com/uStepper/uStepperHardware/master/package_ustepper_index.json,https://raw.githubusercontent.com/uStepper/uStepperSTM32Hardware/master/package.json
+#include <Stepper.h>
+//#include "TinyMPU6050.h"  // Arduino Library Manager
+#include <Adafruit_MPU6050.h>  // only used instead of tiny MPU
+#include <Adafruit_Sensor.h>   // only used instead of tiny MPU
+#include <NewServo.h>          // Available @ https://github.com/GhassanYusuf/NewServo
 
 // Program Attributes
-#define EXPERIMENT_NAME         "dynamics-lab"
-#define FIRMWARE_VERSION        "V0.0.0"
-#define DEVELOPER               "Imogen-Heard"
+#define EXPERIMENT_NAME "dynamics-lab"
+#define FIRMWARE_VERSION "V0.0.0"
+#define DEVELOPER "Imogen-Heard"
 
 // Hardware Definitions
-#define HALL_SENSOR_PIN         A4
-#define HALL_NORMALLY_HIGH      true  // define if normally high, triggered by low pulse (true) or normally low triggered by high pulse (false)
+#define HALL_SENSOR_PIN A4
+#define HALL_NORMALLY_HIGH true  // define if normally high, triggered by low pulse (true) or normally low triggered by high pulse (false)
 
 // User Options & program config
-#define PRINT_RATE_Hz           40
-#define PRINT_PERIODIC_UPDATES  true
+#define PRINT_RATE_Hz 40
+#define PRINT_PERIODIC_UPDATES true
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
-#define STEPPER_HOLD_CURRENT    10  // percent
+#define STEPPER_HOLD_CURRENT 10  // percent
 #define MAX_MOTOR_STEPS_S 800
 #define MAX_MOTOR_ACC_STEPS_S_S 800
 
+#define HOMING_TIMEOUT_S 10  // homing algorithm exits if home not found within this timeframe
+
+#define MAX_RPM 1200
+#define MAX_HZ 20
+
+// Error System
+#define WARNING_ACTIVE_PERIOD_mS 60000  // 1 min
 
 // Stall Detection Options
 // this is definatly better done as a timer
-// Stall count limit never reaches above 5 as position changes just enough to clear stall warning
-#define STALL_COUNT_LIMIT 5  // Limit for typical number of stall events before triggering stall reset behaviour
-// Variables to track total number of stalls and limit users to a defined number per time period
-#define STALL_OPPORTUNITIES 3      // number of times stall reset behaivour can be triggered before motor is limited
-#define STALL_COOL_DOWN_PERIOD 15  // cool down period to reset the number of triggered stalls
-// When limit is reached, automatic stall guard is implemented by limiting how long the motor can stay in stall condition
-#define PROTECT_STALL_COUNT_LIMIT 2  // Limit for number of stall events that trigger stall reset behaviour if protection mode has been activated
+#define STALL_TIME_LIMIT_mS 2000
 
 
+// Servo Options
+#define SERVO_PPM_PIN 6
+#define SERVO_ZERO_POS 0
+#define SERVO_OPEN_POS 20
 
 
 
@@ -51,9 +60,9 @@
 
 
 // Debugging Options
-#define DEBUG_STATES            false
-#define DEBUG_STATE_MACHINE     false
-#define COMMAND_HINTS           false
+#define DEBUG_STATES true
+#define DEBUG_STATE_MACHINE true
+#define COMMAND_HINTS true
 
 
 
@@ -66,11 +75,30 @@
 jsonMessenger jsonRX;  // create a json messenger object to handle commands received over Serial connection
 autoDelay printDelay;  // Delay object for printing periodic JSON messages
 
-UstepperS32 stepper;
-MPU6050 mpu;
+//UstepperS32 stepper;
+//Stepper stepper(400, 8, 9, 10, 11);
+//MPU6050 mpu;
+//Adafruit_MPU6050 mpu;
+
+NewServo servo(SERVO_PPM_PIN);
+
 
 
 // Global Variables
+// Stepper Vars
+float step_rpm = 0;
+float step_hz = 0;
+
+int16_t hall_low_point;
+int16_t step_low_angle;
+
+// Servo Vars
+bool servo_pos = false;
+
+// Sampling Vars
+bool streaming_active = false;
+uint16_t streaming_timer_mS = 0;
+
 uint32_t print_delay_mS = 1000 / PRINT_RATE_Hz;
 
 
@@ -78,7 +106,7 @@ uint32_t print_delay_mS = 1000 / PRINT_RATE_Hz;
 
 
 // Add included internal header files here (at the bottom of globals.h)
-#include "sdFunctions.h"
-#include "matrixFunctions.h"
-#include "pwmController.h"
+
+#include "errorCodes.h"
 #include "stateConfig.h"
+#include "stepperFunctions.h"

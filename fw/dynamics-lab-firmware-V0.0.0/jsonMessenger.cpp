@@ -17,11 +17,11 @@ void jsonMessenger::jsonBegin() {
 
 void jsonMessenger::printJSON(StaticJsonDocument<JSON_RX_SIZE> *jsonDoc) {
 #if PRETTY_PRINT_JSON == true
-#pragma JSON set to Pretty Print !-May experience problems with Machine Parsing
-  serializeJsonPretty(*jsonDoc, Serial);
+//#pragma JSON set to Pretty Print !-May experience problems with Machine Parsing
+ // serializeJsonPretty(*jsonDoc, Serial);
 #else
-#pragma JSON set to standard JSON output - For human readability try enabling Pretty Print !
-  serializeJson(*jsonDoc, Serial);
+//#pragma JSON set to standard JSON output - For human readability try enabling Pretty Print !
+ // serializeJson(*jsonDoc, Serial);
 #endif
   Serial.print(F("\n"));
 }
@@ -79,7 +79,7 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
           // jsonRX_data.data_type = INTEGER;
         } else if (jsonRX_data.data_type == FLOAT) {
           // dtostrf(jsonRXdoc[jsonCommandKeys[i]], 2, 2, databuffer);
-          jsonRX_data.data = jsonRXdoc[jsonCommandKeys[i]].as<float>();
+          jsonRX_data.floatData = jsonRXdoc[jsonCommandKeys[i]].as<float>();
           // jsonRX_data.data_type = FLOAT;
         } else if (jsonRX_data.data_type == CSTRING) {
           const char *extracted = jsonRXdoc[jsonCommandKeys[i]].as<const char *>();  //
@@ -128,7 +128,7 @@ void jsonMessenger::printJSONdata(jsonStateData *data) {  // Use -> to assess me
   Serial.print(F(" Numeric: "));
   Serial.print(data->numeric);
   Serial.print(F(" Float: "));
-  Serial.print(data->data);
+  Serial.print(data->floatData);
   Serial.print(F(" msg: "));
   Serial.print(data->msg);
   Serial.print(F(" cmd: "));

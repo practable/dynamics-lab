@@ -27,14 +27,17 @@ Imogen Heard
 
 void setup() {
   Serial.begin(115200);
-  std::cout << "\n{\"model\":\"" << EXPERIMENT_NAME  << "\",\"version\":\"" << FIRMWARE_VERSION << "\",\"developed-by\":\"" << DEVELOPER << "\"}" << std::endl;
-  Serial.println();
-  jsonRX.jsonBegin();  // Start the json library to accept commands over serial connection
-  
+  //std::cout << "\n{\"model\":\"" << EXPERIMENT_NAME << "\",\"version\":\"" << FIRMWARE_VERSION << "\",\"developed-by\":\"" << DEVELOPER << "\"}" << std::endl;
+//  Serial.println();
+//  jsonRX.jsonBegin();  // Start the json library to accept commands over serial connection
+//  mpu.Initialise();
+//  mpu.calibrate();
+ // stepper_setup();
 }
 
 
 void loop() {
+//  clear_warning();    // clear JSON (move this to bottom of loop later)
 
   jsonStateData nextState = jsonRX.jsonReadSerialLoop();  // If not using the queue function, then pass data from jsonMessenger object by passing values
 
@@ -48,29 +51,30 @@ void loop() {
     if (nextState.data_type == INTEGER) std::cout << nextState.numeric;
     if (nextState.data_type == CSTRING) std::cout << nextState.msg;
     if (nextState.data_type == EMPTY) std::cout << "n/a";
+    // Is this now missing float clause?
     std::cout << "\"}" << std::endl;
 
     // This is the bit that parses the command recieved by user, and sets the state machine to go to the correct state
     if (nextState.cmdState >= FAN_A0 && nextState.cmdState <= FAN_B1) {  // if fan speed change command received
-      smState = STATE_SET_OFFSET;
+      smState = STATE_SET_SPEED_HZ;
     } else if (nextState.cmdState == SPEED) {
-      smState = STATE_SET_SPEED;
+      smState = STATE_SET_SPEED_HZ;
     } else if (nextState.cmdState == START) {
       smState = STATE_START;
     } else if (nextState.cmdState == STOP) {
       smState = STATE_STOP;
     } else if (nextState.cmdState == CAL) {
-      smState = STATE_SET_CAL;
+      smState = STATE_SET_SPEED_HZ;
     } else if (nextState.cmdState == RUN) {
-      smState = STATE_SET_RUN;
+      smState = STATE_SET_SPEED_HZ;
     } else if (nextState.cmdState == SAVE) {
-      smState = STATE_SAVE;
+      smState = STATE_SET_SPEED_HZ;
     } else if (nextState.cmdState == DEL) {
-      smState = STATE_DELETE;
+      smState = STATE_SET_SPEED_HZ;
     } else if (nextState.cmdState == PRINT) {
-      smState = STATE_PRINT;
+      smState = STATE_SET_SPEED_HZ;
     } else if (nextState.cmdState == GET) {
-      smState = STATE_GET;
+      smState = STATE_SET_SPEED_HZ;
     } else if (nextState.cmdState == HELP) {
       smState = STATE_HELP;
     } else {
