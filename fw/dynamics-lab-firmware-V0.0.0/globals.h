@@ -10,14 +10,13 @@
 // Add included external libraries here (at the top of globals.h)
 #include <Wire.h>
 #include <SPI.h>
+#include <iostream>
 #include <stdlib.h>
 #include <autoDelay.h>  // https://github.com/PanGalacticTech/autoDelay_library
-//#include <UstepperS32.h>        // Arduino Library Manager (with additional boards manager ) https://raw.githubusercontent.com/uStepper/uStepperHardware/master/package_ustepper_index.json,https://raw.githubusercontent.com/uStepper/uStepperSTM32Hardware/master/package.json
-#include <Stepper.h>
-//#include "TinyMPU6050.h"  // Arduino Library Manager
-#include <Adafruit_MPU6050.h>  // only used instead of tiny MPU
-#include <Adafruit_Sensor.h>   // only used instead of tiny MPU
+#include <UstepperS32.h>        // Arduino Library Manager (with additional boards manager ) https://raw.githubusercontent.com/uStepper/uStepperHardware/master/package_ustepper_index.json,https://raw.githubusercontent.com/uStepper/uStepperSTM32Hardware/master/package.json
+#include "TinyMPU6050.h"  // Arduino Library Manager
 #include <NewServo.h>          // Available @ https://github.com/GhassanYusuf/NewServo
+#include "errorRep.h"
 
 // Program Attributes
 #define EXPERIMENT_NAME "dynamics-lab"
@@ -75,14 +74,11 @@
 jsonMessenger jsonRX;  // create a json messenger object to handle commands received over Serial connection
 autoDelay printDelay;  // Delay object for printing periodic JSON messages
 
-//UstepperS32 stepper;
-//Stepper stepper(400, 8, 9, 10, 11);
-//MPU6050 mpu;
-//Adafruit_MPU6050 mpu;
-
+UstepperS32 stepper;
+MPU6050 mpu;
 NewServo servo(SERVO_PPM_PIN);
 
-
+errorRep errors;
 
 // Global Variables
 // Stepper Vars
@@ -107,6 +103,6 @@ uint32_t print_delay_mS = 1000 / PRINT_RATE_Hz;
 
 // Add included internal header files here (at the bottom of globals.h)
 
-#include "errorCodes.h"
-#include "stateConfig.h"
 #include "stepperFunctions.h"
+#include "stateConfig.h"
+

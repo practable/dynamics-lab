@@ -9,8 +9,9 @@ Imogen Heard
 */
 #pragma once
 
-#include <ArduinoJson.h>
 
+#include <ArduinoJson.h>
+#include "globals.h"
 
 // Define the valid states for the state machine with an enum
 typedef enum {
@@ -44,7 +45,7 @@ StateType lastState;
 
 
 // Then define a State Names Array, this will allow us to print the enum above in human readable format
-char stateNames[][17] = {
+char stateNames[][20] = {
   "STATE_INIT",
   "STATE_WAIT",
   "STATE_STOP",
@@ -108,24 +109,29 @@ void sm_state_init() {
   if (lastState != smState) {
     Serial.println("state: init");
   }
+  stepper.stop(HARD);
+  stepper.setRPM(0);
+  step_rpm = 0;
+  step_hz = 0;
   smState = STATE_WAIT;
 }
 
 
+
 void print_cmds() {
-  Serial.println(F("   {\"A0\": -255 to 255}"));
-  Serial.println(F("   {\"C3\": -255 to 255}"));
-  Serial.println(F("   {\"speed\": 0 to 255}"));
   Serial.println(F("   {\"start\":0}"));
   Serial.println(F("   {\"stop\":0}"));
+  Serial.println(F("   {\"hz\": -20 to 20}"));
+  Serial.println(F("   {\"rpm\": -200 to 200}"));
+  Serial.println(F("   {\"home\":\"\"}"));
   Serial.println(F("   {\"cal\":\"\"}"));
-  Serial.println(F("   {\"run\":\"\"}"));
-  Serial.println(F("   {\"save\":\"\"}"));      // save current PWM_array to SD card
-  Serial.println(F("   {\"del\":0 to 255}"));   // delete entry for {value} key from SD card
-  Serial.println(F("   {\"print\":\"all\"}"));  // Print all JSON data on SD card
-  Serial.println(F("   {\"print\":\"pwm\"}"));  // Print current PWM_array
-  Serial.println(F("   {\"get\": 0 to 255}"));  // get record for {value} key from SD card
-  Serial.println(F("   {\"help\":\"\"}"));      // Print commands list
+  Serial.println(F("   {\"free\":\"\"}"));
+  Serial.println(F("   {\"brake\":\"\"}"));         // save current PWM_array to SD card
+  Serial.println(F("   {\"goto\": -360 to 360}"));  // delete entry for {value} key from SD card
+  Serial.println(F("   {\"sample\":\"\"}"));        // Print all JSON data on SD card
+  Serial.println(F("   {\"endst\":\"\"}"));         // Print current PWM_array
+  Serial.println(F("   {\"ping\":\"\"}"));          // get record for {value} key from SD card
+  Serial.println(F("   {\"help\":\"\"}"));          // Print commands list
 }
 
 // State Wait is the default state for this program
@@ -154,8 +160,8 @@ void sm_state_stop(void) {
 #endif
     lastState = smState;
   }
-  // stepper.stop(HARD);
-  //  //stepper.setRPM(0);
+  stepper.stop(HARD);
+  stepper.setRPM(0);
   step_rpm = 0;
   step_hz = 0;
   smState = STATE_WAIT;
@@ -170,7 +176,7 @@ void sm_state_start(void) {
 #endif
     lastState = smState;
   }
-  //  //stepper.setRPM(step_rpm * -1);  // invert movement so clockwise is positive
+  stepper.setRPM(step_rpm * -1);  // invert movement so clockwise is positive
   smState = STATE_WAIT;
 }
 
@@ -187,12 +193,13 @@ void sm_state_set_speed_hz(jsonStateData stateData) {
     lastState = smState;
   }
   if (stateData.floatData < (-1 * MAX_HZ) || stateData.floatData > MAX_HZ) {  // if value is out of range, reject
-    set_error(false, -10, "Requested Hz value out of bounds", WARNING, "set_speed_hz");
-    print_json_status(true);
+    errors.set_error(false, -10, "Requested Hz value out of bounds", errors.WARNING, "set_speed_hz");
+    errors.print_json_status(true);
   } else {
+    Serial.println(stateData.floatData);
     step_hz = stateData.floatData;
- //   step_rpm = get_RPM_from_Hz(step_hz);
-    clear_error(-10);
+    step_rpm = get_RPM_from_Hz(step_hz);
+    errors.clear_error(-10);
   }
   smState = STATE_WAIT;
 }
@@ -207,12 +214,12 @@ void sm_state_set_speed_rpm(jsonStateData stateData) {
     lastState = smState;
   }
   if (stateData.floatData < (-1 * MAX_RPM) || stateData.floatData > MAX_RPM) {  // if value is out of range, reject
-    set_error(false, -10, "Requested RPM value out of bounds", WARNING, "set_speed_rpm");
-    print_json_status(true);
+    errors.set_error(false, -10, "Requested RPM value out of bounds", errors.WARNING, "set_speed_rpm");
+    errors.print_json_status(true);
   } else {
     step_rpm = stateData.floatData;
- //   step_hz = get_Hz_from_RPM(step_rpm);
-    clear_error(-10);
+    step_hz = get_Hz_from_RPM(step_rpm);
+    errors.clear_error(-10);
   }
   smState = STATE_WAIT;
 }
@@ -230,7 +237,7 @@ void sm_state_home(void) {
 #endif
     lastState = smState;
   }
-//  step_move_home();
+  step_move_home();
   smState = STATE_WAIT;
 }
 
@@ -241,8 +248,8 @@ void sm_state_calibrate(void) {
 #endif
     lastState = smState;
   }
-//  step_find_home();
- // step_move_home();
+  step_find_home();
+  step_move_home();
   smState = STATE_WAIT;
 }
 
@@ -260,7 +267,7 @@ void sm_state_freewheel(void) {
 #endif
     lastState = smState;
   }
- // stepper.setBrakeMode(FREEWHEELBRAKE);
+  stepper.setBrakeMode(FREEWHEELBRAKE);
   smState = STATE_WAIT;
 }
 
@@ -273,7 +280,7 @@ void sm_state_brake(void) {
 #endif
     lastState = smState;
   }
-//  stepper.setBrakeMode(COOLBRAKE);
+  stepper.setBrakeMode(COOLBRAKE);
   smState = STATE_WAIT;
 }
 
@@ -287,11 +294,11 @@ void sm_state_brake(void) {
 void sm_state_goto(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
-    Serial.println(F("state: SAVE"));
+    Serial.println(F("state: GOTO"));
 #endif
     lastState = smState;
   }
-//  stepper.moveToAngle(jsonStateData.floatData);
+  stepper.moveToAngle(stateData.numeric);
   smState = STATE_WAIT;
 }
 
@@ -299,7 +306,7 @@ void sm_state_goto(jsonStateData stateData) {
 
 
 
-void sm_state_ping(void){
+void sm_state_ping(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
     Serial.println(F("state: SAVE"));
@@ -339,7 +346,7 @@ void sm_state_start_stream(jsonStateData stateData) {
     lastState = smState;
   }
   streaming_active = true;
-//  streaming_timer_mS = jsonStateData.numeric;
+  //  streaming_timer_mS = jsonStateData.numeric;
   smState = STATE_WAIT;
 }
 
