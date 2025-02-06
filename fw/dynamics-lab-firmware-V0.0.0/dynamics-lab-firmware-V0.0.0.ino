@@ -27,18 +27,24 @@ Imogen Heard
 
 void setup() {
   Serial.begin(115200);
-  std::cout << "\n{\"model\":\"" << EXPERIMENT_NAME << "\",\"version\":\"" << FIRMWARE_VERSION << "\",\"developed-by\":\"" << DEVELOPER << "\"}" << std::endl;
-  Serial.println();
+  //  std::cout << "\n{\"model\":\"" << EXPERIMENT_NAME << "\",\"version\":\"" << FIRMWARE_VERSION << "\",\"developed-by\":\"" << DEVELOPER << "\"}" << std::endl;
+  Serial.print("\n{\"model\":\"");
+  Serial.print(EXPERIMENT_NAME);
+  Serial.print("\",\"version\":\"");
+  Serial.print(FIRMWARE_VERSION);
+  Serial.print("\",\"developed-by\":\"");
+  Serial.print(DEVELOPER);
+  Serial.println("\"}");
   jsonRX.jsonBegin();  // Start the json library to accept commands over serial connection
   mpu.Initialize();
   mpu.Calibrate();
   stepper_setup();
-    servo.begin();
+  servo.begin();
   servo.setInit(0);
   servo.setMin(-90);
   servo.setMax(20);
-   servo.goMin();
-//servo_pos = false;
+  servo.goMin();
+  //servo_pos = false;
 }
 
 
@@ -50,8 +56,7 @@ void loop() {
 
 
   if (nextState.cmd_received) {  // If command is receive
-    Serial.println("Getting here? 3");
-    delay(10);
+    //delay(10);
 
     const char* cmd = jsonRX.getCMDkey(nextState.cmdState);  // I feel like the entire point of using ENUMs is being totally lost by doing this, but it is working
     //std::cout << std::endl;

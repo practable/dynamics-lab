@@ -65,9 +65,9 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
                                                    // First get number of elements in the jsonStates enum numValues = NUM_VALUES;
                                                    // Then loop through all keys & see if root contains key
     for (int i = 0; i < NUM_VALUES; i++) {
-      Serial.print(i);  // loop through all the keys
-      Serial.print("  Checking against key: ");
-      Serial.println(jsonCommandKeys[i]);
+    //  Serial.print(i);  // loop through all the keys
+    //  Serial.print("  Checking against key: ");
+    //  Serial.println(jsonCommandKeys[i]);
 
       if (root.containsKey(jsonCommandKeys[i])) {  // Match is found, i holds the correct ENUM reference for the state
         Serial.print("Root Contains Key, Num: ");
@@ -82,7 +82,7 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
         //   jsonRX_data.data_type = map_item->second;  // the second value contains the dataType enum (trying to cut out some middleman vars that are not doing anything)
 
         // new version using 2D array
-        delay(10);  // needs some delay in here or it falls over?
+       // delay(10);  // needs some delay in here or it falls over?
         Serial.print(F("Extracting dataType: "));
         Serial.print(jsonStateMap[i][1]);
         Serial.print("  typeName: ");
@@ -115,14 +115,11 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
           Serial.println(jsonRX_data.numeric);
 
         } else if (jsonRX_data.data_type == FLOAT) {
-          Serial.println("YES FLOAT");
-          delay(10);
+         // delay(10);
           // jsonRX_data.floatData = jsonRXdoc[jsonCommandKeys[i]].as<float>();   // this line not working and stalling everything
-          jsonRX_data.floatData = root[jsonCommandKeys[i]].as<float>();  // try extracted from root doc instead
-          Serial.println("Getting here? 0");
+          jsonRX_data.floatData = root[jsonCommandKeys[i]].as<float>();  // try extracted from root doc instead        
           Serial.println(jsonRX_data.floatData);
-          Serial.println("Getting here? 1");
-          delay(10);
+         // delay(10);
 
         } else if (jsonRX_data.data_type == CSTRING) {
           const char *extracted = jsonRXdoc[jsonCommandKeys[i]].as<const char *>();
@@ -138,12 +135,12 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
           Serial.println(F("Enque cmd failed"));
         }
 #endif
-        Serial.println("Getting here? return");
+       
         return jsonRX_data;  // return the structure as the data has been extracted
       } else {
         // root did not contain key, but command could be further analysed to see if any other data
         //std::cout << "Key not found in JSON root" << std::endl;
-        Serial.println("Key Not Found In JSON root ");
+     //  Serial.println("Key Not Found In JSON root ");
       }
     }
   }

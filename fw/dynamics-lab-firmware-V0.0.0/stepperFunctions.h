@@ -55,12 +55,22 @@ void step_find_home() {
 // Use the previously found hall effect sensor low reading to return the mass to the center position
 int16_t step_move_home() {
   uint32_t start_time_mS = millis();
+  uint32_t resetable_start = start_time_mS;
+  int16_t wait_time_one = 2000;
   bool home_found = false;
   int16_t hall_sensor_val;
   Serial.println("Moving Home, please stand by..");
   while (!home_found) {
     hall_sensor_val = analogRead(HALL_SENSOR_PIN);  // measure the hall sensor
     Serial.println(hall_sensor_val);
+
+    // Function to start reducing the sensitivity of the homing algorithm after some time
+    if (millis() - resetable_start >= wait_time_one) {
+      hall_low_point++;
+      wait_time_one = wait_time_one-200;  // speed up as time progresses
+      resetable_start = millis();
+    }
+    
     // timeout clause here to exit loop if home cannot be found (two functions can be written into their own loop with the output of this function as the escape clause)
     if (millis() - start_time_mS >= (HOMING_TIMEOUT_S * 1000)) {
       Serial.println("step_move_home() timeout");
