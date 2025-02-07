@@ -27,7 +27,7 @@ Imogen Heard
 
 void setup() {
   Serial.begin(115200);
-  display_mallinfo();
+ // display_mallinfo();
   //  std::cout << "\n{\"model\":\"" << EXPERIMENT_NAME << "\",\"version\":\"" << FIRMWARE_VERSION << "\",\"developed-by\":\"" << DEVELOPER << "\"}" << std::endl;
   Serial.print("\n{\"model\":\"");
   Serial.print(EXPERIMENT_NAME);
@@ -40,14 +40,13 @@ void setup() {
   mpu.Initialize();
   mpu.Calibrate();
   stepper_setup();
-  // servo.begin();
-  // servo.setInit(0);
-  // servo.setMin(-90);
-  //  servo.setMax(20);
-  //  servo.goMin();
-  display_mallinfo();
-  //servo_pos = false;
-  stepper.setRPM(180.0);
+  //  servo.begin();
+  //  servo.setInit(0);
+  //  servo.setMin(-90);
+  //    servo.setMax(20);
+  //   servo.goMin();
+ // display_mallinfo();
+  // servo_pos = false;
 }
 
 
@@ -114,23 +113,23 @@ void loop() {
   }
 
 
-    sm_Run(nextState);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
+  sm_Run(nextState);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
 
-  //mpu.Execute();
+  mpu.Execute();
 
 
-  // if (streaming_active) {
-  // if (sampleDelay.millisDelay(sampleDelay_mS)) {
-  //print the sampled data
-  // update_json();
-  // }
-  //  }
+  if (streaming_active) {
+    if (sampleDelay.millisDelay(sampleDelay_mS)) {
+      //print the sampled data
+      update_json();
+    }
+  }
 
-  // errors.clear_warning();  // clear JSON (move this to bottom of loop later)
-  //  if (printDelay.millisDelay(20000)) {
-  // std::cout << "alive" << std::endl;
-  //Serial.println("Alive and Loop");
-  // display_mallinfo();
-  //  stepper.setRPM(0);
-  //}
+  errors.clear_warning();  // clear JSON (move this to bottom of loop later)
+    //  if (printDelay.millisDelay(20000)) {
+    // std::cout << "alive" << std::endl;
+    //Serial.println("Alive and Loop");
+    // display_mallinfo();
+    //  stepper.setRPM(0);
+    //}
 }

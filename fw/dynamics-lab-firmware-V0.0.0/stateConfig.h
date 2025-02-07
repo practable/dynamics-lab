@@ -160,10 +160,10 @@ void sm_state_stop(void) {
 #endif
     lastState = smState;
   }
-  stepper.stop(HARD);
+ // stepper.stop(HARD);
   stepper.setRPM(0);
-  step_rpm = 0;
-  step_hz = 0;
+ // step_rpm = 0;
+ // step_hz = 0;
   smState = STATE_STOPSTREAM;
 }
 
