@@ -27,6 +27,7 @@ Imogen Heard
 
 void setup() {
   Serial.begin(115200);
+  display_mallinfo();
   //  std::cout << "\n{\"model\":\"" << EXPERIMENT_NAME << "\",\"version\":\"" << FIRMWARE_VERSION << "\",\"developed-by\":\"" << DEVELOPER << "\"}" << std::endl;
   Serial.print("\n{\"model\":\"");
   Serial.print(EXPERIMENT_NAME);
@@ -39,12 +40,14 @@ void setup() {
   mpu.Initialize();
   mpu.Calibrate();
   stepper_setup();
-  servo.begin();
-  servo.setInit(0);
-  servo.setMin(-90);
-  servo.setMax(20);
-  servo.goMin();
+  // servo.begin();
+  // servo.setInit(0);
+  // servo.setMin(-90);
+  //  servo.setMax(20);
+  //  servo.goMin();
+  display_mallinfo();
   //servo_pos = false;
+  stepper.setRPM(180.0);
 }
 
 
@@ -55,8 +58,9 @@ void loop() {
 
 
 
-  if (nextState.cmd_received) {  // If command is receive
-    //delay(10);
+  if (nextState.cmd_received) {  // If command is receive   //delay(10);
+
+
 
     const char* cmd = jsonRX.getCMDkey(nextState.cmdState);  // I feel like the entire point of using ENUMs is being totally lost by doing this, but it is working
     //std::cout << std::endl;
@@ -104,25 +108,29 @@ void loop() {
     } else if (nextState.cmdState == HELP) {
       smState = STATE_HELP;
     } else {
-      std::cout << "{\"WARNING\":\"Unrecognised cmdState\"}" << std::endl;
+      // std::cout << "{\"WARNING\":\"Unrecognised cmdState\"}" << std::endl;
+      Serial.println("{\"WARNING\":\"Unrecognised cmdState\"}");
     }
   }
 
 
-  sm_Run(nextState);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
+    sm_Run(nextState);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
 
   //mpu.Execute();
 
-if (streaming_active){
-  if (sampleDelay.millisDelay(sampleDelay_mS)){
-    //print the sampled data
-   // update_json();
-  }
-}
 
-  errors.clear_warning();  // clear JSON (move this to bottom of loop later)
-  if (printDelay.millisDelay(10000)) {
-    // std::cout << "alive" << std::endl;
-    //Serial.println("Alive and Loop");
-  }
+  // if (streaming_active) {
+  // if (sampleDelay.millisDelay(sampleDelay_mS)) {
+  //print the sampled data
+  // update_json();
+  // }
+  //  }
+
+  // errors.clear_warning();  // clear JSON (move this to bottom of loop later)
+  //  if (printDelay.millisDelay(20000)) {
+  // std::cout << "alive" << std::endl;
+  //Serial.println("Alive and Loop");
+  // display_mallinfo();
+  //  stepper.setRPM(0);
+  //}
 }

@@ -12,12 +12,12 @@
 #include <SPI.h>
 //#include <iostream>
 //#include <stdlib.h>
-#include <autoDelay.h>  // https://github.com/PanGalacticTech/autoDelay_library
-#include <UstepperS32.h>        // Arduino Library Manager (with additional boards manager ) https://raw.githubusercontent.com/uStepper/uStepperHardware/master/package_ustepper_index.json,https://raw.githubusercontent.com/uStepper/uStepperSTM32Hardware/master/package.json
+#include <autoDelay.h>    // https://github.com/PanGalacticTech/autoDelay_library
+#include <UstepperS32.h>  // Arduino Library Manager (with additional boards manager ) https://raw.githubusercontent.com/uStepper/uStepperHardware/master/package_ustepper_index.json,https://raw.githubusercontent.com/uStepper/uStepperSTM32Hardware/master/package.json
 #include "TinyMPU6050.h"  // Arduino Library Manager
-#include <NewServo.h>          // Available @ https://github.com/GhassanYusuf/NewServo
+#include <NewServo.h>     // Available @ https://github.com/GhassanYusuf/NewServo
 #include "errorRep.h"
-#include <ArduinoJson.h>           // installed version 6.21.5 [Arduino Library Manager]
+#include <ArduinoJson.h>  // installed version 6.21.5 [Arduino Library Manager]
 
 // Program Attributes
 #define EXPERIMENT_NAME "dynamics-lab"
@@ -79,7 +79,7 @@ autoDelay printDelay;  // Delay object for printing periodic JSON messages // DE
 
 autoDelay sampleDelay;
 uint16_t sampleRate_Hz = 10;
-uint32_t sampleDelay_mS = 1000/sampleRate_Hz;
+uint32_t sampleDelay_mS = 1000 / sampleRate_Hz;
 
 UstepperS32 stepper;
 MPU6050 mpu;
@@ -88,7 +88,7 @@ NewServo servo(SERVO_PPM_PIN);
 errorRep errors;
 
 #define JSON_BUFFER_SIZE 500
-StaticJsonDocument<JSON_BUFFER_SIZE> jsonTX; 
+StaticJsonDocument<JSON_BUFFER_SIZE> jsonTX;
 
 // Global Variables
 // Stepper Vars
@@ -116,4 +116,4 @@ uint32_t print_delay_mS = 1000 / PRINT_RATE_Hz;
 #include "stepperFunctions.h"
 #include "stateConfig.h"
 #include "jsonReporter.h"
-
+#include "trackRAM_stm.h"

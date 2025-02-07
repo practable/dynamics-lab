@@ -33,16 +33,16 @@ void step_find_home() {
 
 
   while (finding_center) {
-    Serial.print("angle moved: ");
-    Serial.println(stepper.angleMoved());
+   // Serial.print("angle moved: ");
+   // Serial.println(stepper.angleMoved());
     hall_sensor_val = analogRead(HALL_SENSOR_PIN);
     if (hall_sensor_val <= hall_low_point) {
       hall_low_point = hall_sensor_val;
-      Serial.print("New Low Point Recorded: ");
-      Serial.print(hall_low_point);
+      //Serial.print("New Low Point Recorded: ");
+     // Serial.print(hall_low_point);
       step_low_angle = stepper.encoder.getAngleRaw();
-      Serial.print(" angle: ");
-      Serial.println(step_low_angle);
+     // Serial.print(" angle: ");
+      //Serial.println(step_low_angle);
     }
     if (stepper.angleMoved() >= 360 || stepper.angleMoved() <= -360) {
       Serial.println("ending init rotation");
@@ -62,7 +62,7 @@ int16_t step_move_home() {
   Serial.println("Moving Home, please stand by..");
   while (!home_found) {
     hall_sensor_val = analogRead(HALL_SENSOR_PIN);  // measure the hall sensor
-    Serial.println(hall_sensor_val);
+    //Serial.println(hall_sensor_val);
 
     // Function to start reducing the sensitivity of the homing algorithm after some time
     if (millis() - resetable_start >= wait_time_one) {
