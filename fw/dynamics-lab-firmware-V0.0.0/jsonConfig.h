@@ -19,7 +19,6 @@ Imogen Heard
 #include <ArduinoSTL.h>  // [Arduino Library Manager][Modified Version -> https://github.com/ImogenWren/ArduinoSTL]
 #pragma "ArduinoSTL Libary Included"
 #elif defined(STM32) || defined(ARDUINO_ARCH_STM32)
-
 #pragma "STM32 Board -> Using Arrays Instead of std::stl"
 #endif
 
@@ -103,7 +102,7 @@ const uint16_t jsonStateMap[NUM_VALUES][2] = {
   { jsonStates::BRAKE, dataTypes::EMPTY },
   { jsonStates::GOTO, dataTypes::INTEGER },
   { jsonStates::SAMPLERATE, dataTypes::INTEGER },
-  { jsonStates::STARTSTREAM, dataTypes::INTEGER },
+  { jsonStates::STARTSTREAM, dataTypes::EMPTY },
   { jsonStates::STOPSTREAM, dataTypes::EMPTY },
   { jsonStates::PING, dataTypes::EMPTY },
   { jsonStates::HELP, dataTypes::EMPTY }

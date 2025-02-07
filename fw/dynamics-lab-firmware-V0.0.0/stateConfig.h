@@ -164,7 +164,7 @@ void sm_state_stop(void) {
   stepper.setRPM(0);
   step_rpm = 0;
   step_hz = 0;
-  smState = STATE_WAIT;
+  smState = STATE_STOPSTREAM;
 }
 
 
@@ -176,7 +176,14 @@ void sm_state_start(void) {
 #endif
     lastState = smState;
   }
+  Serial.print("STARTING MOTOR, RPM: ");
+  Serial.println(step_rpm);
+  delay(200);
   stepper.setRPM(step_rpm * -1);  // invert movement so clockwise is positive
+  Serial.println("MOTOR STARTED?");
+  //stepper.runContinous(true);
+  delay(200);
+  //smState = STATE_STARTSTREAM;
   smState = STATE_WAIT;
 }
 
@@ -244,7 +251,7 @@ void sm_state_home(void) {
 void sm_state_calibrate(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
-    Serial.println(F("state: CALIBRATET"));
+    Serial.println(F("state: CALIBRATE"));
 #endif
     lastState = smState;
   }
@@ -334,11 +341,12 @@ void sm_state_samplerate(jsonStateData stateData) {
 #endif
     lastState = smState;
   }
-
+  sampleRate_Hz = stateData.numeric;
+  sampleDelay_mS = 1000 / sampleRate_Hz;
   smState = STATE_WAIT;
 }
 
-void sm_state_start_stream(jsonStateData stateData) {
+void sm_state_start_stream() {
   if (lastState != smState) {
 #if DEBUG_STATES == true
     Serial.println(F("state: STARTSTREAM"));
@@ -360,7 +368,7 @@ void sm_state_stop_stream(void) {
     lastState = smState;
   }
   streaming_active = false;
-  streaming_timer_mS = 0;
+  // streaming_timer_mS = 0;
   smState = STATE_WAIT;
 }
 
@@ -428,7 +436,7 @@ void sm_Run(jsonStateData stateData) {
         sm_state_samplerate(stateData);
         break;
       case STATE_STARTSTREAM:
-        sm_state_start_stream(stateData);
+        sm_state_start_stream();
         break;
       case STATE_STOPSTREAM:
         sm_state_stop_stream();

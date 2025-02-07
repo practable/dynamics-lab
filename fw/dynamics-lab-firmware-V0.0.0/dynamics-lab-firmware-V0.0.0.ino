@@ -111,6 +111,14 @@ void loop() {
 
   sm_Run(nextState);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
 
+  //mpu.Execute();
+
+if (streaming_active){
+  if (sampleDelay.millisDelay(sampleDelay_mS)){
+    //print the sampled data
+   // update_json();
+  }
+}
 
   errors.clear_warning();  // clear JSON (move this to bottom of loop later)
   if (printDelay.millisDelay(10000)) {
