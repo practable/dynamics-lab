@@ -80,6 +80,8 @@ typedef enum {
   SAMPLERATE,
   STARTSTREAM,
   STOPSTREAM,
+  SNAPSHOT,
+  SNAPTIME,
   PING,
   HELP,
   NUM_VALUES  // Add sentinal NUM_VALUES to count number of elements
@@ -104,6 +106,8 @@ const uint16_t jsonStateMap[NUM_VALUES][2] = {
   { jsonStates::SAMPLERATE, dataTypes::INTEGER },
   { jsonStates::STARTSTREAM, dataTypes::EMPTY },
   { jsonStates::STOPSTREAM, dataTypes::EMPTY },
+  { jsonStates::SNAPSHOT, dataTypes::EMPTY },
+  { jsonStates::SNAPTIME, dataTypes::INTEGER },
   { jsonStates::PING, dataTypes::EMPTY },
   { jsonStates::HELP, dataTypes::EMPTY }
 };
@@ -126,6 +130,8 @@ static char jsonCommandKeys[][7] = {
   "sample",
   "stream",
   "endst",
+  "snap",
+  "time",
   "ping",
   "help"
 };

@@ -29,6 +29,8 @@ typedef enum {
   STATE_SAMPLERATE,
   STATE_STARTSTREAM,
   STATE_STOPSTREAM,
+  STATE_SNAPSHOT,
+  STATE_SNAPTIME,
   STATE_PING,
   STATE_HELP,
   NUM_STATES  // Guard value lets us get the total number of states without manually counting
@@ -60,6 +62,8 @@ char stateNames[][20] = {
   "STATE_SAMPLERATE",
   "STATE_STARTSTREAM",
   "STATE_STOPSTREAM",
+  "STATE_SNAPSHOT",
+  "STATE_SNAPTIME",
   "STATE_PING",
   "STATE_HELP"
 };
@@ -80,6 +84,8 @@ void sm_state_goto(jsonStateData stateData);
 void sm_state_samplerate(jsonStateData stateData);
 void sm_state_start_stream(jsonStateData stateData);
 void sm_state_stop_stream(void);
+void sm_state_snapshot(void);
+void sm_state_snaptime(jsonStateData stateData);
 void sm_state_ping(void);
 void sm_state_help(void);
 
@@ -130,7 +136,9 @@ void print_cmds() {
   Serial.println(F("   {\"goto\": -360 to 360}"));  // delete entry for {value} key from SD card
   Serial.println(F("   {\"sample\":\"\"}"));        // Print all JSON data on SD card
   Serial.println(F("   {\"endst\":\"\"}"));         // Print current PWM_array
-  Serial.println(F("   {\"ping\":\"\"}"));          // get record for {value} key from SD card
+  Serial.println(F("   {\"snap\":\"\"}"));          // Take a Snapshot of data
+  Serial.println(F("   {\"time\": 0 - 100000 }"));  // Change the time over which the data snapshot is taken
+  Serial.println(F("   {\"ping\":\"\"}"));          // Ping the wobble-shaft with the servo
   Serial.println(F("   {\"help\":\"\"}"));          // Print commands list
 }
 
@@ -160,10 +168,10 @@ void sm_state_stop(void) {
 #endif
     lastState = smState;
   }
- // stepper.stop(HARD);
+  // stepper.stop(HARD);
   stepper.setRPM(0);
- // step_rpm = 0;
- // step_hz = 0;
+  // step_rpm = 0;
+  // step_hz = 0;
   smState = STATE_STOPSTREAM;
 }
 
@@ -183,8 +191,8 @@ void sm_state_start(void) {
   Serial.println("MOTOR STARTED?");
   //stepper.runContinous(true);
   delay(200);
-  //smState = STATE_STARTSTREAM;
-  smState = STATE_WAIT;
+  smState = STATE_STARTSTREAM;
+  //smState = STATE_WAIT;
 }
 
 
@@ -313,23 +321,7 @@ void sm_state_goto(jsonStateData stateData) {
 
 
 
-void sm_state_ping(void) {
-  if (lastState != smState) {
-#if DEBUG_STATES == true
-    Serial.println(F("state: SAVE"));
-#endif
-    lastState = smState;
-  }
-  if (servo_pos) {
-    servo.goMin();
-    servo_pos = false;
-  } else {
-    servo.goMax();
-    servo_pos = true;
-  }
-  smState = STATE_WAIT;
-}
-//TODO: Go to stream data snapshot mode?
+
 
 
 
@@ -354,7 +346,7 @@ void sm_state_start_stream() {
     lastState = smState;
   }
   streaming_active = true;
-  //  streaming_timer_mS = jsonStateData.numeric;
+  //  snapshot_timer_mS = jsonStateData.numeric;
   smState = STATE_WAIT;
 }
 
@@ -368,9 +360,55 @@ void sm_state_stop_stream(void) {
     lastState = smState;
   }
   streaming_active = false;
-  // streaming_timer_mS = 0;
+  // snapshot_timer_mS = 0;
   smState = STATE_WAIT;
 }
+
+void sm_state_snapshot() {
+  if (lastState != smState) {
+#if DEBUG_STATES == true
+    Serial.println(F("state: SNAPSHOT"));
+#endif
+    lastState = smState;
+  }
+  snapshop_active = true;
+  snapshot_starttime_mS = millis();
+  smState = STATE_WAIT;
+}
+
+void sm_state_snaptime(jsonStateData stateData) {
+  if (lastState != smState) {
+#if DEBUG_STATES == true
+    Serial.println(F("state: SNAPTIME"));
+#endif
+    lastState = smState;
+  }
+  snapshot_timer_mS = stateData.numeric;
+  smState = STATE_WAIT;
+}
+
+
+void sm_state_ping(void) {
+  if (lastState != smState) {
+#if DEBUG_STATES == true
+    Serial.println(F("state: SAVE"));
+#endif
+    lastState = smState;
+  }
+  if (servo_pos) {
+    // servo.goMin();  // this library causing issues!
+   // servo.writeMicroseconds(MIN_PULSE_WIDTH);
+   Serial.println("MOVING SERVO to MINIMUM...cant find a bloody library to do this yet");
+    servo_pos = false;
+  } else {
+    Serial.println("MOVING SERVO to MAXIMUM...cant find a bloody library to do this yet");
+    // servo.goMax();
+ //  servo.writeMicroseconds(MAX_PULSE_WIDTH);
+    servo_pos = true;
+  }
+  smState = STATE_SNAPSHOT;
+}
+//TODO: Go to stream data snapshot mode?
 
 
 void sm_state_help(void) {
@@ -446,6 +484,12 @@ void sm_Run(jsonStateData stateData) {
         break;
       case STATE_HELP:
         sm_state_help();
+        break;
+      case STATE_SNAPSHOT:
+        sm_state_snapshot();
+        break;
+      case STATE_SNAPTIME:
+        sm_state_snaptime(stateData);
         break;
       default:
         sm_state_stop();

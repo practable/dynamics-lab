@@ -15,7 +15,8 @@
 #include <autoDelay.h>    // https://github.com/PanGalacticTech/autoDelay_library
 #include <UstepperS32.h>  // Arduino Library Manager (with additional boards manager ) https://raw.githubusercontent.com/uStepper/uStepperHardware/master/package_ustepper_index.json,https://raw.githubusercontent.com/uStepper/uStepperSTM32Hardware/master/package.json
 #include "TinyMPU6050.h"  // Arduino Library Manager
-#include <NewServo.h>     // Available @ https://github.com/GhassanYusuf/NewServo
+//#include <NewServo.h>     // Available @ https://github.com/GhassanYusuf/NewServo // NOTE ERRORS POSSIBLY CAUSED BY THIS LIBRARY
+//#include <Servo.h>  // [Arduino Library Manager]
 #include "errorRep.h"
 #include <ArduinoJson.h>  // installed version 6.21.5 [Arduino Library Manager]
 
@@ -83,12 +84,15 @@ uint32_t sampleDelay_mS = 1000 / sampleRate_Hz;
 
 UstepperS32 stepper;
 MPU6050 mpu;
-NewServo servo(SERVO_PPM_PIN);
+//NewServo servo(SERVO_PPM_PIN);
+//Servo servo;
 
 errorRep errors;
 
 #define JSON_BUFFER_SIZE 500
 StaticJsonDocument<JSON_BUFFER_SIZE> jsonTX;
+
+
 
 // Global Variables
 // Stepper Vars
@@ -103,7 +107,9 @@ bool servo_pos = false;
 
 // Sampling Vars
 bool streaming_active = false;
-uint16_t streaming_timer_mS = 0;
+bool snapshop_active = false;
+uint16_t snapshot_timer_mS = 3000;
+uint32_t snapshot_starttime_mS;
 
 uint32_t print_delay_mS = 1000 / PRINT_RATE_Hz;
 
