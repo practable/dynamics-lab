@@ -40,12 +40,8 @@ void setup() {
   mpu.Initialize();
   mpu.Calibrate();
   stepper_setup();
- // servo.attach(SERVO_PPM_PIN, 544); // default width is hopefully at one end of travel  
-  //  servo.begin();
-  //  servo.setInit(0);
-  //  servo.setMin(-90);
-  //    servo.setMax(20);
-  //   servo.goMin();
+  servo.attach(SERVO_PPM_PIN, 800); // default width is hopefully at one end of travel  
+
   // display_mallinfo();
   servo_pos = false;
 }

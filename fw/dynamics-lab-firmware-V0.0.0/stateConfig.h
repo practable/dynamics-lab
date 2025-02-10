@@ -125,21 +125,22 @@ void sm_state_init() {
 
 
 void print_cmds() {
-  Serial.println(F("   {\"start\":0}"));
-  Serial.println(F("   {\"stop\":0}"));
-  Serial.println(F("   {\"hz\": -20 to 20}"));
-  Serial.println(F("   {\"rpm\": -200 to 200}"));
-  Serial.println(F("   {\"home\":\"\"}"));
-  Serial.println(F("   {\"cal\":\"\"}"));
-  Serial.println(F("   {\"free\":\"\"}"));
-  Serial.println(F("   {\"brake\":\"\"}"));         // save current PWM_array to SD card
-  Serial.println(F("   {\"goto\": -360 to 360}"));  // delete entry for {value} key from SD card
-  Serial.println(F("   {\"sample\":\"\"}"));        // Print all JSON data on SD card
-  Serial.println(F("   {\"endst\":\"\"}"));         // Print current PWM_array
-  Serial.println(F("   {\"snap\":\"\"}"));          // Take a Snapshot of data
-  Serial.println(F("   {\"time\": 0 - 100000 }"));  // Change the time over which the data snapshot is taken
-  Serial.println(F("   {\"ping\":\"\"}"));          // Ping the wobble-shaft with the servo
-  Serial.println(F("   {\"help\":\"\"}"));          // Print commands list
+  Serial.println(F("   {\"start\":0}          -> Start/Update Motor Speed"));
+  Serial.println(F("   {\"stop\":0}           -> Stop Motor              "));
+  Serial.println(F("   {\"hz\": -20 to 20}    -> Set Motor Speed in Hz   "));
+  Serial.println(F("   {\"rpm\": -200 to 200} -> Set Motor Speed in RPM  "));
+  Serial.println(F("   {\"home\":\"\"}        -> Move Motor to home pos (test) "));
+  Serial.println(F("   {\"cal\":\"\"}         -> Run Calibration to home motor "));
+  Serial.println(F("   {\"free\":\"\"}        -> Set freewheel brake mode (test)"));
+  Serial.println(F("   {\"brake\":\"\"}       -> Set coolbrake brake mode (test)"));
+  Serial.println(F("   {\"goto\": -360 to 360}-> Goto Angle (test)              "));
+  Serial.println(F("   {\"sample\": 1 to 40}  -> Set Samplerate in Hz         "));
+  Serial.println(F("   {\"stream\":\"\"}      -> Start Data Streaming    "));
+  Serial.println(F("   {\"endst\":\"\"}       -> End Data Streaming      "));
+  Serial.println(F("   {\"snap\":\"\"}        -> Take Data Snapshot       "));             // Take a Snapshot of data
+  Serial.println(F("   {\"time\": 1 - 250000 }-> Set Time for Data Snapshot (mS)  "));     // Change the time over which the data snapshot is taken
+  Serial.println(F("   {\"ping\":\"\"}        -> Ping Servo               "));             // Ping the wobble-shaft with the servo
+  Serial.println(F("   {\"help\":\"\"}        -> Print Commands to Serial Monitor    "));  // Print commands list
 }
 
 // State Wait is the default state for this program
@@ -184,13 +185,8 @@ void sm_state_start(void) {
 #endif
     lastState = smState;
   }
-  Serial.print("STARTING MOTOR, RPM: ");
-  Serial.println(step_rpm);
-  delay(200);
   stepper.setRPM(step_rpm * -1);  // invert movement so clockwise is positive
-  Serial.println("MOTOR STARTED?");
   //stepper.runContinous(true);
-  delay(200);
   smState = STATE_STARTSTREAM;
   //smState = STATE_WAIT;
 }
@@ -256,6 +252,8 @@ void sm_state_home(void) {
   smState = STATE_WAIT;
 }
 
+
+
 void sm_state_calibrate(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -313,6 +311,7 @@ void sm_state_goto(jsonStateData stateData) {
 #endif
     lastState = smState;
   }
+  stepper.stop();
   stepper.moveToAngle(stateData.numeric);
   smState = STATE_WAIT;
 }
@@ -333,8 +332,13 @@ void sm_state_samplerate(jsonStateData stateData) {
 #endif
     lastState = smState;
   }
-  sampleRate_Hz = stateData.numeric;
-  sampleDelay_mS = 1000 / sampleRate_Hz;
+  if (stateData.numeric < 1 || stateData.numeric > 40) {
+    errors.set_error(false, -10, "Out of Bounds Sample Rate Commanded", errors.WARNING, "state-samplerate");
+    errors.print_json_status();
+  } else {
+    sampleRate_Hz = stateData.numeric;
+    sampleDelay_mS = 1000 / sampleRate_Hz;
+  }
   smState = STATE_WAIT;
 }
 
@@ -383,7 +387,12 @@ void sm_state_snaptime(jsonStateData stateData) {
 #endif
     lastState = smState;
   }
-  snapshot_timer_mS = stateData.numeric;
+  if (stateData.numeric < 1 || stateData.numeric > 250000) {
+    errors.set_error(false, -10, "Out of Bounds Snapshot Time Commanded", errors.WARNING, "state-snaptime");
+    errors.print_json_status();
+  } else {
+    snapshot_timer_mS = stateData.numeric;
+  }
   smState = STATE_WAIT;
 }
 
@@ -396,14 +405,10 @@ void sm_state_ping(void) {
     lastState = smState;
   }
   if (servo_pos) {
-    // servo.goMin();  // this library causing issues!
-   // servo.writeMicroseconds(MIN_PULSE_WIDTH);
-   Serial.println("MOVING SERVO to MINIMUM...cant find a bloody library to do this yet");
+    servo.writeMicroseconds(SERVO_ZERO_uS);
     servo_pos = false;
   } else {
-    Serial.println("MOVING SERVO to MAXIMUM...cant find a bloody library to do this yet");
-    // servo.goMax();
- //  servo.writeMicroseconds(MAX_PULSE_WIDTH);
+    servo.writeMicroseconds(SERVO_OPEN_uS);
     servo_pos = true;
   }
   smState = STATE_SNAPSHOT;
