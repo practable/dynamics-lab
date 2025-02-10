@@ -1,4 +1,5 @@
 /* jsonMessenger.h
+
 _Library to simplify two way communication over Serial interfaces using JSON formatted messages_
 
 Imogen Heard
@@ -8,7 +9,7 @@ Please see: https://github.com/ImogenWren/jsonMessenger_library for latest versi
 NOTE: This library is memory intensive and may not be suitable for lightweight microcontrollers (uno, nano, AtTiny etc)
 
 Version V1.0.0
-- Focus on receiving & parsing incoming Serial messages in JSON format
+- Focus on receiving & parsing incoming Serial CMD messages in JSON format
 
 
 

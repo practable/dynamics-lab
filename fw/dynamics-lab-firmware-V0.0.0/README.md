@@ -1,75 +1,10 @@
-# Dandidrone 5x5 Fan Matrix PWM Controller
-_Program for controlling a 5x5 grid of PC-type fans with external PWM Controller._
-
-This program uses the following libraries:
-_Libraries must be called in the order shown, as the state machine library uses variables set by the jsonMessenger library._
-- jsonMessenger_library -> Library for easy configuration of a JSON based Serial messaging system for Arduino
-- stateMachine_library -> Library for configuration of a state machine to control program following
-
-Please find abridged versions of these librarys README files at the bottom of this document
-
-# Interpolation functions
-_Description of the basic operation of this program_
-
-
-_The firmware always boots up in RUN_MODE_
-#### Calibration Mode
-0. Set calibration mode. This prevents interpolation and instead uses raw data if exists, or blank matrix if does not exist.
-1. Set global speed 
-2. Set calibration matrix for that global speed.
-3. "Save State" to write matrix to SD card for current global speed 
-
-#### Run Mode (default)
-4. Set run mode.
-5. Set global speed
-6. Interpolation function looks for matching key for global speed, else interpolates between upper and lower values
-7. Speed is set using modifyers in the interpolated matrix
-
-## JSON SD Card Datastore
-_To store the increased complexity of data on the SD card, it will now be JSON formatted for easy human & machine readability. Example of formatting below_
-
-```
-//JSON document
-{
-	"0": [
-		"0,0,0,0,0",
-		"0,0,0,0,0",
-		"0,0,0,0,0",
-		"0,0,0,0,0",
-		"0,0,0,0,0"
-	],
-	"400": [
-		"-3,4,-5,6,-7",
-		"8,-9,10,-11,12",
-		"-13,14,-15,16,-17",
-		"18,20,-20,10,0",
-		"0,1,5,0,5"
-	],  //etc
-}
-
+# dynamics-lab-firmware
+_Control a stepper motor and servo via JSON formatted command set. Gather data from position encoder and accellerometer mpu
 ```
 ## Commands list
 _List of basic commands in JSON format. This list is printed out on entry to STATE_WAIT_
 
 ```
-Set offset for fan (at current speed)  -> 
-   {"A0": -4096 to 4095}   // Set offset for fan A0 (at current global speed)
-   {"C3": -4096 to 4095}   // Set offset for fan C3 (at current global speed)
-Set Global Fan Speed  -> 
-   {"speed": 0 to 4095}    // set global speed (warning, in calibration mode will delete current offsets)
-Start & Stop Fans  -> 
-   {"start":0}             // Starts fans, uses interpolated matrix when in RUN_MODE, exact match matrix or blank matrix in CALIBRATION_MODE
-   {"stop":0}               // Sets all fan PWMs to 0 (fans may or may not continue to operate with PWM set to 0)
-Set Operational Modes ->
-   {"cal":""}              // Set calibration mode
-   {"run":""}              // Set run mode
-View/Save/Delete Data ->
-   {"save":""}             // Save the current offset matrix for the current global speed to SD card
-   {"del":0 to 4095}       // Delete SD card entry for this key value. No error if key does not exist
-   {"print":"all"}         // Print all saved data from SD card
-   {"print":"pwm"}         // Print current PWM_array offset (only useful in calibration mode)
-   {"get":0 to 4095}       // Get saved data for {value} key from SD Card
-   {"help":""}             // Print this list of commands to the serial monitor
 
 
 ```
