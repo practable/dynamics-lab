@@ -16,7 +16,7 @@ jsonMessenger::jsonMessenger() {
 
 void jsonMessenger::jsonBegin() {
   Serial.begin(115200);
-  Serial.println(F("{\"json\":\"messenger\", \"version\":\"V0.2.0\"}"));
+  Serial.println(F("{\"json\":\"messenger\",\"version\":\"V0.2.0\"}"));
 }
 
 
@@ -51,7 +51,7 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 
     Serial.print(F("{\"rxed\": \""));
     Serial.print(command);
-    Serial.println("\"}");
+    Serial.println(F("\"}"));
 
     //Serial.read();  // clear any additional data left in the buffer
 
@@ -59,8 +59,9 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
     // deserializeJson(jsonRXdoc, Serial);  // less overhead but harder to debug
     DeserializationError error = deserializeJson(jsonRXdoc, command);  // more overhead but can print message before processing (good for debugging)
 
-    Serial.print("deserializeJson() returned ");
-    Serial.println(error.c_str());
+    Serial.print("{\"deserialization\":\"");
+    Serial.print(error.c_str());
+    Serial.println(F("\"}"));
 
     JsonObject root = jsonRXdoc.as<JsonObject>();  // this was previously doc.to<JsonObject>(); DID NOT WORK! does now with "as"
                                                    // Now to parse the JSON message

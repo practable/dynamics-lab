@@ -1,8 +1,28 @@
 /*  jsonConfig.h
 
-This header should be used with the jsonMessenger library to define all the working states & commands that can be decoded by the jsonMessenger system
+This header should be used with the jsonMessenger library to define all the working states & commands that can be decoded by the jsonMessenger system.
 
-Please see: https://github.com/ImogenWren/jsonMessenger_library for latest version and usage instructions
+This library is designed to parse commands recieved via the Serial object in Arduino. Commands should be formatted in CMD:VALUE pairs as follows:
+
+Version 1 -> succinct command structure
+`{"CMD":"VALUE"}` -> for CMDs with passed values
+or
+`{"CMD":} -> for CMDs with no additional values
+note: in the 2nd example, any data entered after : will be ignored, as we have already defined the datatypes that will be passed with each command to the parser
+
+Version 2 -> Verbose command structure
+`{"set":"CMD","to":"VALUE"} -> for CMDs with passed values
+or
+`{"set":"CMD"} -> for CMDs with no additional data.
+
+As the libary works via parsing JSON structures, any additional key:value pairs will simply be ignored, as long as the overal JSON structure is validated, the parser will just look
+for the existance of matching keys, and ignore anything else.
+
+
+Please see: https://github.com/ImogenWren/jsonMessenger_library for latest version and usage instructions, or follow the numbered comments for an
+explanation of how to modify this template for other uses. 
+
+All modifications should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp!
 
 Imogen Heard
 21/10/2024
@@ -15,6 +35,10 @@ Imogen Heard
 #ifndef jsonConfig_h
 #define jsonConfig_h
 
+
+
+// As alternative to <map> data structure has been developed, this is all depreciated
+/*
 #ifdef __AVR__
 #include <ArduinoSTL.h>  // [Arduino Library Manager][Modified Version -> https://github.com/ImogenWren/ArduinoSTL]
 #pragma "ArduinoSTL Libary Included"
@@ -22,7 +46,9 @@ Imogen Heard
 #pragma "STM32 Board -> Using Arrays Instead of std::stl"
 #endif
 
-#include <map>  // [std::map]
+//#include <map>  // [std::map]
+*/
+
 
 
 #define JSON_USE_QUEUE false        //At least one of these should be true
@@ -32,7 +58,9 @@ Imogen Heard
 #define CMD_QUEUE_LENGTH 3  // 3 Working on Arduino Nano
 #define JSON_MSG_LENGTH 8   // Length of msg array in json data structure
 
-// Define an enum to define variable types, These will be linked to a state enum so when a keyword is received, we can look up what data type should be sent with it
+
+// 1. Define an enum to define variable type used, These will be linked to a state enum so when a keyword is received, we can look up what data type should be sent with it
+
 typedef enum {  // enum to pass variable types between functions
   EMPTY,
   INTEGER,
@@ -41,9 +69,11 @@ typedef enum {  // enum to pass variable types between functions
   BOOL
 } dataTypes;
 
+// 1b. Place these enums into an array to enable lookup by index (This shouldnt be nessissary but it fixed a bug at one point)
 const dataTypes dataTypes_array[5] = { EMPTY, INTEGER, FLOAT, CSTRING, BOOL };
 
-// For human readability of enum above
+
+// 1c. List the same enums as cStrings, this will enable human readability of enum above
 static char typeNames[][8] = {
   "EMPTY",
   "INTEGER",
@@ -53,21 +83,12 @@ static char typeNames[][8] = {
 };
 
 
-// Define list of typical commands for system for future reference
-/*
-{"A0": 100}
-{"A1": 98}
-{"all": "stop"}
-{"all":0}
+// 2. Declare a list of all possible key values as ENUM. These values will be passed out of the jsonMessenger Object and can be used to trigger different states
+// NOTE: this list may not include all possible states for the state machine, JUST the states that are triggered by receiving a command.
+// - Include a null value at 0 -> This is because this enum will be initialised at 0 to represent jsonMessenger not receiving data, or being unable to parse a command
 
-*/
-
-
-// Declare a list of all possible key values as ENUM. These values will be passed out of the jsonMessenger Object and can be used to go to different states
-// NOTE this list may not include all possible states, JUST the states that are triggered by receiving a command, including a null value at 0
-// Why null value at 0? I cant remember but it seemed useful at the time
 typedef enum {
-  NONE,
+  NONE,                // Include null or none state
   STOP,
   START,
   SET_SPEED_HZ,
@@ -84,14 +105,13 @@ typedef enum {
   SNAPTIME,
   PING,
   HELP,
-  NUM_VALUES  // Add sentinal NUM_VALUES to count number of elements
+  NUM_VALUES        // Add sentinal NUM_VALUES to count number of elements, this is very important and will be used to size for loops inside the jsonMessenger object
 } jsonStates;
 
 
-// Now Link each jsonState ENUM with the datatype ENUM in a map structure.
-//In this example most will be integers, but will include some cstrings to test
-// As these types are just enums, we can try re-writing this using arrays to avoid using std::map, which is not fully implemented on some platforms
-//const std::map<jsonStates, dataTypes> jsonStateMap = {
+// 3. Link each jsonState ENUM with the datatype ENUM in a ~~map~~<depreciated> structure -> Now uses 2D array!.
+//const std::map<jsonStates, dataTypes> jsonStateMap = {  // Old version
+
 const uint16_t jsonStateMap[NUM_VALUES][2] = {
   { jsonStates::NONE, dataTypes::EMPTY },
   { jsonStates::STOP, dataTypes::EMPTY },
@@ -115,7 +135,7 @@ const uint16_t jsonStateMap[NUM_VALUES][2] = {
 
 
 
-// Then Declare a list of key commands that will be required to be parsed. This must match the order of the enums above
+// 4. Declare a list of key commands that will be required to be parsed. This must match the order of the enums above
 static char jsonCommandKeys[][7] = {
   "na",
   "stop",
@@ -137,18 +157,19 @@ static char jsonCommandKeys[][7] = {
 };
 // NOTE, this can also be used to turn the enums above back into strings for human readability
 
+//<depreciated>
 // Also including generic keys, these are used for more verbose JSON commands like:
 // {"set": "item", "to":"value"}
-static char jsonGenerics[][5] = {
-  "NULL",
-  "set",
-  "to",
-  "get"
-};
+//static char jsonGenerics[][5] = {
+//  "NULL",
+//  "set",
+//  "to",
+//  "get"
+//};
 
 
 
-// Finally Declare a structure that will hold both the jsonStates enum, and any data that will need to be passed from jsonMessenger, into the states.
+// 5. Finally Declare a structure that will hold both the jsonStates enum, and any data that will need to be passed from jsonMessenger, into the states.
 // We can make this fairly generic by including additional datatypes, or we can reduce the size of the memory used by removing the unneeded ones
 struct jsonStateData {
   jsonStates cmdState;  // The command state enum to tell state machine what state to go to next

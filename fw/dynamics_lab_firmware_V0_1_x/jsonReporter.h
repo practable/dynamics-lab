@@ -15,14 +15,14 @@ void update_json() {
   //freeRAM = ram.getPrintStats("update_json");
   // Header
   jsonTX[F("timestamp")].set(millis());  //Message Timestamp set this last before printing
-  // Payload
- jsonTX[F("payload")][F("state")].set(stateNames[smState]);
+                                         // Payload
+  jsonTX[F("payload")][F("state")].set(stateNames[smState]);
   // Output Data
   // Stepper Motor Settings
- jsonTX[F("payload")][F("step")][F("hz")].set(step_hz);
-   jsonTX[F("payload")][F("step")][F("rpm")].set(step_rpm);
+  jsonTX[F("payload")][F("step")][F("hz")].set(step_hz);
+  jsonTX[F("payload")][F("step")][F("rpm")].set(step_rpm);
   // Encoder Data
-  
+
   jsonTX[F("payload")][F("encode")][F("hz")].set(get_Hz_from_RPM(stepper.encoder.getRPM()));
   jsonTX[F("payload")][F("encode")][F("rpm")].set(stepper.encoder.getRPM());
   jsonTX[F("payload")][F("encode")][F("pos(raw)")].set(stepper.encoder.getAngleRaw());

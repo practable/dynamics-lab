@@ -22,7 +22,7 @@
 
 // Program Attributes
 #define EXPERIMENT_NAME "dynamics-lab"
-#define FIRMWARE_VERSION "V0.0.0"
+#define FIRMWARE_VERSION "V0.1.1"
 #define DEVELOPER "Imogen-Heard"
 
 // Hardware Definitions
@@ -63,9 +63,9 @@
 
 
 // Debugging Options
-#define DEBUG_STATES true
+#define DEBUG_STATES false
 #define DEBUG_STATE_MACHINE true
-#define COMMAND_HINTS true
+#define COMMAND_HINTS false
 
 
 
@@ -75,7 +75,7 @@
 #include "jsonMessenger.h"
 
 // Create objects
-jsonMessenger jsonRX;  // create a json messenger object to handle commands received over Serial connection
+jsonMessenger jsonRX;  // create a jsonMessenger object to handle commands received over Serial connection
 autoDelay printDelay;  // Delay object for printing periodic JSON messages // DEPRECIATED FOR NOW
 
 autoDelay sampleDelay;

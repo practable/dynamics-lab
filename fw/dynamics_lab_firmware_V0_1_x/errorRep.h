@@ -1,5 +1,7 @@
 /* errorRep.h Error Reporting and Management System
 
+Imogen Heard
+11/02/2025
 
 */
 
@@ -21,7 +23,7 @@
 -7      I2C Error                                             FATAL
 -8      watchdog timer expired                                WARNING
 -9      Temperature Out of Range Detected                     WARNING
--10     Out of Range Value commanded
+-10     Out of Range Value commanded                          WARNING
 -11     
 -12     
 -13     

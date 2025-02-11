@@ -115,7 +115,7 @@ void errorRep::clear_warning() {
     int16_t active_warning_code = JSONstatus["payload"]["status"]["code"];
     // Check the level of the error
     char msg_level[8];
-    // TODO A string copy HERE JSON["level"] into msg_level
+    //  A string copy HERE JSON["level"] into msg_level
     strcpy(msg_level, JSONstatus["level"]);
 
 #if DEBUG_ERRORS == true

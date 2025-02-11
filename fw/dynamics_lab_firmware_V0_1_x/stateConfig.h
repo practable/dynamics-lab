@@ -1,19 +1,23 @@
 /*  stateConfig.h
 
-This header should be used with the stateMachine library to define all the working states & execution logic for the stateMachine system
+This header defines the state machine framework. It is intended to be used with the jsonMessenger.h Library to handle receiving and parsing JSON formatted commands entered by a user, 
+however this state machine also operates independently and can be used without jsonMessenger.h
+
+This State Machine framework can be adapted to many different purposes, follow the numbered comments for an explanation
 
 Imogen Heard
-21/10/2024
+11/02/2025
 
 
 */
+
 #pragma once
 
-
-#include <ArduinoJson.h>
 #include "globals.h"
 
-// Define the valid states for the state machine with an enum
+
+// 1. Define all the valid states for the state machine with an enum.
+//    - This should include states triggered by user input, but may also contain states that are only accessable programatically
 typedef enum {
   STATE_INIT,
   STATE_WAIT,
@@ -33,12 +37,12 @@ typedef enum {
   STATE_SNAPTIME,
   STATE_PING,
   STATE_HELP,
-  NUM_STATES  // Guard value lets us get the total number of states without manually counting
+  NUM_STATES  // Sentinal value lets us get the total number of states without manually counting. Do not forget this value, it is important for correct function
 } StateType;
 
 
-// Then we define two variables to hold the current state enum, and the previous state enum. Holding both these values allows us to compare them as we enter a state,
-// to see if it is the first time we have entered the state.
+// 2. Then we define two variables to hold the current state enum, and the previous state enum. Holding both these values allows us to compare them as we enter a state,
+//    to see if it is the first time we have entered the state.
 
 StateType smState = STATE_INIT;
 StateType lastState;
@@ -46,7 +50,7 @@ StateType lastState;
 
 
 
-// Then define a State Names Array, this will allow us to print the enum above in human readable format
+// 3. Define a State Names Array, this will allow us to print the enum above in human readable format
 char stateNames[][20] = {
   "STATE_INIT",
   "STATE_WAIT",
@@ -69,7 +73,8 @@ char stateNames[][20] = {
 };
 
 
-// Define the state machine function prototypes
+// 4. Define the state machine function prototypes.
+//    Any function that will be passed data from a user input will be passed the same jsonStateData structure as an argument.
 void sm_state_init(void);
 void sm_state_wait(void);
 void sm_state_stop(void);
@@ -93,24 +98,34 @@ void sm_state_help(void);
 
 
 
-// Define the state machine functions
-//  A typical state function template is shown below
+// 5. Define all the state machine functions
+//    - A typical state function template is shown below
+
 /*
-void sm_state_template(void) {
+void sm_state_template(jsonStateData stateData) {
   if (lastState != smState) {  // Check to see if first time state has been called in sequence
-    // Do anything that needs to happen the First time this state is called
+    // 5a. Do anything that needs to happen the First time this state is called
     lastState = smState;  // Set the last state to the current state
   }
-  // Do everything that repeats as long as this state is active
+  // 5b. Do everything that repeats as long as this state is active
 
-  // Add any logic to navigate to other states
+  // 5c. Extract data from jsonStateData (if required)
+          - remember to validate data if coming from user input!
+
+  if (stateData.numeric < 1 || stateData.numeric > 2000){
+    // Error message to user if data is out of accepted bounds
+  } else {
+    // accept the data and process
+  }
+
+  // 5d. Add any logic to navigate to other states
   smState = STATE_WAIT;
 }
 */
 
 
 
-
+// Init state, only called at startup
 void sm_state_init() {
   if (lastState != smState) {
     Serial.println("state: init");
@@ -123,7 +138,7 @@ void sm_state_init() {
 }
 
 
-
+// Not a state, but function called by "help" state to print commands list to users
 void print_cmds() {
   Serial.println(F("   {\"start\":0}          -> Start/Update Motor Speed"));
   Serial.println(F("   {\"stop\":0}           -> Stop Motor              "));
@@ -143,6 +158,7 @@ void print_cmds() {
   Serial.println(F("   {\"help\":\"\"}        -> Print Commands to Serial Monitor    "));  // Print commands list
 }
 
+
 // State Wait is the default state for this program
 void sm_state_wait() {
   if (lastState != smState) {
@@ -161,7 +177,7 @@ void sm_state_wait() {
 
 
 
-
+// Stop the Motor
 void sm_state_stop(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -177,7 +193,7 @@ void sm_state_stop(void) {
 }
 
 
-
+// Start the Motor / Update entered speed in Hz or RPM to output
 void sm_state_start(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -195,7 +211,7 @@ void sm_state_start(void) {
 
 
 
-// Set the Global Speed
+// Set the Motor Speed in Hz
 void sm_state_set_speed_hz(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -207,16 +223,17 @@ void sm_state_set_speed_hz(jsonStateData stateData) {
     errors.set_error(false, -10, "Requested Hz value out of bounds", errors.WARNING, "set_speed_hz");
     errors.print_json_status(true);
   } else {
-    Serial.println(stateData.floatData);
+    Serial.print("{\"hz-set-to\":\"");
+    Serial.print(stateData.floatData);
+    Serial.println("\"}");
     step_hz = stateData.floatData;
     step_rpm = get_RPM_from_Hz(step_hz);
-    errors.clear_error(-10);
   }
   smState = STATE_WAIT;
 }
 
 
-
+// Set the Motor Speed in RPM
 void sm_state_set_speed_rpm(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -228,9 +245,11 @@ void sm_state_set_speed_rpm(jsonStateData stateData) {
     errors.set_error(false, -10, "Requested RPM value out of bounds", errors.WARNING, "set_speed_rpm");
     errors.print_json_status(true);
   } else {
+    Serial.print("{\"rpm-set-to\":\"");
+    Serial.print(stateData.floatData);
+    Serial.println("\"}");
     step_rpm = stateData.floatData;
     step_hz = get_Hz_from_RPM(step_rpm);
-    errors.clear_error(-10);
   }
   smState = STATE_WAIT;
 }
@@ -240,7 +259,7 @@ void sm_state_set_speed_rpm(jsonStateData stateData) {
 
 
 
-// Send motor to home position
+// Send motor to home position (without recalibrating -> not particularly accurate)
 void sm_state_home(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -253,7 +272,7 @@ void sm_state_home(void) {
 }
 
 
-
+// Run motor home position calibration and homing scripts
 void sm_state_calibrate(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -272,7 +291,7 @@ void sm_state_calibrate(void) {
 
 
 
-
+// Set brake mode to freewheel (does not stop the motor or enter brake mode -> Still trying to figure out how to enter brake mode)
 void sm_state_freewheel(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -285,7 +304,7 @@ void sm_state_freewheel(void) {
 }
 
 
-
+// Set brake mode to COOLBRAKE (adds resistance above FREEWHEEL by shorting H-Bridge driver, but does not apply current to oppose motion)
 void sm_state_brake(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -303,7 +322,7 @@ void sm_state_brake(void) {
 
 
 
-
+// Go to absolute angle (somewhat accurate if recently calibrated -> may take several rotations to find position)
 void sm_state_goto(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -324,7 +343,7 @@ void sm_state_goto(jsonStateData stateData) {
 
 
 
-
+// Change the samplerate of streamed or snapshotted data (Init at 10 Hz)
 void sm_state_samplerate(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -342,6 +361,8 @@ void sm_state_samplerate(jsonStateData stateData) {
   smState = STATE_WAIT;
 }
 
+
+// Start streaming data
 void sm_state_start_stream() {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -356,6 +377,7 @@ void sm_state_start_stream() {
 
 
 
+// Stop streaming data
 void sm_state_stop_stream(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -368,6 +390,8 @@ void sm_state_stop_stream(void) {
   smState = STATE_WAIT;
 }
 
+
+// Trigger a snapshot of data to be taken over X amount of time
 void sm_state_snapshot() {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -380,6 +404,8 @@ void sm_state_snapshot() {
   smState = STATE_WAIT;
 }
 
+
+// Set the period over which snapshot data is recorded (init to 25 seconds)
 void sm_state_snaptime(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -397,6 +423,9 @@ void sm_state_snaptime(jsonStateData stateData) {
 }
 
 
+// Trigger the servo to "ping" the wobble bar for observation of natural decay.
+//  Note -> this state also transitions to snapshot state to aid data capture of the event.
+//          - This behaviour can be changed if required.
 void sm_state_ping(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -413,9 +442,10 @@ void sm_state_ping(void) {
   }
   smState = STATE_SNAPSHOT;
 }
-//TODO: Go to stream data snapshot mode?
 
 
+
+// Print the commands list to the Serial Output
 void sm_state_help(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -430,8 +460,8 @@ void sm_state_help(void) {
 
 
 
-// Finally define the state machine function
-// Automatically generate the switch case from the list of ENUM states and list of functions! -> https://github.com/ImogenWren/switch-case-generator
+// 6. Finally define the state machine function
+//    - Automatically generate the switch case from the list of ENUM states and list of functions! -> https://github.com/ImogenWren/switch-case-generator
 void sm_Run(jsonStateData stateData) {
   if (smState < NUM_STATES) {
 #if DEBUG_STATE_MACHINE == true

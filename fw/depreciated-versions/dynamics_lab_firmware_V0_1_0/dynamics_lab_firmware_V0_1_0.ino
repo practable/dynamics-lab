@@ -14,9 +14,10 @@ Version V0.0.0 Alpha Prototype
 Version V0.1.0 Alpha Prototype with standardised command structure
 Sketch uses 72264 bytes (27%) of program storage space. Maximum is 262144 bytes.
 Global variables use 7524 bytes (11%) of dynamic memory, leaving 58012 bytes for local variables. Maximum is 65536 bytes.
-
 - New command structure working `{"set":"{CMD},"to":{VALUE}"}`
 
+Version V0.1.1
+- Lots of small updates to standardise all debugging outputs into correct JSON formatting
 
 
 */
@@ -34,20 +35,21 @@ Global variables use 7524 bytes (11%) of dynamic memory, leaving 58012 bytes for
 
 void setup() {
   Serial.begin(115200);
+  delay(2000);          // give time for Serial object to start
   // display_mallinfo();
   //  std::cout << "\n{\"model\":\"" << EXPERIMENT_NAME << "\",\"version\":\"" << FIRMWARE_VERSION << "\",\"developed-by\":\"" << DEVELOPER << "\"}" << std::endl;
   Serial.print("\n{\"model\":\"");
   Serial.print(EXPERIMENT_NAME);
   Serial.print("\",\"version\":\"");
   Serial.print(FIRMWARE_VERSION);
-  Serial.print("\",\"developed-by\":\"");
+  Serial.print("\",\"fw-developed-by\":\"");
   Serial.print(DEVELOPER);
   Serial.println("\"}");
   jsonRX.jsonBegin();  // Start the json library to accept commands over serial connection
   mpu.Initialize();
   mpu.Calibrate();
   stepper_setup();
-  servo.attach(SERVO_PPM_PIN, 800); // default width is hopefully at one end of travel  
+  servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);  // default width is hopefully at one end of travel  -> moving this function to the "ping" state to try and avoid chattering (this doesnt work, but may be a good reason to use servoBasic lib instead)
 
   // display_mallinfo();
   servo_pos = false;

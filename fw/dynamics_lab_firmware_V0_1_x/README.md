@@ -2,7 +2,7 @@
 _Control a stepper motor and servo via JSON formatted command set. Gather data from position encoder and accellerometer mpu
 ```
 ## Commands list
-_List of basic commands in JSON format. This list is printed out on entry to STATE_WAIT_
+_List of basic commands in JSON format. This list is printed out on entry to STATE_WAIT and by entering STATE_HELP
 
 ```
 
