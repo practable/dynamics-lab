@@ -214,18 +214,18 @@ _This header should be used with the jsonMessenger library to define all the wor
 This library is designed to parse commands recieved via the Serial object in Arduino. Commands should be formatted in CMD:VALUE pairs as follows:
 
 #### Version 1 -> succinct command structure
-`{"CMD":"VALUE"}` -> for CMDs with passed values
-or
-`{"CMD":}` -> for CMDs with no additional values
+`{"CMD":"VALUE"}` -> for CMDs with passed values  <br>
+or <br>
+`{"CMD":}` -> for CMDs with no additional values <br>
 note: in the 2nd example, any data entered after `:` will be ignored, as we have already defined the datatypes that will be passed with each command to the parser.
 
 #### Version 2 -> Verbose command structure
-`{"set":"CMD","to":"VALUE"}` -> for CMDs with passed values
-or
-`{"set":"CMD"}` -> for CMDs with no additional data.
+`{"set":"CMD","to":"VALUE"}` -> for CMDs with passed values  <br>
+or  <br>
+`{"set":"CMD"}` -> for CMDs with no additional data.  <br>
 
 As the libary works via parsing JSON structures, any additional key:value pairs will simply be ignored, as long as the overal JSON structure is validated, the parser will just look
-for the existance of matching keys, and ignore anything else.
+for the existance of matching keys, and ignore anything else. <br>
 
 All modifications should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp!
 
@@ -243,7 +243,7 @@ typedef enum {  // enum to pass variable types between functions
 } dataTypes;
 ```
 1b. Place these enums into an array to enable lookup by index (This shouldnt be nessissary but it fixed a bug at one point)
-`const dataTypes dataTypes_array[5] = { EMPTY, INTEGER, FLOAT, CSTRING, BOOL };`
+`const dataTypes dataTypes_array[5] = { EMPTY, INTEGER, FLOAT, CSTRING, BOOL };` <br>
 
 1c. Define char string for the above enum to allow us to print out the enum above in a human readable format!
 ```
@@ -256,8 +256,8 @@ static char typeNames[][12] = {
 ```
 
 #### 2. Declare a list of all possible key values as ENUM. 
-These values will be passed out of the jsonMessenger Object and can be used to control a state machine external to this library (i.e the one defined in stateConfig.h).
-_NOTE this list may not include all possible states, JUST the states that are triggered by receiving a command_
+These values will be passed out of the jsonMessenger Object and can be used to control a state machine external to this library (i.e the one defined in stateConfig.h). <br>
+_NOTE this list may not include all possible states, JUST the states that are triggered by receiving a command_ <br>
 - Include a null value at 0 -> This is because this enum will be initialised at 0 to represent jsonMessenger not receiving data, or being unable to parse a command
 
 ```
@@ -303,7 +303,7 @@ static char jsonCommandKeys[][5] = {
   "help"
 };
 ```
-NOTE, this can also be used to turn the enums above back into strings for human readability.
+NOTE, this can also be used to turn the enums above back into strings for human readability. <br>
 
 
 #### 5. Finally Declare a structure that will hold both the jsonStates enum, and any data that will need to be passed from jsonMessenger and outside of 
@@ -311,7 +311,10 @@ this library. <br>
 
 We can make this fairly generic by including additional datatypes, or we can reduce the size of the memory used by removing the unneeded ones. <br>
 This structure must include the `jsonState`, `dataType` and a `command_received` bool that can be used to flag that a new command has been received to methods 
-outside of the library. All other data is arbitary and will depend on use case, though the library has been built to accomidate those listed, modification of the .cpp file may be needed to accomidate additional datatypes.
+outside of the library.
+
+All other data is arbitary and will depend on use case, though the library has been built to accomidate those listed,
+modification of the .cpp file may be needed to accomidate additional datatypes.
 
 ```
 struct jsonStateData {
@@ -330,18 +333,18 @@ struct jsonStateData {
 _This is the point at which the `jsonMessenger` library and `stateConfig.h` meet. Carefully implementing this last step unlocks the full functionality of the header files configured in the previous steps_
 
 #### 1. Create a global jsonMessenger Object
-_I create this within the `globals.h` file, but feel free to put this anywhere within global scope_
+_I create this within the `globals.h` file, but feel free to put this anywhere within global scope_  <br>
 `jsonMessenger jsonRX;` 
 
 #### 2. Call `jsonMessenger::jsonReadSerialLoop()`
-_This function listens for serial commands, parses them if received and returns a data structure including flags for the requested state, and the data passed into the system_
-- If no serial command is received, or the data is unable to be parsed, it returns a null flag, and the program continues waiting for another command
+_This function listens for serial commands, parses them if received and returns a data structure including flags for the requested state, and the data passed into the system_  <br>
+- If no serial command is received, or the data is unable to be parsed, it returns a null flag, and the program continues waiting for another command  <br>
 
-Create a `jsonStateData` structure to receive the data from the loop function
-`  jsonStateData nextState_data = jsonRX.jsonReadSerialLoop();`
+Create a `jsonStateData` structure to receive the data from the loop function  <br>
+`  jsonStateData nextState_data = jsonRX.jsonReadSerialLoop();`  <br>
 
-#### 3. Check the structure for `cmd_recieved` flag
- `if (nextState_data.cmd_received) {  // If command is received `
+#### 3. Check the structure for `cmd_recieved` flag 
+ `if (nextState_data.cmd_received) {  // If command is received ` 
 
 #### 4. If/If Else tree to parse the requested state enum, and define the state defined in `stateConfig.h`
 ```
