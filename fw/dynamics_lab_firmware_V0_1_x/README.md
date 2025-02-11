@@ -27,7 +27,7 @@ _Verbose Command Structure_
 ```
 
 
-_Current Functional Commands_
+_Succinct Command Structure_
 ```
    {"start":}          -> Start/Update Motor Speed
    {"stop":}           -> Stop Motor              
