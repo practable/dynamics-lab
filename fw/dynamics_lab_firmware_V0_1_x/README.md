@@ -306,15 +306,15 @@ static char jsonCommandKeys[][5] = {
 NOTE, this can also be used to turn the enums above back into strings for human readability. <br>
 
 
-#### 5. Finally Declare a structure that will hold both the jsonStates enum, and any data that will need to be passed from jsonMessenger and outside of 
-this library. <br>
+#### 5. Finally Declare a data structure
+_This will hold both the jsonStates enum, and any data that will need to be passed from jsonMessenger and outside of this library._ <br>
 
 We can make this fairly generic by including additional datatypes, or we can reduce the size of the memory used by removing the unneeded ones. <br>
 This structure must include the `jsonState`, `dataType` and a `command_received` bool that can be used to flag that a new command has been received to methods 
-outside of the library.
+outside of the library.  <br>
 
 All other data is arbitary and will depend on use case, though the library has been built to accomidate those listed,
-modification of the .cpp file may be needed to accomidate additional datatypes.
+modification of the .cpp file may be needed to accomidate additional datatypes. 
 
 ```
 struct jsonStateData {
