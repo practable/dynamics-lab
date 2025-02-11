@@ -1,7 +1,7 @@
 #Dynamics Lab Firmware
 
 ## Current Version 
--> [dynamics-lab-firmware-V0.0.0](https://github.com/practable/dynamics-lab/tree/fw-dev/fw/dynamics-lab-firmware-V0.0.0)
+-> [dynamics-lab-firmware-V0.1.1](https://github.com/practable/dynamics-lab/tree/fw-dev/fw/dynamics-lab-firmware-V0.1](https://github.com/practable/dynamics-lab/tree/fw-dev/fw/dynamics_lab_firmware_V0_1_x)
 
 ## Commands List
 _Current Functional Commands_
