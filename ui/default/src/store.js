@@ -5,6 +5,7 @@ import uiStore from './modules/uiStore.js'
 import commandStore from './modules/commandStore.js'
 import chatStore from './modules/chatStore.js'
 import loggingStore from './modules/logging.js'
+import smoothieStore from './modules/smoothie.js'
 
 const store = createStore({
     modules:{
@@ -13,7 +14,8 @@ const store = createStore({
         ui: uiStore,
         command: commandStore,
         chat: chatStore,
-        logging: loggingStore
+        logging: loggingStore,
+        smoothie: smoothieStore
     }
 })
 

@@ -57,13 +57,6 @@ export default {
       let expire_time = query.get('exp');
       this.$store.dispatch('setExpiryTime', expire_time);
 
-      //Search for the course query parameter
-      // If it doesn't exist then don't set null or '', just leave the default course set in the logging.js store - probably engdes1 for now
-      let course = query.get('course');
-      if(course != null){
-        this.$store.dispatch('setCourse', course);
-      }
-
       //get configuration parameters
       let conf_url = query.get('config');
       if(conf_url != null){
