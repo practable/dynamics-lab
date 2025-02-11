@@ -4,8 +4,8 @@ const config = {
     definitions_path: '/verbs',
 
     //UPDATE this with your remote lab version
-    remote_lab_ui: 'template-2.0',
-    hardware_code_prefix: 'none',   //the short code for hardware that is used for each experiment code, e.g. spin in spin30
+    remote_lab_ui: 'dynamics-default-1.0',
+    hardware_code_prefix: 'dyna',   //the short code for hardware that is used for each experiment code, e.g. spin in spin30
 
     click_logs_on: true,
     mouse_enter_logs_on: false,
