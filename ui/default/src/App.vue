@@ -10,12 +10,11 @@
 
             <div class='d-flex' id='first-row'>
                 <div class='drop-area drop-area-one-third' id='drop_0_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><webcam-stream id='webcam-stream' /></div>
-                <div class='drop-area drop-area-one-third' id='drop_1_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"></div>
-                <div class='drop-area drop-area-one-third' id='drop_2_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"></div>
+                <div class='drop-area drop-area-two-thirds' id='drop_1_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"></div>
             </div>
 
             <div class='d-flex' id='second-row'>
-                <div class='drop-area drop-area-half' id='drop_0_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"></div>
+                <div class='drop-area drop-area-half' id='drop_0_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><control-panel id='control-panel' :url="getDataURL"/></div>
                 <div class='drop-area drop-area-half' id='drop_1_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"></div>
             </div>
 
@@ -42,6 +41,7 @@ import DataStream from "./components/DataStream.vue";
 import NavigationBar from "./components/NavigationBar.vue";
 import Streams from "./components/Streams.vue";
 import Logging from './components/Logging.vue'
+import ControlPanel from "./components/ControlPanel.vue";
 
 import { mapGetters } from 'vuex'
 
@@ -52,7 +52,8 @@ export default {
     WebcamStream,
     DataStream,
     NavigationBar,
-    Logging
+    Logging,
+    ControlPanel
 
   },
   mounted(){
@@ -74,6 +75,7 @@ export default {
       'getDraggable',
       'getUsesLocalStorage',
       'getIsLoggingOn',
+      'getDataURL'
     ]),
     isMobile(){
       if(window.screen.width < 992){

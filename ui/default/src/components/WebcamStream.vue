@@ -2,8 +2,8 @@
 <div class='container-fluid practable-component'>
 	<div class='d-flex flex-column' id="video">
 		
-		<!-- <canvas class="mb-2" id="smoothie-chart-acceleration"></canvas>
-		<canvas class="mb-2" id="smoothie-chart-position"></canvas> -->
+		<canvas class="mb-2" id="smoothie-chart-acceleration"></canvas>
+		<canvas class="mb-2" id="smoothie-chart-position"></canvas>
 
 		<video-element :url="url" />
 

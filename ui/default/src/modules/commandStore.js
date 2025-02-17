@@ -4,7 +4,8 @@
 const commandStore = {
     state: () => ({
         dataSocket: null,
-        currentMode: 'stopped'  //driven, undriven
+        currentMode: 'stopped',  //driven, undriven - CONSIDER THE NEED FOR BOTH currentMode and currentState
+        currentState: 'STATE_WAIT'      //reported state from hardware
        }),
        mutations:{
         SET_DATA_SOCKET(state, socket){
@@ -20,21 +21,25 @@ const commandStore = {
         },
         SET_DRIVEN(state){
             state.currentMode = 'driven';
+        },
+        SET_UNDRIVEN(state){
+            state.currentMode = 'undriven';
+        },
+        COMMAND_START(state){
             if(state.dataSocket != null){
                 state.dataSocket.send(JSON.stringify({
                     set: "start"
                 }));
             }
         },
-        SET_UNDRIVEN(state){
-            state.currentMode = 'undriven';
+        COMMAND_PING(state){
             if(state.dataSocket != null){
                 state.dataSocket.send(JSON.stringify({
                     set: "ping"
                 }));
             }
         },
-        UPDATE_SPEED_HZ(state, val){
+        COMMAND_UPDATE_SPEED_HZ(state, val){
             //state.currentMode = 'undriven';
             if(state.dataSocket != null){
                 state.dataSocket.send(JSON.stringify({
@@ -43,7 +48,7 @@ const commandStore = {
                 }));
             }
         },
-        UPDATE_SPEED_RPM(state, val){
+        COMMAND_UPDATE_SPEED_RPM(state, val){
             //state.currentMode = 'undriven';
             if(state.dataSocket != null){
                 state.dataSocket.send(JSON.stringify({
@@ -52,7 +57,7 @@ const commandStore = {
                 }));
             }
         },
-        UPDATE_SAMPLE_RATE(state, val){
+        COMMAND_UPDATE_SAMPLE_RATE(state, val){
             //state.currentMode = 'undriven';
             if(state.dataSocket != null){
                 state.dataSocket.send(JSON.stringify({
@@ -61,6 +66,27 @@ const commandStore = {
                 }));
             }
         },
+        COMMAND_START_STREAMING(state){
+            if(state.dataSocket != null){
+                state.dataSocket.send(JSON.stringify({
+                    set: "stream"
+                }));
+            }
+        },
+        COMMAND_STOP_STREAMING(state){
+            if(state.dataSocket != null){
+                state.dataSocket.send(JSON.stringify({
+                    set: "endst"
+                }));
+            }
+        },
+        COMMAND_CALIBRATE(state){
+            if(state.dataSocket != null){
+                state.dataSocket.send(JSON.stringify({
+                    set: "cal"
+                }));
+            }
+        }
             
 
        },
@@ -68,9 +94,39 @@ const commandStore = {
         setDataSocket(context, socket){
             context.commit("SET_DATA_SOCKET", socket);
         },
-        setHardwareStop(context){
-            context.commit('STOP');
+        setModeStop(context){
+            context.commit('SET_STOP');
         },
+        setModeDriven(context){
+            context.commit('SET_DRIVEN');
+        },
+        setModeUndriven(context){
+            context.commit('SET_UNDRIVEN');
+        },
+        sendCommandStart(context){
+            context.commit('COMMAND_START');
+        },
+        sendCommandPing(context){
+            context.commit('COMMAND_PING');
+        },
+        sendCommandUpdateSpeedHz(context, val){
+            context.commit('COMMAND_UPDATE_SPEED_HZ', val);
+        },
+        sendCommandUpdateSpeedRPM(context, val){
+            context.commit('COMMAND_UPDATE_SPEED_RPM', val);
+        },
+        sendCommandUpdateSampleRate(context, val){
+            context.commit('COMMAND_UPDATE_SAMPLE_RATE', val);
+        },
+        sendCommandStartStream(context){
+            context.commit('COMMAND_START_STREAMING');
+        },
+        sendCommandStopStream(context){
+            context.commit('COMMAND_STOP_STREAMING');
+        },
+        sendCommandCalibrate(context){
+            context.commit('COMMAND_CALIBRATE');
+        }
         
 
        },

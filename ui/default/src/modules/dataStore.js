@@ -2,8 +2,16 @@
 
 const dataStore = {
    state: () => ({
-     data: [],
-     isRecording: false,
+      //current values
+      start_time: 0,
+      currentTime: 0,
+      currentPos: {},
+      currentAcc: {},
+      currentGyro: {},
+      //recorded data
+      data: [],
+      max_data_points: 5000,
+      isRecording: false,
    }),
    mutations:{
       SET_IS_RECORDING(state, set){
@@ -17,6 +25,21 @@ const dataStore = {
       },
       DELETE_DATA(state, id){
          state.data.splice(id, 1);
+      },
+      SET_START_TIME(state, time){
+         state.start_time = time;
+      },
+      SET_CURRENT_TIME(state, time){
+         state.currentTime = time;
+      },
+      SET_CURRENT_POS(state, pos){
+         state.currentPos = pos;
+      },
+      SET_CURRENT_ACC(state, acc){
+         state.currentAcc = acc;
+      },
+      SET_CURRENT_GYRO(state, gyro){
+         state.currentGyro = gyro;
       }
 
    },
@@ -33,6 +56,21 @@ const dataStore = {
       deleteData (context, dataId) {
          context.commit('DELETE_DATA', dataId);
       },
+      setStartTime(context, time){
+         context.commit("SET_START_TIME", time);
+      },
+      setCurrentTime(context, time){
+         context.commit('SET_CURRENT_TIME', time);
+      },
+      setCurrentPosition(context, pos){
+         context.commit('SET_CURRENT_POS', pos);
+      },
+      setCurrentAcceleration(context, acc){
+         context.commit('SET_CURRENT_ACC', acc);
+      },
+      setCurrentGyro(context, gyro){
+         context.commit('SET_CURRENT_GYRO', gyro);
+      }
    },
    getters:{
       getData(state){
@@ -44,10 +82,31 @@ const dataStore = {
       getNumData(state){
          return state.data.length;
      },
+     getMaxReached(state){
+      if(state.data.length >= state.max_data_points){
+         return true;
+      } else {
+         return false;
+      }
+   },
      getDataSets(state){
          let datasets = helpers.GetDataSets(state.data);
          return datasets;
-
+     },
+     getStartTime(state){
+      return state.start_time;
+     },
+     getCurrentTime(state){
+      return state.currentTime;
+     },
+     getCurrentPosition(state){
+      return state.currentPos;
+     },
+     getCurrentAcceleration(state){
+      return state.currentAcc;
+     },
+     getCurrentGyro(state){
+      return state.currentGyro;
      }
    }
       

@@ -2,7 +2,6 @@
 
 <div class='container-fluid practable-component'>
 	<div class="m-2">
-		<!-- <div v-if='getCurrentMode != ""' class='panel-heading'><h3>Current mode: {{getModeName}}</h3></div> -->
 		<div class='panel-body'>{{message}}</div>
 		<div :class='getErrorClass'><h3>{{ error }}</h3></div>
 	</div>
@@ -14,20 +13,37 @@
 					<label for="hardware-select-dropdown">Select Hardware Mode</label>
 					<div class="dropdown">
 						<button class="button-sm button-dropdown dropdown-toggle" type="button" id="hardware-select-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-							{{ getModeName }}
+							{{ getCurrentMode }}
 						</button>
 						<ul class="dropdown-menu" aria-labelledby="hardware-dropdown-menu">
-							<li><a class="dropdown-item" id="enter-stopped-mode-select" aria-label="stopped mode" @click="setHardwareStop">stopped</a></li>
+							<li><a class="dropdown-item" id="stopped-mode-select" aria-label="stopped mode" @click="setModeStop">stopped</a></li>
+							<li><a class="dropdown-item" id="undriven-mode-select" aria-label="undriven mode" @click="setModeUndriven">undriven</a></li>
+							<li><a class="dropdown-item" id="driven-mode-select" aria-label="driven mode" @click="setModeDriven">driven</a></li>
 					
 						</ul>
 					</div>
 				</div>
 
 				<div class="mb-lg-2">
-					<button id="stop-motor-button" v-if='getCurrentMode != "stopped"' class="button-sm button-danger" aria-label="exit mode" @click="setHardwareStop">Exit mode</button>
+					<button id="stop-motor-button" v-if='getCurrentMode != "stopped"' class="button-sm button-danger" aria-label="exit mode" @click="setModeStop">Exit mode</button>
 				</div>
 			</div>
 		</div>
+
+		<div class="col-lg-3">
+			<button id="stop-stream-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="stop data streaming" @click="sendCommandStopStream">Stop Stream</button>
+			<button id="start-stream-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="start data streaming" @click="sendCommandStartStream">Start Stream</button>
+			<button id="calibrate-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="calibrate zero position" @click="sendCommandCalibrate">Zero</button>
+		
+			<button id="undriven-ping-button" v-if='getCurrentMode == "undriven"' class="button-sm button-primary" aria-label="start an undriven oscillation" @click="sendCommandPing">Ping</button>
+			<button id="driven-start-button" v-if='getCurrentMode == "driven"' class="button-sm button-primary" aria-label="start a driven oscillation" @click="sendCommandStart">Start Driving</button>
+			<button id="driven-stop-button" v-if='getCurrentMode == "driven"' class="button-sm button-primary" aria-label="stop a driven oscillation" @click="setModeStop">Stop Driving</button>
+		</div>
+
+		<div class="col-lg-3">
+			<!-- <input v-if='getCurrentMode == "stopped"' type="range" :min="1" :max="40" step="1" v-model="sampling_rate" list='tickmarks' id="sampling-rate-slider" @change='sendCommandUpdateSampleRate(sampling_rate)'> -->
+		</div>
+
 	</div>
 
 	<div class="d-flex flex-row">
@@ -70,7 +86,7 @@ export default {
 			dataSocket: null,
 			message: '',				//for sending user messages to screen
 			error:'',					//for sending errors to screen
-			
+			sampling_rate: 10
         }
     },
 	created(){
@@ -89,7 +105,12 @@ export default {
 			'getCanvasAcceleration',
 			'getCanvasPosition',
 			'getAccAbs',
-			'getPosAbs'
+			'getPosAbs',
+			'getCurrentTime',
+			'getCurrentPosition',
+			'getCurrentAcceleration',
+			'getCurrentGyro',
+			'getCurrentMode'
 		]),
 		getDataSocket(){
 			return this.dataSocket;
@@ -147,6 +168,7 @@ export default {
         url(){
 			try{
 				if(this.url != '' && this.getDataURLObtained){
+					console.log('connected to websocket');
 					this.connect();								
 				} else{
 					console.log('disconnecting');
@@ -160,7 +182,7 @@ export default {
 		},
 		getSessionExpired(exp){
 			if(exp){
-				this.setHardwareStop();
+				this.setModeStop();
 			}
 		},
 		getMaxReached(reached){
@@ -180,12 +202,23 @@ export default {
 			'setChartPosition',
 			'setCanvasAcceleration',
 			'setCanvasPosition',
-			'setHardwareStop'
+			'setModeStop',
+			'setModeDriven',
+			'setModeUndriven',
+			'sendCommandStart',
+			'sendCommandPing',
+			'sendCommandStartStream',
+			'sendCommandStopStream',
+			'sendCommandCalibrate',
+			'setCurrentTime',
+			'setCurrentPosition',
+			'setCurrentAcceleration',
+			'setCurrentGyro'
 		]),
 		
 		hotkey(event){
 			if(event.key == "s"){
-				this.setHardwareStop();
+				this.setModeStop();
 			} 
 		},
 		clearMessages(){
@@ -233,15 +266,16 @@ export default {
 			this.dataSocket.onmessage = (event) => {
 				try {
 					var obj = JSON.parse(event.data);
-					
 					if(obj.error){
 						console.log(obj.error)
 					}
-					else if(obj.t){
-
-						let msgTime = obj.t;
-						let acc = obj.a;
-						let pos = obj.p;
+					else if(obj.payload){
+						let msgTime = obj.timestamp;		//int
+						let state = obj.payload.state		//string
+						let pos = obj.payload.encode;		//object
+						let acc = obj.payload.mpu.acc;		//object
+						let gyro = obj.payload.mpu.gyro;	//object
+						
 
 						let d_msgTime = parseFloat(msgTime);
 						var thisDelay = new Date().getTime() - d_msgTime;
@@ -272,14 +306,14 @@ export default {
 			
 						messageCount += 1
 
-						if(!isNaN(d_msgTime) && !isNaN(pos) && !isNaN(acc)){
-							_store.dispatch('setCurrentTime', msgTime);
+						if(!isNaN(d_msgTime)){
+							_this.setCurrentTime(msgTime);
 
-							_store.dispatch('setCurrentPosition', pos);
-							series_position.append(msgTime + thisDelay, pos);
+							_this.setCurrentPosition(pos);
+							series_position.append(msgTime + thisDelay, pos.pos);
 
-							_store.dispatch('setCurrentAcceleration', acc);
-							series_acceleration.append(msgTime + thisDelay, acc);
+							_this.setCurrentAcceleration(acc);
+							series_acceleration.append(msgTime + thisDelay, acc.x);
 							}
 					}
 				} catch (e) {
@@ -292,8 +326,8 @@ export default {
 
 		_store.dispatch('setStartTime', new Date().getTime());
 		window.addEventListener('keydown', this.hotkey, false);
-		window.addEventListener('pagehide', this.setHardwareStop);				//closing window
-		window.addEventListener('beforeunload', this.setHardwareStop);			//refreshing page, changing URL
+		//window.addEventListener('pagehide', this.setModeStop);				//closing window
+		//window.addEventListener('beforeunload', this.setModeStop);			//refreshing page, changing URL
 		
 		
 		},
