@@ -5,7 +5,16 @@ const commandStore = {
     state: () => ({
         dataSocket: null,
         currentMode: 'stopped',  //driven, undriven - CONSIDER THE NEED FOR BOTH currentMode and currentState
-        currentState: 'STATE_WAIT'      //reported state from hardware
+        currentState: 'STATE_WAIT',      //reported state from hardware
+        samplingRate: {'value': 20, 'max':40, 'min':1, 'step':1},
+        drivingFrequency: {
+            'hz': 1, 
+            'rpm': 60, 
+            'from_hardware': {'hz': 1, 'rpm': 60,}, 
+            'max':20, 
+            'min':1, 
+            'step':1},
+
        }),
        mutations:{
         SET_DATA_SOCKET(state, socket){
@@ -39,26 +48,34 @@ const commandStore = {
                 }));
             }
         },
-        COMMAND_UPDATE_SPEED_HZ(state, val){
-            //state.currentMode = 'undriven';
+        UPDATE_DRIVING_FREQUENCY_HZ(state, val){
+            state.drivingFrequency.hz = Number(val);
+        },
+        UPDATE_DRIVING_FREQUENCY_RPM(state, val){
+            state.drivingFrequency.rpm = Number(val);
+        },
+        COMMAND_UPDATE_DRIVING_FREQUENCY_HZ(state){
             if(state.dataSocket != null){
                 state.dataSocket.send(JSON.stringify({
                     set: "hz",
-                    to: val
+                    to: state.drivingFrequency.hz
                 }));
             }
         },
-        COMMAND_UPDATE_SPEED_RPM(state, val){
-            //state.currentMode = 'undriven';
+        COMMAND_UPDATE_DRIVING_FREQUENCY_RPM(state){
             if(state.dataSocket != null){
                 state.dataSocket.send(JSON.stringify({
                     set: "rpm",
-                    to: val
+                    to: state.drivingFrequency.rpm
                 }));
             }
         },
+        SET_REPORTED_DRIVING_FREQUENCY(state, val_object){
+            state.drivingFrequency['from_hardware'].hz = val_object.hz;
+            state.drivingFrequency['from_hardware'].rpm = val_object.rpm;
+        },
         COMMAND_UPDATE_SAMPLE_RATE(state, val){
-            //state.currentMode = 'undriven';
+            state.samplingRate.value = val;
             if(state.dataSocket != null){
                 state.dataSocket.send(JSON.stringify({
                     set: "sample",
@@ -109,14 +126,39 @@ const commandStore = {
         sendCommandPing(context){
             context.commit('COMMAND_PING');
         },
-        sendCommandUpdateSpeedHz(context, val){
-            context.commit('COMMAND_UPDATE_SPEED_HZ', val);
+        updateDrivingFrequencyHz(context, val){
+            let to_set = val;
+            if(val < context.getters.getDrivingFrequencyMin){
+                to_set = context.getters.getDrivingFrequencyMin;
+            } else if(val > context.getters.getDrivingFrequencyMax){
+                to_set = context.getters.getDrivingFrequencyMax;
+            }
+            context.commit('UPDATE_DRIVING_FREQUENCY_HZ', to_set);
+            let rpm = helpers.convertHzToRPM(to_set);
+            context.commit('UPDATE_DRIVING_FREQUENCY_RPM', rpm);
         },
-        sendCommandUpdateSpeedRPM(context, val){
-            context.commit('COMMAND_UPDATE_SPEED_RPM', val);
+        updateDrivingFrequencyRPM(context, val){
+            context.commit('UPDATE_DRIVING_FREQUENCY_RPM', val);
+            let hz = helpers.convertRPMToHz(val);
+            context.commit('UPDATE_DRIVING_FREQUENCY_HZ', hz);
+        },
+        sendCommandUpdateDrivingFrequencyHz(context){
+            context.commit('COMMAND_UPDATE_DRIVING_FREQUENCY_HZ');
+        },
+        sendCommandUpdateDrivingFrequencyRPM(context){
+            context.commit('COMMAND_UPDATE_DRIVING_FREQUENCY_RPM');
+        },
+        setReportedDrivingFrequency(context, val_object){
+            context.commit('SET_REPORTED_DRIVING_FREQUENCY', val_object)
         },
         sendCommandUpdateSampleRate(context, val){
-            context.commit('COMMAND_UPDATE_SAMPLE_RATE', val);
+            let to_set = val;
+            if(val < context.getters.getSamplingRateMin){
+                to_set = context.getters.getSamplingRateMin;
+            } else if(val > context.getters.getSamplingRateMax){
+                to_set = context.getters.getSamplingRateMax;
+            }
+            context.commit('COMMAND_UPDATE_SAMPLE_RATE', to_set);
         },
         sendCommandStartStream(context){
             context.commit('COMMAND_START_STREAMING');
@@ -126,7 +168,7 @@ const commandStore = {
         },
         sendCommandCalibrate(context){
             context.commit('COMMAND_CALIBRATE');
-        }
+        },
         
 
        },
@@ -137,9 +179,51 @@ const commandStore = {
         getCurrentMode(state){
             return state.currentMode;
         },
+        getSamplingRate(state){
+            return state.samplingRate.value;
+        },
+        getSamplingRateMax(state){
+            return state.samplingRate.max;
+        },
+        getSamplingRateMin(state){
+            return state.samplingRate.min;
+        },
+        getSamplingRateStep(state){
+            return state.samplingRate.step;
+        },
+        getDrivingFrequencyMin(state){
+            return state.drivingFrequency.min;
+        },
+        getDrivingFrequencyMax(state){
+            return state.drivingFrequency.max;
+        },
+        getDrivingFrequencyStep(state){
+            return state.drivingFrequency.step;
+        },
+        getDrivingFrequencyHz(state){
+            return state.drivingFrequency.hz;
+        },
+        getDrivingFrequencyRPM(state){
+            return state.drivingFrequency.rpm;
+        },
+        getReportedDrivingFrequencyHz(state){
+            return state.drivingFrequency['from_hardware'].hz;
+        },
+        getReportedDrivingFrequencyRPM(state){
+            return state.drivingFrequency['from_hardware'].rpm;
+        },
           
        },  
   
   }
+
+  export const helpers = {
+    convertHzToRPM(hz) {
+       return Math.round(hz*60)
+    },
+    convertRPMToHz(rpm) {
+        return Math.round(rpm/60)
+    }
+ }
 
   export default commandStore;

@@ -31,17 +31,36 @@
 		</div>
 
 		<div class="col-lg-3">
+			<!-- STOPPED mode command options -->
 			<button id="stop-stream-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="stop data streaming" @click="sendCommandStopStream">Stop Stream</button>
 			<button id="start-stream-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="start data streaming" @click="sendCommandStartStream">Start Stream</button>
 			<button id="calibrate-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="calibrate zero position" @click="sendCommandCalibrate">Zero</button>
-		
+			
+			<!-- UNDRIVEN mode command options -->
 			<button id="undriven-ping-button" v-if='getCurrentMode == "undriven"' class="button-sm button-primary" aria-label="start an undriven oscillation" @click="sendCommandPing">Ping</button>
+			
+			<!-- DRIVEN mode command options -->
 			<button id="driven-start-button" v-if='getCurrentMode == "driven"' class="button-sm button-primary" aria-label="start a driven oscillation" @click="sendCommandStart">Start Driving</button>
 			<button id="driven-stop-button" v-if='getCurrentMode == "driven"' class="button-sm button-primary" aria-label="stop a driven oscillation" @click="setModeStop">Stop Driving</button>
 		</div>
 
-		<div class="col-lg-3">
-			<!-- <input v-if='getCurrentMode == "stopped"' type="range" :min="1" :max="40" step="1" v-model="sampling_rate" list='tickmarks' id="sampling-rate-slider" @change='sendCommandUpdateSampleRate(sampling_rate)'> -->
+		<div class="col-lg-6 align-content-top">
+			<!-- DRIVEN mode settings -->
+			<div v-if='getCurrentMode == "driven"' class="d-flex flex-row align-items-center justify-content-end">
+				<div class="d-flex flex-column">
+					<label id="driving-frequency-slider-label" for="driving-frequency-slider">Set to: ({{ driving_frequency }}Hz)</label>
+					<label id="driving-frequency-slider-label" for="driving-frequency-slider">Current ({{ getReportedDrivingFrequencyHz }}Hz)</label>
+				</div>
+				<input class="ms-2" type="range" :min="getDrivingFrequencyMin" :max="getDrivingFrequencyMax" :step="getDrivingFrequencyStep" v-model="driving_frequency" id="driving-frequency-slider" @mousedown="setDraggable(false)" @mouseup="setDraggable(true)" @mouseleave="setDraggable(true)">
+				<button id="update-driving-frequency-button" class="button-sm button-primary" aria-label="update driving frequency" @click="updateDrivingFrequency">Run</button>
+			</div>
+
+			<!-- STOPPED mode settings -->
+			<div class="d-flex flex-row align-items-center justify-content-end">
+				<label id="sampling-rate-slider-label" for="sampling-rate-slider">Sampling rate ({{ sampling_rate }}Hz)</label>
+				<input class="ms-2" type="range" :min="getSamplingRateMin" :max="getSamplingRateMax" :step="getSamplingRateStep" v-model="sampling_rate" id="sampling-rate-slider" @mousedown="setDraggable(false)" @mouseup="setDraggable(true)" @mouseleave="setDraggable(true)">
+			</div>
+		
 		</div>
 
 	</div>
@@ -85,8 +104,7 @@ export default {
         return{
 			dataSocket: null,
 			message: '',				//for sending user messages to screen
-			error:'',					//for sending errors to screen
-			sampling_rate: 10
+			error:''					//for sending errors to screen
         }
     },
 	created(){
@@ -110,7 +128,16 @@ export default {
 			'getCurrentPosition',
 			'getCurrentAcceleration',
 			'getCurrentGyro',
-			'getCurrentMode'
+			'getCurrentMode',
+			'getSamplingRateMax',
+			'getSamplingRateMin',
+			'getSamplingRateStep',
+			'getSamplingRate',
+			'getDrivingFrequencyMin',
+			'getDrivingFrequencyMax',
+			'getDrivingFrequencyStep',
+			'getDrivingFrequencyHz',
+			'getReportedDrivingFrequencyHz'
 		]),
 		getDataSocket(){
 			return this.dataSocket;
@@ -120,6 +147,22 @@ export default {
 				return ""
 			} else {
 				return "error-message panel-body border border-danger";
+			}
+		},
+		driving_frequency: {
+			get(){
+				return this.getDrivingFrequencyHz;
+			},
+			set(val){
+				this.updateDrivingFrequencyHz(val);
+			}
+		},
+		sampling_rate:{
+			get(){
+				return this.getSamplingRate;
+			},
+			set(val){
+				this.sendCommandUpdateSampleRate(val);
 			}
 		},
 		smoothie_y_max_acc: {
@@ -210,12 +253,21 @@ export default {
 			'sendCommandStartStream',
 			'sendCommandStopStream',
 			'sendCommandCalibrate',
+			'sendCommandUpdateSampleRate',
+			'updateDrivingFrequencyHz',
+			'setReportedDrivingFrequency',
+			'sendCommandUpdateDrivingFrequencyHz',
 			'setCurrentTime',
 			'setCurrentPosition',
 			'setCurrentAcceleration',
 			'setCurrentGyro'
 		]),
-		
+		updateDrivingFrequency(){
+			this.sendCommandUpdateDrivingFrequencyHz();
+			setTimeout(() => {
+				this.sendCommandStart();
+			}, 100);
+		},
 		hotkey(event){
 			if(event.key == "s"){
 				this.setModeStop();
@@ -261,6 +313,7 @@ export default {
 
 			this.dataSocket.onopen = () => {
 				console.log('data connection opened');
+				this.sendCommandUpdateSampleRate(this.getSamplingRate);
 			};
 
 			this.dataSocket.onmessage = (event) => {
@@ -271,11 +324,12 @@ export default {
 					}
 					else if(obj.payload){
 						let msgTime = obj.timestamp;		//int
-						let state = obj.payload.state		//string
+						//let state = obj.payload.state		//string
 						let pos = obj.payload.encode;		//object
 						let acc = obj.payload.mpu.acc;		//object
-						let gyro = obj.payload.mpu.gyro;	//object
-						
+						//let gyro = obj.payload.mpu.gyro;	//object
+
+						_this.setReportedDrivingFrequency(obj.payload.step);
 
 						let d_msgTime = parseFloat(msgTime);
 						var thisDelay = new Date().getTime() - d_msgTime;
