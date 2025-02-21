@@ -327,7 +327,7 @@ export default {
 						//let state = obj.payload.state		//string
 						let pos = obj.payload.encode;		//object
 						let acc = obj.payload.mpu.acc;		//object
-						//let gyro = obj.payload.mpu.gyro;	//object
+						let gyro = obj.payload.mpu.gyro;	//object
 
 						_this.setReportedDrivingFrequency(obj.payload.step);
 
@@ -368,6 +368,8 @@ export default {
 
 							_this.setCurrentAcceleration(acc);
 							series_acceleration.append(msgTime + thisDelay, acc.x);
+
+							_this.setCurrentGyro(gyro);
 							}
 					}
 				} catch (e) {

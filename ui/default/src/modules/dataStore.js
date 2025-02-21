@@ -10,12 +10,19 @@ const dataStore = {
       currentGyro: {},
       //recorded data
       data: [],
+      data_set_index: 0,
       max_data_points: 5000,
       isRecording: false,
    }),
    mutations:{
       SET_IS_RECORDING(state, set){
          state.isRecording = set;
+      },
+      SET_DATASET_INDEX(state, set){
+         state.data_set_index = set;
+      },
+      ADD_TO_DATASET_INDEX(state){
+         state.data_set_index += 1;
       },
       CLEAR_ALL_DATA(state){
          state.data = [];
@@ -46,6 +53,12 @@ const dataStore = {
    actions:{
       setIsRecording(context, value){
          context.commit('SET_IS_RECORDING', value);
+      },
+      setDatasetIndex(context, set){
+         context.commit('SET_DATASET_INDEX', set);
+      },
+      addToDatasetIndex(context){
+         context.commit('ADD_TO_DATASET_INDEX');
       },
       clearAllData(context){
          context.commit('CLEAR_ALL_DATA');
@@ -82,6 +95,9 @@ const dataStore = {
       getNumData(state){
          return state.data.length;
      },
+     getMaxDataPoints(state){
+      return state.max_data_points;
+   },
      getMaxReached(state){
       if(state.data.length >= state.max_data_points){
          return true;
@@ -93,12 +109,28 @@ const dataStore = {
          let datasets = helpers.GetDataSets(state.data);
          return datasets;
      },
+     getDatasetIndex(state){
+      return state.data_set_index;
+      },
+      getLatestDatasetIndex(state){
+         let latest_data = state.data[state.data.length - 1];
+         let index = latest_data.set;
+         return index;
+      },
      getStartTime(state){
       return state.start_time;
      },
      getCurrentTime(state){
       return state.currentTime;
      },
+     getTimeFromStart(state){ 
+      if(state.currentTime - state.start_time >= 0){
+         return (state.currentTime - state.start_time)/1000;  //in seconds
+      } else{
+         state.start_time = state.currentTime;
+         return 0.0;
+      }
+   },
      getCurrentPosition(state){
       return state.currentPos;
      },
