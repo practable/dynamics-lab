@@ -226,10 +226,11 @@ export default {
     computed:{
         ...mapGetters([
             'getData',
-            'getGraphDataParameter',
+            //'getGraphDataParameter',
             'getNumData',
             'getIsRecording',
-            'getDarkTheme'
+            'getDarkTheme',
+            'getCurrentMode'
         ]),
       },
     watch:{
@@ -239,10 +240,10 @@ export default {
         getDarkTheme(){
             this.clearData();
         },
-        getGraphDataParameter(new_value){
-            scatterChart.options.scales['y'].title.text = new_value;
-            scatterChart.update();
-        }
+        // getGraphDataParameter(new_value){
+        //     scatterChart.options.scales['y'].title.text = new_value;
+        //     scatterChart.update();
+        // }
     },
     methods: {
         ...mapActions([
@@ -314,7 +315,7 @@ export default {
                     y: {
                         title:{
                             display: true,
-                            text: _this.getGraphDataParameter,
+                            text: 'acceleration',
                             color: _this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
                         },
                         type: 'linear',
@@ -329,6 +330,28 @@ export default {
                         },
                         grid: {
                             color: _this.getDarkTheme ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+                        },
+                        sampleSize: 2,
+                    },
+                    y2: {
+                        title:{
+                            display: true,
+                            text: 'driving force',
+                            color: _this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
+                        },
+                        type: 'linear',
+                        position: 'right',
+                        ticks: {
+                            callback : (value,index,values) => {
+                                _this.updateYAxisMax(value, index);
+                                _this.updateYAxisMin(value, index, values);
+                                return value;
+                            },
+                            color: _this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
+                        },
+                        grid: {
+                            color: _this.getDarkTheme ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+                            drawOnChartArea: false,
                         },
                         sampleSize: 2,
                     },
@@ -353,6 +376,11 @@ export default {
                                 }
                                 
                             }
+                        }
+                    },
+                    legend:{
+                        labels:{
+                            usePointStyle: true,
                         }
                     }
                 }
@@ -386,7 +414,13 @@ export default {
             //check if the next dataset doesn't exist and create it
             if(dataset_index == this.countDataSets()){
                 this.deleteFunctionDataset();   //remove any plotted functions to not conflict with dataset index
-                this.addEmptyDataSet(dataset_index);
+                //this.addEmptyDataSet(dataset_index);
+                if(this.getCurrentMode == 'driven'){
+                    this.addTwoEmptyDataSets(dataset_index);
+                } else{
+                    this.addEmptyDataSet(dataset_index);
+                }
+                
             }
             //add data to the existing dataset
             try{
@@ -410,9 +444,16 @@ export default {
             for(let i=_current_index; i<this.getNumData;i++){
                 let data = this.getData[i];
                 let x_data = data.t;
-                let y_data = data.gyro.x;    //FOR NOW TEST ONLY SINGLE DATA PLOTTING
+                let y_data = data.acc.x;
+                let y_data_two = -1*Math.cos(Math.PI*data.pos/180);    //normalised driving force
 
-                this.addDataToChart({x: x_data, y: y_data}, data.set);
+                if(this.getCurrentMode == 'driven'){
+                    this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));
+                    this.addDataToChart({x: x_data, y: y_data_two}, 2*parseInt(data.set) + 1);
+                } else{
+                    this.addDataToChart({x: x_data, y: y_data}, data.set);
+                }
+                
 
                 if(i >= this.current_data_index + this.data_index_interval || i == this.getNumData - 1){
                     this.current_data_index = i + 1;
@@ -434,25 +475,38 @@ export default {
         },
         getLatestData(){
             let index = this.getNumData - 1;
-            let y_data;
             if(index >= 0){
                 let data = this.getData[index];
                 let x_data = data.t;
-                y_data = data.gyro.x;    //FOR NOW TEST ONLY SINGLE DATA PLOTTING
+                let y_data = data.acc.x;
+                let y_data_two = -1*Math.cos(Math.PI*data.pos/180);
 
-                this.addDataToChart({x: x_data, y: y_data}, data.set);
-                } 
+                if(this.getCurrentMode == 'driven'){
+                    this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));
+                    this.addDataToChart({x: x_data, y: y_data_two}, 2*parseInt(data.set) + 1);
+                } else{
+                    this.addDataToChart({x: x_data, y: y_data}, data.set);
+                }
+                
+            } 
             
         },
         getDataAtIndex(index){
-            let y_data;
             if(index >= 0){
                 let data = this.getData[index];
                 let x_data = data.t;
-                y_data = data.gyro.x;    //FOR NOW TEST ONLY SINGLE DATA PLOTTING
-                //console.log(data.set)
-                this.addDataToChart({x: x_data, y: y_data}, data.set);
-                } 
+                let y_data = data.acc.x;
+                let y_data_two = -1*Math.cos(Math.PI*data.pos/180);
+                
+                if(this.getCurrentMode == 'driven'){
+                    this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));
+                    this.addDataToChart({x: x_data, y: y_data_two}, 2*parseInt(data.set) + 1);
+                } else{
+                    this.addDataToChart({x: x_data, y: y_data}, data.set);
+                }
+
+                
+            } 
         },
         removeChart(){
             scatterChart.destroy();
@@ -549,55 +603,6 @@ export default {
         exponential(t){
             return parseFloat(this.func_a)*Math.exp(parseFloat(this.func_b)*t);
         },
-        step(t){
-            //let A = parseFloat(store.state.step.step_size);
-            let t0 = parseFloat(this.func_d);
-            //let t0 = 0.0;
-            //let w0 = -parseFloat(this.func_a)*A*(1-Math.exp(t0/parseFloat(this.func_b)));
-            //let t0 = 0;
-            let expterm = 1 - Math.exp(-(t-t0)/parseFloat(this.func_c));
-
-            if(t < t0){
-                return 0;
-            } else{
-                return parseFloat(this.func_a)*parseFloat(this.func_b)*expterm; 
-            }
-            
-        },
-        step2nd(t){
-            let t0 = parseFloat(this.func_d);
-            let t_norm = t - t0;
-            let zeta = parseFloat(this.func_b);
-            let omega = parseFloat(this.func_c);
-            let step = parseFloat(this.func_a);
-            let phi = Math.acos(zeta);
-
-            let root_term = Math.sqrt(1-zeta*zeta);
-            let exp_term = Math.exp(-zeta*omega*t_norm);
-            let sin_term = Math.sin(root_term*omega*t_norm + phi);
-
-            if(t < t0){
-                return 0;
-            } else{
-                return step*(1 - exp_term*sin_term/root_term);
-            }
-            
-        },
-        ramp(t){
-            //let A = parseFloat(store.state.ramp.ramp_gradient);
-            let tau = parseFloat(this.func_c);
-            let K = parseFloat(this.func_a)*parseFloat(this.func_b);
-            //let t0 = parseFloat(this.func_c);
-            let t0 = 0.0;
-            let w0 = parseFloat(this.func_d);
-            
-            if(t < t0){
-                return w0;
-            } else{
-                return K*((t-t0) - tau + tau*Math.exp(-(t-t0)/tau)) + w0;
-            }
-            
-        },
         addFunctionPlot(colour, data){
             scatterChart.data.datasets.push({
                 label:"function",
@@ -609,11 +614,35 @@ export default {
         },
         addEmptyDataSet(new_index){
             scatterChart.data.datasets.push({
-                label:`dataset${new_index}`,
+                id: `dataset${new_index}`,
+                label:`acceleration${new_index}`,
                 pointBackgroundColor: this.getDarkTheme ? this.dark_colours[new_index % this.dark_colours.length] : this.light_colours[new_index % this.light_colours.length],
                 borderColor: this.getDarkTheme ? this.dark_colours[new_index % this.dark_colours.length] : this.light_colours[new_index % this.light_colours.length],
                 data: []
                 });
+            scatterChart.update(0);
+        },
+        addTwoEmptyDataSets(new_index){
+            scatterChart.data.datasets.push({
+                yAxisID: 'y',
+                id: `dataset${new_index}`,
+                label:`acceleration${parseInt(new_index)/2}`,
+                pointBackgroundColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
+                borderColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
+                data: []
+                });
+
+            scatterChart.data.datasets.push({
+                yAxisID: 'y2',
+                id: `dataset${new_index+1}`,
+                label:`position${parseInt(new_index)/2}`,
+                pointBackgroundColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
+                borderColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
+                pointStyle: 'rectRot',
+                pointRadius: 5,
+                data: []
+                });
+
             scatterChart.update(0);
         },
         deleteFunctionDataset(){
@@ -621,7 +650,7 @@ export default {
             scatterChart.update(0);
         },
         countDataSets(){
-                let datasets = scatterChart.data.datasets.filter(set => set.label.includes("dataset"));
+                let datasets = scatterChart.data.datasets.filter(set => set.id.includes("dataset"));
                 return datasets.length;
         }
 
