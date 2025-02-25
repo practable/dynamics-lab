@@ -138,7 +138,7 @@ export default {
         let pos = this.getCurrentPosition; 
         let acc = this.getCurrentAcceleration; 
         let gyro = this.getCurrentGyro; 
-        console.log(this.getDatasetIndex);
+        
         let data_object = {id: this.getNumData,  set: this.getDatasetIndex, t: time, pos: pos.pos, acc: acc, gyro: gyro, showDataPoint: true};
         this.$store.dispatch('addData', data_object);
       },

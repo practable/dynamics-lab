@@ -390,13 +390,13 @@ export default {
         },
         updateYAxisMax(value, index){
             if(index == 0){
-                this.YAxisMax = value;
+                this.YAxisMax = value.toFixed(2);
             }
             
         },
         updateYAxisMin(value,index,values){
             if(index == values.length - 1){
-                this.YAxisMin = value;
+                this.YAxisMin = value.toFixed(2);
             }
         },
         updateXAxisMin(value, index){

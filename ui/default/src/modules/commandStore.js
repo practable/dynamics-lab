@@ -13,7 +13,7 @@ const commandStore = {
             'from_hardware': {'hz': 1, 'rpm': 60,}, 
             'max':20, 
             'min':1, 
-            'step':1},
+            'step':0.1},
 
        }),
        mutations:{

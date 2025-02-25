@@ -15,8 +15,9 @@
 
             <div class='d-flex' id='second-row'>
                 <div class='drop-area drop-area-half' id='drop_0_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><control-panel id='control-panel' :url="getDataURL"/></div>
-                <div class='drop-area drop-area-half' id='drop_1_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><data-recorder v-if='isDataRecorderOn' id='data-recorder' /></div>
-            </div>
+                <div class='drop-area drop-area-one-quarter' id='drop_1_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><data-recorder v-if='isDataRecorderOn' id='data-recorder' /></div>
+                <div class='drop-area drop-area-one-quarter' id='drop_2_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><data-panel id='data-panel' /></div>
+              </div>
 
         </div>
 
@@ -44,6 +45,7 @@ import Logging from './components/Logging.vue'
 import ControlPanel from "./components/ControlPanel.vue";
 import DataRecorder from "./components/DataRecorder.vue"
 import Graph from "./components/Graph.vue"
+import DataPanel from "./components/DataPanel.vue";
 
 import { mapGetters } from 'vuex'
 
@@ -57,7 +59,8 @@ export default {
     Logging,
     ControlPanel,
     DataRecorder,
-    Graph
+    Graph,
+    DataPanel
 
   },
   mounted(){
