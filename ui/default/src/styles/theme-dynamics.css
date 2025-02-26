@@ -140,6 +140,14 @@ body.dark-theme {
     width: 25dvw;
 }
 
+.drop-area-one-eigth{
+    width: 12.5dvw;
+}
+
+.drop-area-three-eigths{
+    width: 37.5dvw;
+}
+
 .drop-area-one-fifth{
     width: 20dvw;
 }
