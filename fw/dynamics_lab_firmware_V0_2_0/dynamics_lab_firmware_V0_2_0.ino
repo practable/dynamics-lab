@@ -23,6 +23,8 @@ Global variables use 7524 bytes (11%) of dynamic memory, leaving 58012 bytes for
 
 Version V0.2.0
 - Need to update homing algorithm to use 2 point calibration
+- Changed accellerometer library to +- 4G maximum sensor reading
+- added/modified sample-rate and print rate functions to save data to array for greater time resolution
 
 
 
@@ -41,7 +43,7 @@ Version V0.2.0
 
 void setup() {
   Serial.begin(115200);
-  delay(2000);          // give time for Serial object to start
+  delay(2000);  // give time for Serial object to start
   // display_mallinfo();
   //  std::cout << "\n{\"model\":\"" << EXPERIMENT_NAME << "\",\"version\":\"" << FIRMWARE_VERSION << "\",\"developed-by\":\"" << DEVELOPER << "\"}" << std::endl;
   Serial.print("\n{\"model\":\"");
@@ -53,8 +55,9 @@ void setup() {
   Serial.println("\"}");
   jsonRX.jsonBegin();  // Start the json library to accept commands over serial connection
   mpu.Initialize();
+  mpu.RegisterWrite(MPU6050_ACCEL_CONFIG, 0b00011000);  // It does this in Initialize, set to 0x08 (+-4G)
   mpu.Calibrate();
-  stepper_setup();
+  stepper_setup(false);
   servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);  // default width is hopefully at one end of travel  -> moving this function to the "ping" state to try and avoid chattering (this doesnt work, but may be a good reason to use servoBasic lib instead)
 
   // display_mallinfo();
@@ -136,11 +139,29 @@ void loop() {
 
   mpu.Execute();
 
+// Do sampling Data at the specified rate
+  if (sampleDelay.millisDelay(sampleDelay_mS)) {
+    if (samples_written < DATA_ARRAY_SIZE) {  // check to make sure not overwriting array bounds
+      encode_array[samples_written] = stepper.encoder.getAngle();
+      accX_array[samples_written] = mpu.GetAccX();
+      accY_array[samples_written] = mpu.GetAccY();
+      accZ_array[samples_written] = mpu.GetAccZ();
+      gyroX_array[samples_written] = mpu.GetGyroX();
+      gyroY_array[samples_written] = mpu.GetGyroY();
+      gyroZ_array[samples_written] = mpu.GetGyroZ();
+      samples_written++;
+    } else if (samples_written == DATA_ARRAY_SIZE){
+      // we have written our last sample to the array, if it was a string, would append with a /n
+      // but as floats this isnt needed
+    }    
+  }
 
+// do streaming data at the specified rate
   if (streaming_active || snapshop_active) {
-    if (sampleDelay.millisDelay(sampleDelay_mS)) {
+    if (printDelay.millisDelay(print_delay_mS)) {
       //print the sampled data
-      update_json();
+      update_json(samples_written);
+      samples_written = 0;   
     }
     if (snapshop_active) {
       if (millis() - snapshot_starttime_mS >= snapshot_timer_mS) {
