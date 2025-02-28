@@ -4,7 +4,21 @@ Written By:
 Imogen Heard
 32/01/2025
 
+NOTE: This requires modification of the uStepper32 library files!
+ for correct fork see ->>>>>>>>>>   (put link here when complete!)
 
+ Specific change: TLE5012B.cpp, comment out lines in init function
+ ```
+//this->encoderOffset = this->angle;
+//this->angle = 0;
+ ```
+ Also Changed: UstepperS32.cpp
+
+  commented out line:
+  ```
+//encoder.setHome(); // Changed Imogen Heard 28/02/25 
+  ```
+in setup function
 
 */
 
@@ -119,6 +133,8 @@ void loop() {
       smState = STATE_GOTO;
     } else if (nextState_data.cmdState == SAMPLERATE) {
       smState = STATE_SAMPLERATE;
+    } else if (nextState_data.cmdState == PRINTRATE) {
+      smState = STATE_PRINTRATE;
     } else if (nextState_data.cmdState == STARTSTREAM) {
       smState = STATE_STARTSTREAM;
     } else if (nextState_data.cmdState == STOPSTREAM) {
@@ -155,12 +171,12 @@ void loop() {
   if (sampleDelay.millisDelay(sampleDelay_mS)) {
     if (samples_written < num_samples_req && samples_written < DATA_ARRAY_SIZE) {  // check to make sure collecting the correct number of samples for the samplerate, and smaller than the
       encode_array[samples_written] = stepper.encoder.getAngle();
-      accX_array[samples_written] = a.acceleration.x / G_CONST;  //mpu.GetAccX();
-      accY_array[samples_written] = a.acceleration.y / G_CONST;  //mpu.GetAccY();
-      accZ_array[samples_written] = a.acceleration.z / G_CONST;  //mpu.GetAccZ();
-      gyroX_array[samples_written] = g.gyro.x;                   // mpu.GetGyroX();
-      gyroY_array[samples_written] = g.gyro.y;                   //mpu.GetGyroY();
-      gyroZ_array[samples_written] = g.gyro.z;                   //mpu.GetGyroZ();
+      accX_array[samples_written] = (a.acceleration.x / G_CONST);        // - acc_offset.X;  //mpu.GetAccX();
+      accY_array[samples_written] = (a.acceleration.y / G_CONST);        /// - acc_offset.Y;  //mpu.GetAccY();
+      accZ_array[samples_written] = (a.acceleration.z / G_CONST) - 0.3;  // Added 0.3 offset due to sensor calibration issue  // - acc_offset.Z;  //mpu.GetAccZ();
+      gyroX_array[samples_written] = g.gyro.x - gyro_offset.X;           // mpu.GetGyroX();
+      gyroY_array[samples_written] = g.gyro.y - gyro_offset.Y;           //mpu.GetGyroY();
+      gyroZ_array[samples_written] = g.gyro.z - gyro_offset.Z;           //mpu.GetGyroZ();
       samples_written++;
     } else if (samples_written == DATA_ARRAY_SIZE) {
       // we have written our last sample to the array, if it was a string, would append with a /n

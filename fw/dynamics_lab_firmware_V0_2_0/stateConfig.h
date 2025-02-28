@@ -152,7 +152,7 @@ void print_cmds() {
   Serial.println(F("   {\"free\":\"\"}        -> Set freewheel brake mode (test)"));
   Serial.println(F("   {\"brake\":\"\"}       -> Set coolbrake brake mode (test)"));
   Serial.println(F("   {\"goto\": -360 to 360}-> Goto Angle (test)              "));
-  Serial.println(F("   {\"sample\": 1 to 200} -> Set Samplerate in Hz (dflt: 200)"));
+  Serial.println(F("   {\"sample\": 1 to 200} -> Set Samplerate in Hz (dflt: 200)"));   // Note, when changing print & sample rates, the size of the JSON doc may not be able to handle additional data. Max number of samples is governed by JSON doc size
   Serial.println(F("   {\"print\": 1 to 50}   -> Set Print Rate in Hz (dflt: 50)"));
   Serial.println(F("   {\"stream\":\"\"}      -> Start Data Streaming    "));
   Serial.println(F("   {\"endst\":\"\"}       -> End Data Streaming      "));
@@ -361,6 +361,7 @@ void sm_state_samplerate(jsonStateData stateData) {
   } else {
     sampleRate_Hz = stateData.numeric;
     sampleDelay_mS = 1000 / sampleRate_Hz;
+    num_samples_req = uint8_t(sampleRate_Hz / print_rate_Hz);  // Number of samples required to collect between each print cycle
   }
   smState = STATE_WAIT;
 }
@@ -379,8 +380,9 @@ void sm_state_print_rate(jsonStateData stateData) {
     errors.set_error(false, -10, "Out of Bounds Print Rate Commanded", errors.WARNING, "state-samplerate");
     errors.print_json_status();
   } else {
-    print_rate_Hz  = stateData.numeric;
-    print_delay_mS = 1000 / sampleRate_Hz;
+    print_rate_Hz = stateData.numeric;
+    print_delay_mS = 1000 / print_rate_Hz;
+    num_samples_req = uint8_t(sampleRate_Hz / print_rate_Hz);  // Number of samples required to collect between each print cycle
   }
   smState = STATE_WAIT;
 }
@@ -534,6 +536,9 @@ void sm_Run(jsonStateData stateData) {
         break;
       case STATE_SAMPLERATE:
         sm_state_samplerate(stateData);
+        break;
+      case STATE_PRINTRATE:
+        sm_state_print_rate(stateData);
         break;
       case STATE_STARTSTREAM:
         sm_state_start_stream();

@@ -95,7 +95,7 @@ errorRep errors;
 
 // why is this defined in globals?!?
 // moving it to local
-#define JSON_TX_BUFFER_SIZE 2000
+#define JSON_TX_BUFFER_SIZE 20000
 //StaticJsonDocument<JSON_TX_BUFFER_SIZE> jsonTX;
 
 
@@ -120,7 +120,7 @@ uint32_t snapshot_starttime_mS;
 
 autoDelay sampleDelay;
 uint16_t sampleRate_Hz = INIT_SAMPLE_RATE_Hz;
-uint32_t sampleDelay_mS = uint32_t(1000 / sampleRate_Hz) - 4;  // added -5 to make the delay just a little shorter, and ensure we get all samples in before they are sent. 
+uint32_t sampleDelay_mS = uint32_t(1000 / sampleRate_Hz) - 4;  // added -5 to make the delay just a little shorter, and ensure we get all samples in before they are sent.
 // The function will stop sampling once buffer it full, so this should make more consistant outputs
 // #TODO MAKE SURE STATE FUNCTION IS UPDATED TO MATCH
 
@@ -149,6 +149,18 @@ float gyroZ_array[DATA_ARRAY_SIZE];
 
 int16_t samples_written = 0;
 
+struct accOffsets {
+  float X;
+  float Y;
+  float Z;
+} acc_offset = { 0, 0, 0 };
+
+struct gyroOffsets {
+  float X;
+  float Y;
+  float Z;
+} gyro_offset = { 0, 0, 0 };
+
 
 
 //uint32_t print_delay_mS = 1000 / PRINT_RATE_Hz;
@@ -164,4 +176,3 @@ int16_t samples_written = 0;
 #include "stateConfig.h"
 #include "jsonReporter.h"
 #include "trackRAM_stm.h"
-
