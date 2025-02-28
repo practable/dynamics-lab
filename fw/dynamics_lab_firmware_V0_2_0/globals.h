@@ -8,13 +8,15 @@
 #pragma once
 
 // Add included external libraries here (at the top of globals.h)
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include <SPI.h>
 //#include <iostream>
 //#include <stdlib.h>
 #include <autoDelay.h>    // https://github.com/PanGalacticTech/autoDelay_library
 #include <UstepperS32.h>  // Arduino Library Manager (with additional boards manager ) https://raw.githubusercontent.com/uStepper/uStepperHardware/master/package_ustepper_index.json,https://raw.githubusercontent.com/uStepper/uStepperSTM32Hardware/master/package.json
-#include "TinyMPU6050.h"  // Arduino Library Manager
+//#include "TinyMPU6050.h"  // Arduino Library Manager
 //#include <NewServo.h>     // Available @ https://github.com/GhassanYusuf/NewServo // NOTE ERRORS POSSIBLY CAUSED BY THIS LIBRARY
 #include <Servo.h>  // [Arduino Library Manager]
 #include "errorRep.h"
@@ -30,8 +32,8 @@
 #define HALL_NORMALLY_HIGH true  // define if normally high, triggered by low pulse (true) or normally low triggered by high pulse (false)
 
 // User Options & program config
-#define INIT_SAMPLE_RATE_Hz 40
-#define INIT_PRINT_RATE_Hz 5
+#define INIT_SAMPLE_RATE_Hz 200
+#define INIT_PRINT_RATE_Hz 50
 #define PRINT_PERIODIC_UPDATES true
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
 #define STEPPER_HOLD_CURRENT 10  // percent
@@ -68,7 +70,8 @@
 #define DEBUG_STATE_MACHINE true
 #define COMMAND_HINTS false
 
-
+// Physics Constants
+#define G_CONST 9.80665
 
 
 
@@ -82,7 +85,8 @@ jsonMessenger jsonRX;  // create a jsonMessenger object to handle commands recei
 
 
 UstepperS32 stepper;
-MPU6050 mpu;
+//MPU6050 mpu;   /// replaced with Adafruit library
+Adafruit_MPU6050 mpu;
 
 Servo servo;
 
@@ -91,7 +95,7 @@ errorRep errors;
 
 // why is this defined in globals?!?
 // moving it to local
-#define JSON_TX_BUFFER_SIZE 1000
+#define JSON_TX_BUFFER_SIZE 2000
 //StaticJsonDocument<JSON_TX_BUFFER_SIZE> jsonTX;
 
 
@@ -116,13 +120,15 @@ uint32_t snapshot_starttime_mS;
 
 autoDelay sampleDelay;
 uint16_t sampleRate_Hz = INIT_SAMPLE_RATE_Hz;
-uint32_t sampleDelay_mS = uint32_t(1000 / sampleRate_Hz) - 2;  // added -5 to make the delay just a little shorter, and ensure we get all samples in before they are sent. 
+uint32_t sampleDelay_mS = uint32_t(1000 / sampleRate_Hz) - 4;  // added -5 to make the delay just a little shorter, and ensure we get all samples in before they are sent. 
 // The function will stop sampling once buffer it full, so this should make more consistant outputs
 // #TODO MAKE SURE STATE FUNCTION IS UPDATED TO MATCH
 
 autoDelay printDelay;
 uint16_t print_rate_Hz = INIT_PRINT_RATE_Hz;
 uint32_t print_delay_mS = uint32_t(1000 / print_rate_Hz);
+
+uint8_t num_samples_req = uint8_t(sampleRate_Hz / print_rate_Hz);  // Number of samples required to collect between each print cycle
 
 // Maximum sample rate of 200Hz, minimum print rate of 1Hz, so max number of data to be collected is 200 samples x 7 datapoints, 4 bytes per float = 5600 bytes. Very doable data levels on STM32, HOWEVER;
 // remember all this data will need to be copied to JSON so lets double that 11200! -> still very doable on STM32!
@@ -154,6 +160,8 @@ int16_t samples_written = 0;
 // Add included internal header files here (at the bottom of globals.h)
 
 #include "stepperFunctions.h"
+#include "mpuFunctions.h"
 #include "stateConfig.h"
 #include "jsonReporter.h"
 #include "trackRAM_stm.h"
+
