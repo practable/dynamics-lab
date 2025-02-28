@@ -72,7 +72,7 @@ void setup() {
   //  Serial.print(num_samples_req);
   //  Serial.println("\"}");
   jsonRX.jsonBegin();  // Start the json library to accept commands over serial connection
-  // replaced with arafruit library
+  // replaced with adafruit library
   //  mpu.Initialize();
   //  mpu.RegisterWrite(MPU6050_ACCEL_CONFIG, 0b00011000);  // It does this in Initialize, set to 0x08 (+-4G)
   //  mpu.Calibrate();
