@@ -26,7 +26,7 @@
 
 // Program Attributes
 #define EXPERIMENT_NAME "dynamics-lab"
-#define FIRMWARE_VERSION "V0.2.0"
+#define FIRMWARE_VERSION "V0.2.1"
 #define DEVELOPER "Imogen-Heard"
 
 // Hardware Definitions

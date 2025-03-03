@@ -24,6 +24,10 @@ NOTE: This requires modification of the uStepper32 library files!
   ```
 in setup function
 
+ALSO:
+- added new function to library encoder.setHomeActual(uint16_t encoderVal)
+run this function and pass current encoder value when encoder is at zero position
+
 */
 
 /* Version Control 
@@ -51,6 +55,7 @@ Sketch uses 76296 bytes (29%) of program storage space. Maximum is 262144 bytes.
 Global variables use 29856 bytes (45%) of dynamic memory, leaving 35680 bytes for local variables. Maximum is 65536 bytes.
 - Now library has been modified for absolute encoder position, 
     - Adding ability to save encoder offset value in EEPROM
+- modified encoder.setHomeActual -> added function to manually reset the encoder angle
 
 
 */
@@ -68,11 +73,11 @@ Global variables use 29856 bytes (45%) of dynamic memory, leaving 35680 bytes fo
 
 void setup() {
   Serial.begin(115200);
-   while (!Serial){
-      delay(1);  // give time for Serial object to start
-   }
+  while (!Serial) {
+    delay(1);  // give time for Serial object to start
+  }
 
- // delay(2000);  // give time for Serial object to start
+  // delay(2000);  // give time for Serial object to start
   // display_mallinfo();
   //  std::cout << "\n{\"model\":\"" << EXPERIMENT_NAME << "\",\"version\":\"" << FIRMWARE_VERSION << "\",\"developed-by\":\"" << DEVELOPER << "\"}" << std::endl;
   Serial.print("\n{\"model\":\"");
@@ -92,11 +97,13 @@ void setup() {
   //  mpu.Calibrate();
   mpu_setup();
   get_offset_from_memory();  // get encoder_offset from persistant memory before stepper setup
-  stepper_setup(false);
+  stepper_setup(false);      // if true run old homing scripts
 
 
 
   servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);  // default width is hopefully at one end of travel  -> moving this function to the "ping" state to try and avoid chattering (this doesnt work, but may be a good reason to use servoBasic lib instead)
+
+  stepper.encoder.setHomeActual(18192);
 
   // display_mallinfo();
   servo_pos = false;

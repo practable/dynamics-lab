@@ -16,6 +16,9 @@ float get_Hz_from_RPM(float rpm) {
   return Hz;
 }
 
+void home_position(){
+  
+}
 
 // do one full revolution to find the lowest value reported by the hall effect sensor
 void step_find_home() {
@@ -45,7 +48,7 @@ void step_find_home() {
       //Serial.println(step_low_angle);
     }
     if (stepper.angleMoved() >= 360 || stepper.angleMoved() <= -360) {
-      //Serial.println("ending init rotation");
+      Serial.println("ending init rotation");
       finding_center = false;
     }
   }

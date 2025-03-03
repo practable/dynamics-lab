@@ -140,7 +140,7 @@ void sm_state_init() {
   stepper.setRPM(0);
   step_rpm = 0;
   step_hz = 0;
-  smState = STATE_WAIT;
+  smState = STATE_HOME;
 }
 
 
@@ -151,7 +151,7 @@ void print_cmds() {
   Serial.println(F("   {\"hz\": -20 to 20}    -> Set Motor Speed in Hz   "));
   Serial.println(F("   {\"rpm\": -200 to 200} -> Set Motor Speed in RPM  "));
   Serial.println(F("   {\"home\":\"\"}        -> Move Motor to home pos (test) "));
-  Serial.println(F("   {\"cal\":\"\"}         -> Run Calibration to home motor "));
+  Serial.println(F("   {\"cal\":\"\"}         -> DEPRECIATED for now "));
   Serial.println(F("   {\"free\":\"\"}        -> Set freewheel brake mode (test)"));
   Serial.println(F("   {\"brake\":\"\"}       -> Set coolbrake brake mode (test)"));
   Serial.println(F("   {\"goto\": -360 to 360}-> Goto Angle (test)              "));
@@ -162,7 +162,7 @@ void print_cmds() {
   Serial.println(F("   {\"snap\":\"\"}        -> Take Data Snapshot       "));                  // Take a Snapshot of data
   Serial.println(F("   {\"time\": 1 - 250000 }-> Set Time for Data Snapshot (mS)  "));          // Change the time over which the data snapshot is taken
   Serial.println(F("   {\"ping\":\"\"}        -> Ping Servo               "));                  // Ping the wobble-shaft with the servo
-  Serial.println(F("   {\"offset\":\"-32768 to 32768\"} -> Save new offset value to memory"));  // Print commands list
+  Serial.println(F("   {\"offset\":\"-32768 to 32768\"} -> NOT CURRENTLY USED"));  // Print commands list
   Serial.println(F("   {\"help\":\"\"}        -> Print Commands to Serial Monitor    "));       // Print commands list
 }
 
@@ -197,7 +197,7 @@ void sm_state_stop(void) {
   stepper.setRPM(0);
   // step_rpm = 0;
   // step_hz = 0;
-  smState = STATE_STOPSTREAM;
+  smState = STATE_WAIT;
 }
 
 
@@ -275,7 +275,18 @@ void sm_state_home(void) {
 #endif
     lastState = smState;
   }
-  step_move_home();
+  //step_move_home();
+  stepper.setMaxVelocity(800);
+  stepper.setMaxAcceleration(4000);
+  float currentAngle = stepper.encoder.getAngle();
+  while ((!currentAngle < 0.3) && !(currentAngle > 359.7)) {
+    // stepper.moveAngle(2);
+    stepper.setRPM(50);
+    currentAngle = stepper.encoder.getAngle();
+  }
+  stepper.stop();
+  stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
+  stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
   smState = STATE_WAIT;
 }
 
