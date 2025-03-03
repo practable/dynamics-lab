@@ -9,7 +9,7 @@ Imogen Heard
 03/03/2025
 
 NOTE: This requires modification of the uStepper32 library files!
- for correct fork see ->>>>>>>>>>   (put link here when complete!)
+ for correct fork see ->>>>>>>>>> https://github.com/ImogenWren/uStepperS32
 
  Specific change: TLE5012B.cpp, comment out lines in init function
  ```
