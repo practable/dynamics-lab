@@ -292,7 +292,7 @@ export default {
                     x: {
                         title:{
                             display: true,
-                            text: 'time/s',
+                            text: 'time[s]',
                             color: _this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
                         },
                         type: 'linear',
@@ -315,7 +315,7 @@ export default {
                     y: {
                         title:{
                             display: true,
-                            text: 'acceleration',
+                            text: 'acceleration[x g m/s^2]',
                             color: _this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
                         },
                         type: 'linear',

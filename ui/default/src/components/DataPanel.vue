@@ -22,13 +22,13 @@
               <thead class='table-head'>
                 <tr>
                       <th scope="col"></th>
-                      <th scope="col">Pos[deg]</th>
+                      <!-- <th scope="col">Pos[deg]</th> -->
                       <th scope="col" colspan="3">Acc[g]</th>
                       <th scope="col" colspan="3">Gyro[deg/s]</th>
                   </tr>
                   <tr>
                       <th scope="col"></th>
-                      <th scope="col"></th>
+                      <!-- <th scope="col"></th> -->
                       <th scope="col">x</th>
                       <th scope="col">y</th>
                       <th scope="col">z</th>
@@ -38,20 +38,20 @@
                   </tr>
               </thead>
               <tbody>
-                <tr v-if="getCurrentPosition.pos != undefined">
-                  <td>Current</td>
-                  <td>{{getCurrentPosition.pos.toFixed(3)}}</td>
-                  <td>{{getCurrentAcceleration.x.toFixed(3)}}</td>
-                  <td>{{getCurrentAcceleration.y.toFixed(3)}}</td>
-                  <td>{{getCurrentAcceleration.z.toFixed(3)}}</td>
-                  <td>{{getCurrentGyro.x.toFixed(3)}}</td>
-                  <td>{{getCurrentGyro.y.toFixed(3)}}</td>
-                  <td>{{getCurrentGyro.z.toFixed(3)}}</td>
+                <tr v-if="getCurrentPosition[0] != undefined">
+                  <td class="ps-2">Current</td>
+                  <!-- <td>{{getCurrentPosition.pos.toFixed(3)}}</td> -->
+                  <td>{{getCurrentAcceleration.x[0]}}</td>
+                  <td>{{getCurrentAcceleration.y[0]}}</td>
+                  <td>{{getCurrentAcceleration.z[0]}}</td>
+                  <td>{{getCurrentGyro.x[0]}}</td>
+                  <td>{{getCurrentGyro.y[0]}}</td>
+                  <td>{{getCurrentGyro.z[0]}}</td>
                 </tr>
 
                 <tr v-if="getDataSets.length != 0">
-                  <td>Abs. Max.</td>
-                  <td>-</td>
+                  <td class="ps-2">Abs. Max.</td>
+                  <!-- <td>-</td> -->
                   <td>{{ maxAcc.x.toFixed(3) }}</td>
                   <td>{{ maxAcc.y.toFixed(3) }}</td>
                   <td>{{ maxAcc.z.toFixed(3) }}</td>
@@ -61,8 +61,8 @@
                 </tr>
 
                 <tr v-if="getDataSets.length != 0">
-                  <td>RMS Avg.</td>
-                  <td>-</td>
+                  <td class="ps-2">RMS Avg.</td>
+                  <!-- <td>-</td> -->
                   <td>{{ rmsAcc.x.toFixed(3) }}</td>
                   <td>{{ rmsAcc.y.toFixed(3) }}</td>
                   <td>{{ rmsAcc.z.toFixed(3) }}</td>
@@ -145,10 +145,24 @@ export default {
       getIsRecording(now, then){
         if(then && !now){
           this.updateAllCalculations();
+          this.selectedDataSet = this.getDataSets.length - 1;
         } 
       },
       selectedDataSet(now,then){
         this.updateAllCalculations();
+      },
+      getNumData(n){
+        //if data has been reset, then reset the selected dataset to 0 and the average values
+        if(n == 0){
+          this.selectedDataSet = 0;
+          this.avgPos = 0;
+          this.avgAcc = {x:0,y:0,z:0};
+          this.avgGyro = {x:0,y:0,z:0};
+          this.maxAcc = {x:0,y:0,z:0};
+          this.maxGyro = {x:0,y:0,z:0};
+          this.rmsAcc = {x:0,y:0,z:0};
+          this.rmsGyro = {x:0,y:0,z:0};
+        }
       }
   },
   created(){
@@ -160,7 +174,7 @@ export default {
   methods: {
     updateAllCalculations(){
       let data = this.getDataSets[this.selectedDataSet];
-      if(data.length > 0){
+      if(data != undefined && data.length > 0){
         this.maxAcc.x = this.getAbsMaxValueFromDataSetWithAxis(data, 'acc', 'x');
         this.maxAcc.y = this.getAbsMaxValueFromDataSetWithAxis(data, 'acc', 'y');
         this.maxAcc.z = this.getAbsMaxValueFromDataSetWithAxis(data, 'acc', 'z');
