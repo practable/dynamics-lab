@@ -11,9 +11,9 @@ const commandStore = {
             'hz': 1, 
             'rpm': 60, 
             'from_hardware': {'hz': 1, 'rpm': 60,}, 
-            'max':20, 
+            'max':10, 
             'min':1, 
-            'step':0.1},
+            'step':0.05},
 
        }),
        mutations:{
@@ -103,6 +103,13 @@ const commandStore = {
                     set: "cal"
                 }));
             }
+        },
+        COMMAND_HOME(state){
+            if(state.dataSocket != null){
+                state.dataSocket.send(JSON.stringify({
+                    set: "home"
+                }));
+            }
         }
             
 
@@ -169,6 +176,9 @@ const commandStore = {
         sendCommandCalibrate(context){
             context.commit('COMMAND_CALIBRATE');
         },
+        sendCommandHome(context){
+            context.commit('COMMAND_HOME');
+        }
         
 
        },

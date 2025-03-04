@@ -267,7 +267,7 @@ export default {
             } 
          
 
-            setTimeout(this.updateChart, 50);
+            setTimeout(this.updateChart, 100);
         },
         createChart() {
             var _this = this;
@@ -342,11 +342,11 @@ export default {
                         type: 'linear',
                         position: 'right',
                         ticks: {
-                            callback : (value,index,values) => {
-                                _this.updateYAxisMax(value, index);
-                                _this.updateYAxisMin(value, index, values);
-                                return value;
-                            },
+                            // callback : (value,index,values) => {
+                            //     _this.updateYAxisMax(value, index);
+                            //     _this.updateYAxisMin(value, index, values);
+                            //     return value;
+                            // },
                             color: _this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
                         },
                         grid: {
@@ -445,7 +445,7 @@ export default {
                 let data = this.getData[i];
                 let x_data = data.t;
                 let y_data = data.acc.x;
-                let y_data_two = -1*Math.cos(Math.PI*data.pos/180);    //normalised driving force
+                let y_data_two = -1*Math.sin(Math.PI*data.pos/180);
 
                 if(this.getCurrentMode == 'driven'){
                     this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));
@@ -479,7 +479,7 @@ export default {
                 let data = this.getData[index];
                 let x_data = data.t;
                 let y_data = data.acc.x;
-                let y_data_two = -1*Math.cos(Math.PI*data.pos/180);
+                let y_data_two = -1*Math.sin(Math.PI*data.pos/180);
 
                 if(this.getCurrentMode == 'driven'){
                     this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));
@@ -496,7 +496,7 @@ export default {
                 let data = this.getData[index];
                 let x_data = data.t;
                 let y_data = data.acc.x;
-                let y_data_two = -1*Math.cos(Math.PI*data.pos/180);
+                let y_data_two = -1*Math.sin(Math.PI*data.pos/180);
                 
                 if(this.getCurrentMode == 'driven'){
                     this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));

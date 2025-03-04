@@ -34,7 +34,7 @@
 			<!-- STOPPED mode command options -->
 			<button id="stop-stream-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="stop data streaming" @click="sendCommandStopStream">Stop Stream</button>
 			<button id="start-stream-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="start data streaming" @click="sendCommandStartStream">Start Stream</button>
-			<button id="calibrate-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="calibrate zero position" @click="sendCommandCalibrate">Zero</button>
+			<button id="home-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="return to home position" @click="sendCommandHome">Home</button>
 			
 			<!-- UNDRIVEN mode command options -->
 			<button id="undriven-ping-button" v-if='getCurrentMode == "undriven"' class="button-sm button-primary" aria-label="start an undriven oscillation" @click="sendCommandPing">Ping</button>
@@ -48,18 +48,18 @@
 			<!-- DRIVEN mode settings -->
 			<div v-if='getCurrentMode == "driven"' class="d-flex flex-row align-items-center justify-content-end">
 				<div class="d-flex flex-column">
-					<label id="driving-frequency-slider-label" for="driving-frequency-slider">Set to: ({{ driving_frequency }}Hz)</label>
-					<label id="driving-frequency-slider-label" for="driving-frequency-slider">Current ({{ getReportedDrivingFrequencyHz }}Hz)</label>
+					<label id="driving-frequency-slider-label" for="driving-frequency-slider">Set to: ({{ driving_frequency.toFixed(2) }}Hz)</label>
+					<label id="driving-frequency-slider-label" for="driving-frequency-slider">Current ({{ getReportedDrivingFrequencyHz.toFixed(2) }}Hz)</label>
 				</div>
 				<input class="ms-2" type="range" :min="getDrivingFrequencyMin" :max="getDrivingFrequencyMax" :step="getDrivingFrequencyStep" v-model="driving_frequency" id="driving-frequency-slider" @mousedown="setDraggable(false)" @mouseup="setDraggable(true)" @mouseleave="setDraggable(true)">
 				<button id="update-driving-frequency-button" class="button-sm button-primary" aria-label="update driving frequency" @click="updateDrivingFrequency">Run</button>
 			</div>
 
 			<!-- STOPPED mode settings -->
-			<div class="d-flex flex-row align-items-center justify-content-end">
+			<!-- <div class="d-flex flex-row align-items-center justify-content-end">
 				<label id="sampling-rate-slider-label" for="sampling-rate-slider">Sampling rate ({{ sampling_rate }}Hz)</label>
 				<input class="ms-2" type="range" :min="getSamplingRateMin" :max="getSamplingRateMax" :step="getSamplingRateStep" v-model="sampling_rate" id="sampling-rate-slider" @mousedown="setDraggable(false)" @mouseup="setDraggable(true)" @mouseleave="setDraggable(true)">
-			</div>
+			</div> -->
 		
 		</div>
 
@@ -252,7 +252,8 @@ export default {
 			'sendCommandPing',
 			'sendCommandStartStream',
 			'sendCommandStopStream',
-			'sendCommandCalibrate',
+			//'sendCommandCalibrate',
+			'sendCommandHome',
 			'sendCommandUpdateSampleRate',
 			'updateDrivingFrequencyHz',
 			'setReportedDrivingFrequency',
@@ -324,10 +325,13 @@ export default {
 					}
 					else if(obj.payload){
 						let msgTime = obj.timestamp;		//int
+						let time = obj.payload.meta.time;			//int array
 						//let state = obj.payload.state		//string
-						let pos = obj.payload.encode;		//object
+						let pos = obj.payload.encode.pos;		//float array pos in degrees
 						let acc = obj.payload.mpu.acc;		//object
 						let gyro = obj.payload.mpu.gyro;	//object
+
+						
 
 						_this.setReportedDrivingFrequency(obj.payload.step);
 
@@ -361,16 +365,17 @@ export default {
 						messageCount += 1
 
 						if(!isNaN(d_msgTime)){
-							_this.setCurrentTime(msgTime);
-
+							_this.setCurrentTime(time);
 							_this.setCurrentPosition(pos);
-							series_position.append(msgTime + thisDelay, pos.pos);
-
 							_this.setCurrentAcceleration(acc);
-							series_acceleration.append(msgTime + thisDelay, acc.x);
-
 							_this.setCurrentGyro(gyro);
+
+							for(let i=0; i<time.length;i++){
+								series_position.append(time[i] + thisDelay, pos[i]);
+								series_acceleration.append(time[i] + thisDelay, acc.x[i]);	//only streaming x axis data
 							}
+							
+						}
 					}
 				} catch (e) {
 					if(debug){

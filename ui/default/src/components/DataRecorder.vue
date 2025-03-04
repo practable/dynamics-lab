@@ -134,13 +134,24 @@ export default {
         this.addToDatasetIndex();
       },
       plot(){
-        let time = parseFloat(this.getTimeFromStart);     
+        let time = this.getTimeFromStart;     
         let pos = this.getCurrentPosition; 
         let acc = this.getCurrentAcceleration; 
         let gyro = this.getCurrentGyro; 
         
-        let data_object = {id: this.getNumData,  set: this.getDatasetIndex, t: time, pos: pos.pos, acc: acc, gyro: gyro, showDataPoint: true};
-        this.$store.dispatch('addData', data_object);
+        pos.forEach((pos, index) => {
+          let data_object = {
+              id: this.getNumData,  
+              set: this.getDatasetIndex, 
+              t: parseFloat(time[index]), 
+              pos: parseFloat(pos), 
+              acc: {x: parseFloat(acc['x'][index]), y: parseFloat(acc['y'][index]), z: parseFloat(acc['z'][index])}, 
+              gyro: {x: parseFloat(gyro['x'][index]), y: parseFloat(gyro['y'][index]), z: parseFloat(gyro['z'][index])},
+              showDataPoint: true};
+
+          this.$store.dispatch('addData', data_object);
+        });
+        
       },
       clearData(){
           this.$store.dispatch('clearAllData');

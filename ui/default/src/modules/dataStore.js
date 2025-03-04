@@ -4,8 +4,8 @@ const dataStore = {
    state: () => ({
       //current values
       start_time: 0,
-      currentTime: 0,
-      currentPos: {},
+      currentTime: [],
+      currentPos: [],
       currentAcc: {},
       currentGyro: {},
       //recorded data
@@ -123,13 +123,27 @@ const dataStore = {
      getCurrentTime(state){
       return state.currentTime;
      },
-     getTimeFromStart(state){ 
-      if(state.currentTime - state.start_time >= 0){
-         return (state.currentTime - state.start_time)/1000;  //in seconds
-      } else{
-         state.start_time = state.currentTime;
-         return 0.0;
+   //   getTimeFromStart(state){ 
+   //    if(state.currentTime - state.start_time >= 0){
+   //       return (state.currentTime - state.start_time)/1000;  //in seconds
+   //    } else{
+   //       state.start_time = state.currentTime;
+   //       return 0.0;
+   //    }
+   // },
+   getTimeFromStart(state){ 
+      let new_time = []
+      for(let i=0;i<state.currentTime.length; i++){
+         if(state.currentTime[i] - state.start_time >= 0){
+            new_time.push((state.currentTime[i] - state.start_time)/1000);  //in seconds
+         } else{
+            state.start_time = state.currentTime[i];
+            new_time.push(0.0);
+         }
       }
+
+      return new_time;
+      
    },
      getCurrentPosition(state){
       return state.currentPos;
