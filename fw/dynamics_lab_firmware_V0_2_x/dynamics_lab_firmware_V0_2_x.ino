@@ -57,6 +57,8 @@ Global variables use 29856 bytes (45%) of dynamic memory, leaving 35680 bytes fo
     - Adding ability to save encoder offset value in EEPROM
 - modified encoder.setHomeActual -> added function to manually reset the encoder angle
 
+Version V0.2.2
+- Updated sampling timing for more even timing between samples
 
 */
 
@@ -109,6 +111,7 @@ void setup() {
   servo_pos = false;
   //  delay(1000);
 }
+
 
 
 void loop() {
@@ -195,29 +198,32 @@ void loop() {
   mpu.getEvent(&a, &g, &temp);
 
   // Do sampling Data at the specified rate
-  if (sampleDelay.millisDelay(sampleDelay_mS)) {
+  if (sampleDelay.millisDelay(sampleDelay_mS) || samples_written == 0) {  // added OR if samples written has been reset to 0 after printing
     if (samples_written < num_samples_req && samples_written < DATA_ARRAY_SIZE) {  // check to make sure collecting the correct number of samples for the samplerate, and smaller than the
       timestamp_array[samples_written] = millis();
       encode_array[samples_written] = stepper.encoder.getAngle();
-      accX_array[samples_written] = (a.acceleration.x / G_CONST);        // - acc_offset.X;  //mpu.GetAccX();
-      accY_array[samples_written] = (a.acceleration.y / G_CONST);        /// - acc_offset.Y;  //mpu.GetAccY();
-      accZ_array[samples_written] = (a.acceleration.z / G_CONST) - 0.3;  // Added 0.3 offset due to sensor calibration issue  // - acc_offset.Z;  //mpu.GetAccZ();
-      gyroX_array[samples_written] = g.gyro.x - gyro_offset.X;           // mpu.GetGyroX();
-      gyroY_array[samples_written] = g.gyro.y - gyro_offset.Y;           //mpu.GetGyroY();
-      gyroZ_array[samples_written] = g.gyro.z - gyro_offset.Z;           //mpu.GetGyroZ();
+      accX_array[samples_written] = (a.acceleration.x / G_CONST);  // - acc_offset.X;  //mpu.GetAccX();
+      accY_array[samples_written] = (a.acceleration.y / G_CONST);  /// - acc_offset.Y;  //mpu.GetAccY();
+      accZ_array[samples_written] = (a.acceleration.z / G_CONST);  // Added 0.3 offset due to sensor calibration issue  // - acc_offset.Z;  //mpu.GetAccZ();
+      gyroX_array[samples_written] = g.gyro.x - gyro_offset.X;     // mpu.GetGyroX();
+      gyroY_array[samples_written] = g.gyro.y - gyro_offset.Y;     //mpu.GetGyroY();
+      gyroZ_array[samples_written] = g.gyro.z - gyro_offset.Z;     //mpu.GetGyroZ();
       samples_written++;
-    } else if (samples_written == DATA_ARRAY_SIZE) {
+    }
+    // else if (samples_written == DATA_ARRAY_SIZE) {
       // we have written our last sample to the array, if it was a string, would append with a /n
       // but as floats this isnt needed
-    }
+   // }
   }
 
   // do streaming data at the specified rate
   if (streaming_active || snapshop_active) {
-    if (printDelay.millisDelay(print_delay_mS)) {
+   // if (printDelay.millisDelay(print_delay_mS)) {
+    if (samples_written >= num_samples_req){               // REMOVED PRINT TIMER
+      sampleDelay.resetDelayTime_mS(); // makes sure that the sample loop is synced to the printing loop //moved to try and improve timings (doing this first so next sample is sooner)
       //print the sampled data
       update_json(samples_written);
-      samples_written = 0;
+      samples_written = 0;      
     }
     if (snapshop_active) {
       if (millis() - snapshot_starttime_mS >= snapshot_timer_mS) {

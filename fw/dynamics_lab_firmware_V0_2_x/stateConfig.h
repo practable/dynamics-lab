@@ -159,11 +159,11 @@ void print_cmds() {
   Serial.println(F("   {\"print\": 1 to 50}   -> Set Print Rate in Hz (dflt: 50)"));
   Serial.println(F("   {\"stream\":\"\"}      -> Start Data Streaming    "));
   Serial.println(F("   {\"endst\":\"\"}       -> End Data Streaming      "));
-  Serial.println(F("   {\"snap\":\"\"}        -> Take Data Snapshot       "));                  // Take a Snapshot of data
-  Serial.println(F("   {\"time\": 1 - 250000 }-> Set Time for Data Snapshot (mS)  "));          // Change the time over which the data snapshot is taken
-  Serial.println(F("   {\"ping\":\"\"}        -> Ping Servo               "));                  // Ping the wobble-shaft with the servo
-  Serial.println(F("   {\"offset\":\"-32768 to 32768\"} -> NOT CURRENTLY USED"));  // Print commands list
-  Serial.println(F("   {\"help\":\"\"}        -> Print Commands to Serial Monitor    "));       // Print commands list
+  Serial.println(F("   {\"snap\":\"\"}        -> Take Data Snapshot       "));             // Take a Snapshot of data
+  Serial.println(F("   {\"time\": 1 - 250000 }-> Set Time for Data Snapshot (mS)  "));     // Change the time over which the data snapshot is taken
+  Serial.println(F("   {\"ping\":\"\"}        -> Ping Servo               "));             // Ping the wobble-shaft with the servo
+  Serial.println(F("   {\"offset\":\"-32768 to 32768\"} -> NOT CURRENTLY USED"));          // Print commands list
+  Serial.println(F("   {\"help\":\"\"}        -> Print Commands to Serial Monitor    "));  // Print commands list
 }
 
 
@@ -378,7 +378,8 @@ void sm_state_samplerate(jsonStateData stateData) {
     errors.print_json_status();
   } else {
     sampleRate_Hz = stateData.numeric;
-    sampleDelay_mS = 1000 / sampleRate_Hz;
+    // sampleDelay_mS = 1000 / sampleRate_Hz;
+    sampleDelay_mS = 1E3 / sampleRate_Hz - SAMPLE_DELAY_OFFSET;
     num_samples_req = uint8_t(sampleRate_Hz / print_rate_Hz);  // Number of samples required to collect between each print cycle
   }
   smState = STATE_WAIT;

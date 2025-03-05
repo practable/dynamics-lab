@@ -26,7 +26,7 @@
 
 // Program Attributes
 #define EXPERIMENT_NAME "dynamics-lab"
-#define FIRMWARE_VERSION "V0.2.1"
+#define FIRMWARE_VERSION "V0.2.2"
 #define DEVELOPER "Imogen-Heard"
 
 // Hardware Definitions
@@ -129,10 +129,12 @@ bool snapshop_active = false;
 uint16_t snapshot_timer_mS = 25000;
 uint32_t snapshot_starttime_mS;
 
+#define SAMPLE_DELAY_OFFSET 0 // offset in mS
 
 autoDelay sampleDelay;
 uint16_t sampleRate_Hz = INIT_SAMPLE_RATE_Hz;
-uint32_t sampleDelay_mS = uint32_t(1000 / sampleRate_Hz) - 4;  // added -5 to make the delay just a little shorter, and ensure we get all samples in before they are sent.
+//uint32_t sampleDelay_mS = uint32_t(1000 / sampleRate_Hz) - 4;  // added -5 to make the delay just a little shorter, and ensure we get all samples in before they are sent.
+uint32_t sampleDelay_mS = uint32_t(1E3 / sampleRate_Hz) - SAMPLE_DELAY_OFFSET; // 
 // The function will stop sampling once buffer it full, so this should make more consistant outputs
 // #TODO MAKE SURE STATE FUNCTION IS UPDATED TO MATCH
 
