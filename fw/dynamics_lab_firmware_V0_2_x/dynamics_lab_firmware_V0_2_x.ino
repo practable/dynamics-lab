@@ -60,6 +60,13 @@ Global variables use 29856 bytes (45%) of dynamic memory, leaving 35680 bytes fo
 Version V0.2.2
 - Updated sampling timing for more even timing between samples
 
+Version V0.2.3
+Sketch uses 76952 bytes (29%) of program storage space. Maximum is 262144 bytes.
+Global variables use 29864 bytes (45%) of dynamic memory, leaving 35672 bytes for local variables. Maximum is 65536 bytes.
+- Changed "home" state to non-blocking
+- Change GOTO state to work using encoder externally -> needs more work but is in progress
+
+
 */
 
 

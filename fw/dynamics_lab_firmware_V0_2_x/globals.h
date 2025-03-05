@@ -117,6 +117,9 @@ int16_t hall_low_point;
 int16_t step_low_angle;
 int16_t persistant_encoder_offset;
 
+float goto_target = 0;   // goto state sets global var then uses this while remaining in goto state until target position has been reached
+bool goto_triggered = false;
+
 //EEprom Variables
 const int WRITTEN_SIGNATURE = 0x98C7AB1E;    // Arbitary signature to check for existing encoder offset value in persistant memory (practable)
 

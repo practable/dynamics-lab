@@ -279,15 +279,18 @@ void sm_state_home(void) {
   stepper.setMaxVelocity(800);
   stepper.setMaxAcceleration(4000);
   float currentAngle = stepper.encoder.getAngle();
-  while ((!currentAngle < 0.3) && !(currentAngle > 359.7)) {
-    // stepper.moveAngle(2);
+  if ((!currentAngle < 0.3) && !(currentAngle > 359.7)) {
     stepper.setRPM(50);
-    currentAngle = stepper.encoder.getAngle();
+  } else {
+    stepper.stop();
+    stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
+    stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
+    smState = STATE_WAIT;
   }
-  stepper.stop();
-  stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
-  stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
-  smState = STATE_WAIT;
+  // while ((!currentAngle < 0.3) && !(currentAngle > 359.7)) {    // replaced with non-blocking version
+  //   stepper.setRPM(50);
+  //   currentAngle = stepper.encoder.getAngle();
+  //  }
 }
 
 
@@ -348,10 +351,35 @@ void sm_state_goto(jsonStateData stateData) {
     Serial.println(F("state: GOTO"));
 #endif
     lastState = smState;
+    goto_triggered = true;
+    stepper.stop();
+  //  stepper.setMaxVelocity(800);
+  //  stepper.setMaxAcceleration(4000);
+    goto_target = stateData.numeric;
   }
-  stepper.stop();
+
+  //This will be way easier by writing a function that can tell if a number is close to another, knowing that 360 = 0
+  /*
+  float currentAngle = stepper.encoder.getAngle();
+  float target_high = goto_target + 0.3;
+  float target_low = goto_target - 0.3;
+  if (target_high > 360.0) target_high += -360;
+  if (target_low < 0) target_low = 
+  if ((!currentAngle < goto_target + 0.3) && !(currentAngle > 359.7)) {
+    stepper.setRPM(50);
+  } else {
+    stepper.stop();
+    stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
+    stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
+    smState = STATE_WAIT;
+  }
+
   stepper.moveToAngle(stateData.numeric);
+*/
   smState = STATE_WAIT;
+
+  //  float goto_target = 0;   // goto state sets global var then uses this while remaining in goto state until target position has been reached
+  //bool goto_triggered = false;
 }
 
 
