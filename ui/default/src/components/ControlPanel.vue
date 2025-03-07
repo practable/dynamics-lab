@@ -314,7 +314,7 @@ export default {
 
 			this.dataSocket.onopen = () => {
 				console.log('data connection opened');
-				this.sendCommandUpdateSampleRate(this.getSamplingRate);
+				//this.sendCommandUpdateSampleRate(this.getSamplingRate);
 			};
 
 			this.dataSocket.onmessage = (event) => {
