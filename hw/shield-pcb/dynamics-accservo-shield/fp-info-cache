@@ -1,4 +1,4 @@
-22610125153105214
+22611874561898203
 000-edge-connectors-immo
 1-pin-edge-touch-xl
 PCIexpress Bus Edge Connector x1 http://www.ritrontek.com/uploadfile/2016/1026/20161026105231124.pdf#page=70
@@ -1056,6 +1056,13 @@ D2PAK DDPAK TO-263 D2PAK-5 TO-263-5 SOT-426
 0
 4
 4
+000_Modules_Immo
+MPU6050-acc-module
+Through hole straight pin header, 2x10, 2.54mm pitch, single row
+uStepper Shield
+0
+8
+8
 000_Modules_Immo
 UOE-PCB-Template-nocuts
 
