@@ -485,6 +485,185 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "000_Capacitor_Electrolytic_Immo:1000uF"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "EC"
+				(at 0.635 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "1000uF"
+				(at 0.635 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "Capacitor_SMD:CP_Elec_10x10"
+				(at 0.9652 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Polarized capacitor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "JLCpart" "C134726"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Cost" "0.1866"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "cap capacitor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "CP_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "1000uF_0_1"
+				(rectangle
+					(start -2.286 0.508)
+					(end 2.286 1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.778 2.286) (xy -0.762 2.286)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 2.794) (xy -1.27 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 2.286 -0.508)
+					(end -2.286 -1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+			)
+			(symbol "1000uF_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 2.794)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 2.794)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "000_Capacitor_Electrolytic_Immo:220u"
 			(pin_numbers
 				(hide yes)
@@ -3031,10 +3210,10 @@
 		(uuid "36153b26-ead4-40d3-be9d-cdece72cd29b")
 	)
 	(junction
-		(at 86.36 39.37)
+		(at 87.63 39.37)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "474a6ec5-7598-4332-a2ea-1e2b4bbd781e")
+		(uuid "584da7a6-be4c-4e2d-88b7-2e10e5c07331")
 	)
 	(junction
 		(at 44.45 116.84)
@@ -3055,22 +3234,16 @@
 		(uuid "9283168f-f65c-4dc2-b138-23daf65248ab")
 	)
 	(junction
-		(at 74.93 39.37)
+		(at 77.47 39.37)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "c8ab4fc6-4e64-4159-997e-691de1fea189")
+		(uuid "a794d63b-21ef-40cd-b6cc-ecfde575ca7e")
 	)
 	(junction
 		(at 134.62 96.52)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "cf040900-fc7d-4c55-98cb-23a4242a960a")
-	)
-	(junction
-		(at 74.93 53.34)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "efc94271-f5da-4b8d-a65a-b71482f19240")
 	)
 	(junction
 		(at 35.56 39.37)
@@ -3162,7 +3335,7 @@
 	)
 	(wire
 		(pts
-			(xy 85.09 53.34) (xy 86.36 53.34)
+			(xy 76.2 53.34) (xy 77.47 53.34)
 		)
 		(stroke
 			(width 0)
@@ -3182,7 +3355,7 @@
 	)
 	(wire
 		(pts
-			(xy 74.93 53.34) (xy 62.23 53.34)
+			(xy 62.23 53.34) (xy 68.58 53.34)
 		)
 		(stroke
 			(width 0)
@@ -3209,16 +3382,6 @@
 			(type default)
 		)
 		(uuid "3e7f5b3c-7a14-480e-9764-72ca08c565bc")
-	)
-	(wire
-		(pts
-			(xy 74.93 39.37) (xy 86.36 39.37)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "438983ec-8803-462b-bb4e-105531644e35")
 	)
 	(wire
 		(pts
@@ -3282,17 +3445,7 @@
 	)
 	(wire
 		(pts
-			(xy 86.36 39.37) (xy 107.95 39.37)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "774945d2-a794-4798-9e1f-16a43630903e")
-	)
-	(wire
-		(pts
-			(xy 86.36 39.37) (xy 86.36 41.91)
+			(xy 77.47 39.37) (xy 77.47 41.91)
 		)
 		(stroke
 			(width 0)
@@ -3352,6 +3505,16 @@
 	)
 	(wire
 		(pts
+			(xy 77.47 39.37) (xy 87.63 39.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8d8ae937-1282-4973-8d8f-1c28eabed30a")
+	)
+	(wire
+		(pts
 			(xy 134.62 96.52) (xy 132.08 96.52)
 		)
 		(stroke
@@ -3359,16 +3522,6 @@
 			(type default)
 		)
 		(uuid "8e8ec7d9-bc23-46d3-a0e4-bb2adf192b6b")
-	)
-	(wire
-		(pts
-			(xy 74.93 50.8) (xy 74.93 53.34)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "916d0501-0f1a-4500-919c-23c2001683d5")
 	)
 	(wire
 		(pts
@@ -3452,7 +3605,7 @@
 	)
 	(wire
 		(pts
-			(xy 86.36 53.34) (xy 86.36 49.53)
+			(xy 77.47 53.34) (xy 77.47 49.53)
 		)
 		(stroke
 			(width 0)
@@ -3462,7 +3615,17 @@
 	)
 	(wire
 		(pts
-			(xy 69.85 39.37) (xy 74.93 39.37)
+			(xy 87.63 39.37) (xy 107.95 39.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ac213bc8-7217-433d-8255-34ad6115df59")
+	)
+	(wire
+		(pts
+			(xy 69.85 39.37) (xy 77.47 39.37)
 		)
 		(stroke
 			(width 0)
@@ -3502,23 +3665,13 @@
 	)
 	(wire
 		(pts
-			(xy 74.93 39.37) (xy 74.93 43.18)
+			(xy 87.63 39.37) (xy 87.63 41.91)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "bd93a203-a000-4dd5-875c-7d547a010895")
-	)
-	(wire
-		(pts
-			(xy 74.93 53.34) (xy 77.47 53.34)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bfc2e10b-c747-4388-a9f4-230132e5cc26")
+		(uuid "bdd29f13-1f2f-439f-bbb9-27a5c45b51c8")
 	)
 	(wire
 		(pts
@@ -3619,6 +3772,16 @@
 			(type default)
 		)
 		(uuid "e62b3dc7-fdbc-4224-9269-b0396b669a30")
+	)
+	(wire
+		(pts
+			(xy 87.63 49.53) (xy 87.63 52.07)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ecf36b66-ab09-40a7-9315-72e814770b1b")
 	)
 	(label "5V"
 		(at 129.54 92.71 0)
@@ -3892,7 +4055,7 @@
 	)
 	(symbol
 		(lib_id "000_Resistors_Immo:1k")
-		(at 81.28 53.34 0)
+		(at 72.39 53.34 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3900,7 +4063,7 @@
 		(dnp no)
 		(uuid "301c290e-c363-4e56-8495-64aac7c8acaa")
 		(property "Reference" "R2"
-			(at 82.296 51.308 0)
+			(at 73.406 51.308 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3908,7 +4071,7 @@
 			)
 		)
 		(property "Value" "1k"
-			(at 81.534 55.626 0)
+			(at 72.644 55.626 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3916,7 +4079,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 81.28 55.118 0)
+			(at 72.39 55.118 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3925,7 +4088,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 81.28 53.34 90)
+			(at 72.39 53.34 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3934,7 +4097,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 81.28 53.34 0)
+			(at 72.39 53.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3943,7 +4106,7 @@
 			)
 		)
 		(property "JLCpart" "C218388"
-			(at 82.55 55.88 0)
+			(at 73.66 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3952,7 +4115,7 @@
 			)
 		)
 		(property "Cost" "0.0082"
-			(at 81.28 55.88 0)
+			(at 72.39 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4457,35 +4620,16 @@
 		)
 	)
 	(symbol
-		(lib_id "000_Capacitor_Electrolytic_Immo:220u")
-		(at 74.93 46.99 0)
+		(lib_id "power:GND")
+		(at 87.63 52.07 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "700e4d71-1781-4042-8ba5-ce227f75dec5")
-		(property "Reference" "EC3"
-			(at 78.74 44.8309 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "220u"
-			(at 78.74 47.3709 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:CP_Elec_6.3x7.7"
-			(at 75.8952 50.8 0)
+		(uuid "5dbc17e1-6316-4d70-b08f-f29d805cb18e")
+		(property "Reference" "#PWR06"
+			(at 87.63 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4493,8 +4637,16 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
-			(at 74.93 46.99 0)
+		(property "Value" "GND"
+			(at 87.63 55.626 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 87.63 52.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4502,8 +4654,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Polarized capacitor"
-			(at 74.93 46.99 0)
+		(property "Datasheet" ""
+			(at 87.63 52.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4511,52 +4663,22 @@
 				(hide yes)
 			)
 		)
-		(property "JLCpart" "C4747974"
-			(at 74.93 46.99 0)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 87.63 52.07 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
 			)
-		)
-		(property "RSpart" ""
-			(at 74.93 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "supplier" ""
-			(at 74.93 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "cost" "0.0315"
-			(at 74.93 46.99 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "f1bb61c4-bb71-4f91-aa3c-ea02d5c28f7e")
 		)
 		(pin "1"
-			(uuid "f52940ad-0471-457b-b86b-e2458c8967dc")
+			(uuid "1fad4a32-1fcb-4e85-85eb-5957e88e275c")
 		)
 		(instances
 			(project "dynamics-accservo-shield"
 				(path "/38f0d034-708d-4cd6-9c27-5364533099fc"
-					(reference "EC3")
+					(reference "#PWR06")
 					(unit 1)
 				)
 			)
@@ -5063,7 +5185,7 @@
 	)
 	(symbol
 		(lib_id "000_Diodes_Immo:LED_0805_Blue")
-		(at 86.36 45.72 90)
+		(at 77.47 45.72 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5072,7 +5194,7 @@
 		(fields_autoplaced yes)
 		(uuid "d32fe4f9-3d30-46bd-9b76-f6cddba60e50")
 		(property "Reference" "D2"
-			(at 90.17 46.0374 90)
+			(at 81.28 46.0374 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5081,7 +5203,7 @@
 			)
 		)
 		(property "Value" "6v"
-			(at 90.17 48.5774 90)
+			(at 81.28 48.5774 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5090,7 +5212,7 @@
 			)
 		)
 		(property "Footprint" "Diode_SMD:D_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
-			(at 93.98 44.45 0)
+			(at 85.09 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5099,7 +5221,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 95.25 48.26 0)
+			(at 86.36 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5108,7 +5230,7 @@
 			)
 		)
 		(property "Description" "Light emitting diode"
-			(at 86.36 45.72 0)
+			(at 77.47 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5117,7 +5239,7 @@
 			)
 		)
 		(property "JLCpart" "C84259"
-			(at 86.36 45.72 0)
+			(at 77.47 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5126,7 +5248,7 @@
 			)
 		)
 		(property "Cost" "0.0227"
-			(at 86.36 45.72 0)
+			(at 77.47 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5144,6 +5266,94 @@
 			(project ""
 				(path "/38f0d034-708d-4cd6-9c27-5364533099fc"
 					(reference "D2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "000_Capacitor_Electrolytic_Immo:1000uF")
+		(at 87.63 45.72 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d4b3ecdf-54aa-4763-a04c-dc52867ee3b7")
+		(property "Reference" "EC1"
+			(at 91.44 43.5609 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "1000uF"
+			(at 91.44 46.1009 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_THT:CP_Radial_D13.0mm_P5.00mm"
+			(at 88.5952 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 87.63 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Polarized capacitor"
+			(at 87.63 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLCpart" "C134726"
+			(at 87.63 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Cost" "0.1866"
+			(at 87.63 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d0c9fa27-5035-4cfc-ab5b-b5af38e6d062")
+		)
+		(pin "2"
+			(uuid "51d31cbc-caae-4555-8069-484e2bd13998")
+		)
+		(instances
+			(project ""
+				(path "/38f0d034-708d-4cd6-9c27-5364533099fc"
+					(reference "EC1")
 					(unit 1)
 				)
 			)
@@ -5204,7 +5414,7 @@
 				(hide yes)
 			)
 		)
-		(property "JLCpart" "C4747974"
+		(property "JLCpart" "C3342"
 			(at 48.26 46.99 0)
 			(effects
 				(font
