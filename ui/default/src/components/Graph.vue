@@ -618,7 +618,8 @@ export default {
                 label:`acceleration${new_index}`,
                 pointBackgroundColor: this.getDarkTheme ? this.dark_colours[new_index % this.dark_colours.length] : this.light_colours[new_index % this.light_colours.length],
                 borderColor: this.getDarkTheme ? this.dark_colours[new_index % this.dark_colours.length] : this.light_colours[new_index % this.light_colours.length],
-                data: []
+                data: [],
+                showLine: true
                 });
             scatterChart.update(0);
         },
@@ -629,7 +630,8 @@ export default {
                 label:`acceleration${parseInt(new_index)/2}`,
                 pointBackgroundColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
                 borderColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
-                data: []
+                data: [],
+                showLine: true
                 });
 
             scatterChart.data.datasets.push({
@@ -640,7 +642,8 @@ export default {
                 borderColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
                 pointStyle: 'rectRot',
                 pointRadius: 5,
-                data: []
+                data: [],
+                showLine: true
                 });
 
             scatterChart.update(0);
