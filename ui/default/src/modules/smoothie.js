@@ -7,12 +7,12 @@ const smoothieStore = {
         canvas_acceleration: null,
         chart_position: null,
         canvas_position: null,
-        y_min_acc: -1,
-        y_max_acc: 1,
+        y_min_acc: -2,
+        y_max_acc: 2,
         y_min_pos: 0,
         y_max_pos: 360,
-        y_acc_abs: 100,
-        y_pos_abs: 200,
+        y_acc_abs: 2,
+        y_pos_abs: 360,
         millis_per_pixel: 10
        }),
        mutations:{
@@ -139,12 +139,12 @@ const smoothieStore = {
   }
 
   export const default_settings = {
-      y_min_acc: -200,
-      y_max_acc: 200,
-      y_min_pos: -1,
-      y_max_pos: 10.0,
-      y_acc_abs: 100,
-      y_pos_abs: 200,
+      y_min_acc: -2,
+      y_max_acc: 2,
+      y_min_pos: 0,
+      y_max_pos: 360,
+      y_acc_abs: 2,
+      y_pos_abs: 360,
       millis_per_pixel: 10
   }
 
