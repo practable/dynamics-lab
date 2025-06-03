@@ -605,6 +605,7 @@ export default {
         },
         addFunctionPlot(colour, data){
             scatterChart.data.datasets.push({
+                id: "function",
                 label:"function",
                 pointBackgroundColor: colour,
                 borderColor: colour,

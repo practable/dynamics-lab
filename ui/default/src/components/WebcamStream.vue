@@ -55,6 +55,19 @@
 				</template>
 			</options-tool>
 
+			<popup-help class="ms-2" id="popup-help-streams">
+				<template v-slot:header>
+					<h5> Streams Help </h5>
+				</template>
+				<template v-slot:body>
+					<p>This component displays live streams of video and data: the acceleration (along x axis, measured in units of g) and angular position 
+						of the rotating mass (in degrees) are provided as live data streams, alongside a video feed of the hardware. The live data stream axes can 
+						be updated using the options button. The webcam feed can be enlarged or reduced by clicking and dragging (horizontally) on the bottom right corner 
+						of this component.
+					</p>
+				</template>
+			</popup-help>
+
 		</div>
 		
 	</div>
@@ -67,13 +80,15 @@ import VideoElement from "./VideoElement.vue";
 import { mapGetters, mapActions } from 'vuex';
 import DownloadImageButton from "./elements/DownloadImageButton.vue";
 import OptionsTool from './elements/OptionsTool.vue';
+import PopupHelp from "./elements/PopupHelp.vue";
 
 export default {
 	name: "WebcamStream",
 	components:{
 		VideoElement,
 		DownloadImageButton,
-		OptionsTool
+		OptionsTool,
+		PopupHelp
 	},
     data(){
         return{
