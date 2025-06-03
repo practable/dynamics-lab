@@ -334,9 +334,10 @@ export default {
                         sampleSize: 2,
                     },
                     y2: {
+                        display: 'auto',    //only displays when a dataset is added
                         title:{
                             display: true,
-                            text: 'driving force',
+                            text: 'relative driving force',
                             color: _this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
                         },
                         type: 'linear',
@@ -390,13 +391,13 @@ export default {
         },
         updateYAxisMax(value, index){
             if(index == 0){
-                this.YAxisMax = value.toFixed(2);
+                this.YAxisMax = value;
             }
             
         },
         updateYAxisMin(value,index,values){
             if(index == values.length - 1){
-                this.YAxisMin = value.toFixed(2);
+                this.YAxisMin = value;
             }
         },
         updateXAxisMin(value, index){
@@ -641,7 +642,8 @@ export default {
                 label:`position${parseInt(new_index)/2}`,
                 pointBackgroundColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
                 borderColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
-                pointStyle: 'rectRot',
+                //borderColor: this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)',
+                pointStyle: 'triangle',
                 pointRadius: 5,
                 data: [],
                 showLine: true
