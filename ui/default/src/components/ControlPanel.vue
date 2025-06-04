@@ -16,43 +16,45 @@
 							{{ getCurrentMode }}
 						</button>
 						<ul class="dropdown-menu" aria-labelledby="hardware-dropdown-menu">
-							<li><a class="dropdown-item" id="stopped-mode-select" aria-label="stopped mode" @click="setModeStop">stopped</a></li>
-							<li><a class="dropdown-item" id="undriven-mode-select" aria-label="undriven mode" @click="setModeUndriven">undriven</a></li>
-							<li><a class="dropdown-item" id="driven-mode-select" aria-label="driven mode" @click="setModeDriven">driven</a></li>
+							<li><a class="dropdown-item" id="stopped-mode-select" aria-label="stopped mode" @click="setModeAndCommandStop(); hideCurrentFrequency = true">stopped</a></li>
+							<li><a class="dropdown-item" id="undriven-mode-select" aria-label="undriven mode" @click="setModeUndriven"><u>u</u>ndriven</a></li>
+							<li><a class="dropdown-item" id="driven-mode-select" aria-label="driven mode" @click="setModeDriven"><u>d</u>riven</a></li>
 					
 						</ul>
 					</div>
 				</div>
 
 				<div class="mb-lg-2">
-					<button id="stop-motor-button" v-if='getCurrentMode != "stopped"' class="button-sm button-danger" aria-label="exit mode" @click="setModeStop">Exit mode</button>
+					<button id="stop-motor-button" v-if='getCurrentMode != "stopped"' class="button-sm button-danger" aria-label="exit mode" @click="setModeAndCommandStop(); hideCurrentFrequency = true">E<u>x</u>it mode</button>
 				</div>
 			</div>
 		</div>
 
-		<div class="col-lg-3">
+		<div class="col-lg-3 align-content-top mt-lg-3">
 			<!-- STOPPED mode command options -->
-			<button id="stop-stream-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="stop data streaming" @click="sendCommandStopStream">Stop Stream</button>
-			<button id="start-stream-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="start data streaming" @click="sendCommandStartStream">Start Stream</button>
-			<button id="home-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="return to home position" @click="sendCommandHome">Home</button>
-			
+			<!-- <button id="stop-stream-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="stop data streaming" @click="sendCommandStopStream">Stop Stream</button>
+			<button id="start-stream-button" v-if='getCurrentMode == "stopped"' class="button-sm button-primary" aria-label="start data streaming" @click="sendCommandStartStream">Start Stream</button> -->
+			<button id="home-button" v-if='getCurrentMode == "stopped"' class="button-lg button-primary" aria-label="return to home position" @click="sendCommandHome"><u>H</u>ome</button>
+			<!-- <button id="cal-button" v-if='getCurrentMode == "stopped"' class="button-lg button-primary" aria-label="calibrate stepper position" @click="sendCommandCalibrate">Cal</button> -->
+
 			<!-- UNDRIVEN mode command options -->
-			<button id="undriven-ping-button" v-if='getCurrentMode == "undriven"' class="button-sm button-primary" aria-label="start an undriven oscillation" @click="sendCommandPing">Ping</button>
+			<button id="undriven-ping-button" v-if='getCurrentMode == "undriven"' class="button-lg button-primary" aria-label="start an undriven oscillation" @click="sendCommandPing">Pi<u>n</u>g</button>
 			
 			<!-- DRIVEN mode command options -->
-			<button id="driven-start-button" v-if='getCurrentMode == "driven"' class="button-sm button-primary" aria-label="start a driven oscillation" @click="sendCommandStart">Start Driving</button>
-			<button id="driven-stop-button" v-if='getCurrentMode == "driven"' class="button-sm button-primary" aria-label="stop a driven oscillation" @click="setModeStop">Stop Driving</button>
+			<!-- <button id="driven-start-button" v-if='getCurrentMode == "driven"' class="button-sm button-primary" aria-label="start a driven oscillation" @click="sendCommandStart">Start Driving</button> -->
+			<button id="driven-stop-button" v-if='getCurrentMode == "driven"' class="button-lg button-danger" aria-label="stop a driven oscillation" @click="sendCommandStop(); hideCurrentFrequency = true"><u>S</u>top</button>
 		</div>
 
 		<div class="col-lg-6 align-content-top">
 			<!-- DRIVEN mode settings -->
-			<div v-if='getCurrentMode == "driven"' class="d-flex flex-row align-items-center justify-content-end">
-				<div class="d-flex flex-column">
-					<label id="driving-frequency-slider-label" for="driving-frequency-slider">Set to: ({{ driving_frequency.toFixed(2) }}Hz)</label>
-					<label id="driving-frequency-slider-label" for="driving-frequency-slider">Current ({{ getReportedDrivingFrequencyHz.toFixed(2) }}Hz)</label>
-				</div>
+			<div v-if='getCurrentMode == "driven"' class="d-flex flex-column align-items-center justify-content-end">
+				
+				<label id="driving-frequency-slider-label" for="driving-frequency-slider">Set to: {{ driving_frequency.toFixed(2) }}Hz</label>
+				<label v-if="hideCurrentFrequency == false" id="driving-frequency-slider-label" for="driving-frequency-slider">Current: {{ getReportedDrivingFrequencyHz.toFixed(2) }}Hz</label>
+				<label v-else id="driving-frequency-slider-label" for="driving-frequency-slider">Current: 0.00 Hz</label>
+
 				<input class="ms-2" type="range" :min="getDrivingFrequencyMin" :max="getDrivingFrequencyMax" :step="getDrivingFrequencyStep" v-model="driving_frequency" id="driving-frequency-slider" @mousedown="setDraggable(false)" @mouseup="setDraggable(true)" @mouseleave="setDraggable(true)">
-				<button id="update-driving-frequency-button" class="button-sm button-primary" aria-label="update driving frequency" @click="updateDrivingFrequency">Run</button>
+				<button id="update-driving-frequency-button" class="button-lg button-primary" aria-label="update driving frequency" @click="updateDrivingFrequency(); hideCurrentFrequency = false"><u>R</u>un</button>
 			</div>
 
 			<!-- STOPPED mode settings -->
@@ -72,9 +74,17 @@
             </template>
             <template v-slot:body>
                 
+				<p>Dynamics lab has two modes of operation <b>undriven</b> and <b>driven</b>.</p>
 
-                //to fill in
-
+				<p>In <b>undriven</b> mode, the <b>ping</b> function will displace and then release the mass which will undergo 
+				damped oscillations that will decay until the mass returns to its equilibrium position.</p>
+			
+				<p>In <b>driven</b> mode, select a drive frequency using the slider and click <b>Run</b> to cause the unbalanced mass 
+				to rotate at the set frequency. To update the driving frequency, first select a new frequency on the slider and then click <b>Run</b> 
+				again. <b>Stop</b> will stop the rotation.</p>
+			
+				<p>Driven and undriven modes can also be selected using the <b>d</b> and <b>u</b> keyboard keys respectively. Once in undriven mode <b>p</b> 
+				can be used to run the ping function. In driven mode, <b>s</b> and <b>r</b> can be used to stop and run respectively. <b>x</b> will exit any mode. </p>
             </template>
         </popup-help>
 	</div>
@@ -104,7 +114,8 @@ export default {
         return{
 			dataSocket: null,
 			message: '',				//for sending user messages to screen
-			error:''					//for sending errors to screen
+			error:'',					//for sending errors to screen
+			hideCurrentFrequency: true,
         }
     },
 	created(){
@@ -248,11 +259,12 @@ export default {
 			'setModeStop',
 			'setModeDriven',
 			'setModeUndriven',
+			'sendCommandStop',
 			'sendCommandStart',
 			'sendCommandPing',
 			'sendCommandStartStream',
 			'sendCommandStopStream',
-			//'sendCommandCalibrate',
+			'sendCommandCalibrate',
 			'sendCommandHome',
 			'sendCommandUpdateSampleRate',
 			'updateDrivingFrequencyHz',
@@ -263,6 +275,10 @@ export default {
 			'setCurrentAcceleration',
 			'setCurrentGyro'
 		]),
+		setModeAndCommandStop(){
+			this.sendCommandStop();
+			this.setModeStop();
+		},
 		updateDrivingFrequency(){
 			this.sendCommandUpdateDrivingFrequencyHz();
 			setTimeout(() => {
@@ -271,8 +287,27 @@ export default {
 		},
 		hotkey(event){
 			if(event.key == "s"){
-				this.setModeStop();
-			} 
+				this.sendCommandStop();
+				this.hideCurrentFrequency = true;
+			} else if(event.key == "r" & this.getCurrentMode == 'driven'){
+				this.updateDrivingFrequency();
+				this.hideCurrentFrequency = false;
+			} else if(event.key == "o"){
+				this.setIsRecording(true);
+			} else if(event.key == "p"){
+				this.setIsRecording(false);
+			} else if(event.key == "u"){
+				this.setModeUndriven();
+			} else if(event.key == "d"){
+				this.setModeDriven();
+			} else if(event.key == "n" & this.getCurrentMode == 'undriven'){
+				this.sendCommandPing();
+			} else if(event.key == "h" & this.getCurrentMode == 'stopped'){
+				this.sendCommandHome();
+			} else if(event.key == "x" & this.getCurrentMode != 'stopped'){
+				this.setModeAndCommandStop();
+				this.hideCurrentFrequency = true;
+			}
 		},
 		clearMessages(){
 			this.message = '';
@@ -387,8 +422,8 @@ export default {
 
 		_store.dispatch('setStartTime', new Date().getTime());
 		window.addEventListener('keydown', this.hotkey, false);
-		//window.addEventListener('pagehide', this.setModeStop);				//closing window
-		//window.addEventListener('beforeunload', this.setModeStop);			//refreshing page, changing URL
+		//window.addEventListener('pagehide', this.setModeAndCommandStop());				//closing window
+		//window.addEventListener('beforeunload', this.setModeAndCommandStop());			//refreshing page, changing URL
 		
 		
 		},

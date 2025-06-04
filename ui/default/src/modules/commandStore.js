@@ -20,19 +20,21 @@ const commandStore = {
         SET_DATA_SOCKET(state, socket){
             state.dataSocket = socket;
         },
-        SET_STOP(state){
+        SET_STOPPED(state){
             state.currentMode = 'stopped';
-            if(state.dataSocket != null){
-                state.dataSocket.send(JSON.stringify({
-                    set: "stop"
-                }));
-            }
         },
         SET_DRIVEN(state){
             state.currentMode = 'driven';
         },
         SET_UNDRIVEN(state){
             state.currentMode = 'undriven';
+        },
+        COMMAND_STOP(state){
+            if(state.dataSocket != null){
+                state.dataSocket.send(JSON.stringify({
+                    set: "stop"
+                }));
+            }
         },
         COMMAND_START(state){
             if(state.dataSocket != null){
@@ -119,7 +121,10 @@ const commandStore = {
             context.commit("SET_DATA_SOCKET", socket);
         },
         setModeStop(context){
-            context.commit('SET_STOP');
+            context.commit('SET_STOPPED');
+        },
+        sendCommandStop(context){
+            context.commit('COMMAND_STOP');
         },
         setModeDriven(context){
             context.commit('SET_DRIVEN');

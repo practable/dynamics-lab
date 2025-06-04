@@ -67,7 +67,7 @@ body.dark-theme {
 
     #second-row{
         overflow: auto;
-        height: 25dvh;
+        height: 27.5dvh;
         max-height: 100dvh;
         min-height: 20dvh;
         max-width: 100dvw;
@@ -107,8 +107,8 @@ body.dark-theme {
     resize: horizontal;
     overflow: scroll;
     display: block;
-    min-width: 10dvw;
-    min-height: 10dvh;
+    /* min-width: 10dvw;
+    min-height: 10dvh; */
     -ms-overflow-style: none;  /* Hiding scrollbars in IE and Edge */
     scrollbar-width: none;  /* Hiding scrollbars in Firefox */
 }
@@ -126,50 +126,62 @@ body.dark-theme {
 
 .drop-area-full{
     width: 100dvw;
+    min-width: 50dvw;
 }
 
 .drop-area-half{
     width: 50dvw;
+    min-width: 25dvw;
 }
 
 .drop-area-three-quarters{
     width: 75dvw;
+    min-width: 50dvw;
 }
 
 .drop-area-one-quarter{
     width: 25dvw;
+    min-width: 20dvw;
 }
 
 .drop-area-one-eigth{
     width: 12.5dvw;
+    min-width: 10dvw;
 }
 
 .drop-area-three-eigths{
     width: 37.5dvw;
+    min-width: 30dvw;
 }
 
 .drop-area-one-fifth{
     width: 20dvw;
+    min-width: 15dvw;
 }
 
 .drop-area-two-fifths{
     width: 40dvw;
+    min-width: 33dvw;
 }
 
 .drop-area-three-fifths{
     width: 60dvw;
+    min-width: 50dvw;
 }
 
 .drop-area-four-fifths{
     width: 80dvw;
+    min-width: 70dvw;
 }
 
 .drop-area-one-third{
     width: 33dvw;
+    min-width: 20dvw;
 }
 
 .drop-area-two-thirds{
     width: 66dvw;
+    min-width: 50dvw;
 }
 
 .drop-area-mobile{

@@ -4,8 +4,8 @@
 <template>
 <div class='m-2 p-2 practable-component'>
     <div class="d-grid gap-2 d-sm-block">
-        <button type='button' class="button-xsm button-primary" aria-label="record" v-if="!getIsRecording" id="record-data-button" @click='$store.dispatch("setIsRecording", true)'>Record</button>
-        <button type='button' class="button-xsm button-danger" aria-label="stop" v-if="getIsRecording" id="stop-data-button" @click='$store.dispatch("setIsRecording", false)'>Stop</button>
+        <button type='button' class="button-xsm button-primary" aria-label="record" v-if="!getIsRecording" id="record-data-button" @click='$store.dispatch("setIsRecording", true)'>Rec<u>o</u>rd</button>
+        <button type='button' class="button-xsm button-danger" aria-label="stop" v-if="getIsRecording" id="stop-data-button" @click='$store.dispatch("setIsRecording", false)'>Sto<u>p</u></button>
         <button type='button' class="button-xsm button-warning" aria-label="reset" id="reset-data-button" @click="toggleResetModal">Reset</button>
         <button type='button' class="button-xsm button-primary" aria-label="download csv" v-if="hasData" id="download-data-button" @click="outputToCSV">Download CSV</button>
     </div>
@@ -13,7 +13,7 @@
       <div v-if='getIsRecording' class='col-2'>
         <img id='red-light' src='/images/red-light.png' width='20' height='20' :hidden='!showRedLight'>
       </div>
-      <div class='col-10'>  
+      <div class='col-10'>
         <p class='m-1'>Recorded: {{getNumData}}/{{getMaxDataPoints}} data points</p>
       </div>
     </div>
@@ -46,6 +46,8 @@
                 <h5> Data Recorder Help </h5>
             </template>
             <template v-slot:body>  
+                <p>Click record or press <b>o</b> on the keyboard to start recording.</p>
+                <p>Click stop or press <b>p</b> on the keyboard to stop recording.</p>
                 <p>Clicking <b>Reset</b> will delete all recorded data, including clearing the graph component.</p>
                 <p>If you want to save data prior to resetting then click <b>Download CSV</b>
                 to save the data to your local computer.</p>  
@@ -160,62 +162,50 @@ export default {
       toggleResetModal(){
           this.showResetConfirmModal = !this.showResetConfirmModal;
       },
-    //   outputToCSV(){
-    //     let data = this.$store.getters.getData;
-    //     let current_dataset = 0;
-    //     let csv = 'Time/s,Angle/rad,AngVel/rad/s,Command,Drive,Error\n';
-    //     let date = new Date();
+      outputToCSV(){
+        let data = this.$store.getters.getData;
+        let current_dataset = 0;
+        let csv = 'Time[s],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g], Gyro_x[rad/s], Gyro_y[rad/s], Gyro_z[rad/s]\n';
+        let date = new Date();
 
-    //     data.forEach(function(d){
-    //         if(d.set == current_dataset + 1){
-    //             let hiddenElement = document.createElement('a');
-    //             hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-    //             hiddenElement.target = '_blank';
-    //             hiddenElement.download = `spinner-${date.getHours()}-${date.getMinutes()}-run${current_dataset}.csv`;
-    //             hiddenElement.click();
+        data.forEach(function(d){
+            if(d.set == current_dataset + 1){
+                let hiddenElement = document.createElement('a');
+                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+                hiddenElement.target = '_blank';
+                hiddenElement.download = `dynamics-${date.getHours()}-${date.getMinutes()}-dataset${current_dataset}.csv`;
+                hiddenElement.click();
 
-    //             csv = 'Time/s,Angle/rad,AngVel/rad/s,Command,Drive,Error\n';
-    //             current_dataset += 1;
-    //           }
+                csv = 'Time[s],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g], Gyro_x[rad/s], Gyro_y[rad/s], Gyro_z[rad/s]\n';
+                current_dataset += 1;
+              }
 
-    //           csv += d.t.toString();
-    //           csv += ",";
-    //           csv += d.theta.toString();
-    //           csv += ',';
-    //           csv += d.omega.toString();
-    //           if(d.command != null){
-    //             csv += ",";
-    //             csv += d.command.toString();
-    //           } else {
-    //             csv += ",";
-    //             csv += "";
-    //           }
-    //           if(d.drive != null){
-    //             csv += ",";
-    //             csv += d.drive.toString();
-    //           } else{
-    //             csv += ",";
-    //             csv += "";
-    //           }
-
-    //           if(d.error != null){
-    //             csv += ",";
-    //             csv += d.error.toString();
-    //           } else{
-    //             csv += ",";
-    //             csv += "";
-    //           }    
+              csv += d.t.toString();
+              csv += ",";
+              csv += d.pos.toString();
+              csv += ',';
+              csv += d.acc.x.toString();
+              csv += ',';
+              csv += d.acc.y.toString();
+              csv += ',';
+              csv += d.acc.z.toString();
+              csv += ',';
+              csv += d.gyro.x.toString();
+              csv += ',';
+              csv += d.gyro.y.toString();
+              csv += ',';
+              csv += d.gyro.z.toString();
               
-    //           csv += "\n";
-    //     });
+              csv += "\n";
+        });
 
-    //     //output the final dataset
-    //     let hiddenElement = document.createElement('a');
-    //     hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-    //     hiddenElement.target = '_blank';
-    //     hiddenElement.download = `spinner-${date.getHours()}-${date.getMinutes()}-run${current_dataset}.csv`;
-    //     hiddenElement.click();
-    // },
+        //output the final dataset
+        let hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = `dynamics-${date.getHours()}-${date.getMinutes()}-dataset${current_dataset}.csv`;
+        hiddenElement.click();
+    },
       
   }
 }

@@ -14,13 +14,13 @@
                 <div class='row mb-2'>
                     <h5>Recording more than 5000 data points</h5>
                     <p>For smooth running of the web app there is a limit of 5000 recorded data points and 2000 data points on the Graph tool. Please download this dataset or perform the necessary analysis
-                        and then reset the data and run again in order to collect more data. For collecting single data points over a long time you may be best to use the Snapshot tool which can continue to collect data beyond this limit.
+                        and then reset the data and run again in order to collect more data.
                     </p>
                 </div>
                 
                 <div class='row mb-2'>
                     <h5> Gradient tool </h5>
-                    <p> Click and drag on the graph in order to draw a straight line segment. The gradient of this line is displayed in the Gradient box.</p>
+                    <p> Click and drag on the graph in order to draw a straight line segment. The gradient of this line is displayed above the graph.</p>
                 </div>
 
                 <div class='row mb-2'>

@@ -24,7 +24,7 @@
                       <th scope="col"></th>
                       <!-- <th scope="col">Pos[deg]</th> -->
                       <th scope="col" colspan="3">Acc[g]</th>
-                      <th scope="col" colspan="3">Gyro[deg/s]</th>
+                      <th scope="col" colspan="3">Gyro[rad/s]</th>
                   </tr>
                   <tr>
                       <th scope="col"></th>
