@@ -2,19 +2,18 @@
 
 <template>
 <div :id='id'>
-    <button type='button' class='button-toolbar button-secondary' :id='id + "-button"' @blur='closeHelp' @click='openHelp' aria-label="popup help" data-bs-toggle="tooltip" title="Help">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-square" viewBox="0 0 16 16">
-            <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-        </svg>
+    <button type='button' class='button-toolbar button-secondary' :id='id + "-button"' @click='openHelp' aria-label="popup help" data-bs-toggle="tooltip" title="Help">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07"/>
+            </svg>
     </button>
 
 
     <!-- <transition name='fade'> -->
         <div v-if='popup_showing' class="modal" id='modal-popup-help' tabindex="-1">
             <div class="modal-dialog model-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content" @mousedown="(event) => {selectModal(event)}" @mousemove="(event) => {moveModal(event)}" @mouseup="(event) => {deselectModal(event)}" @mouseleave="(event) => {deselectModal(event)}">
-                <div class="modal-header" >
+            <div class="modal-content">
+                <div class="modal-header" @mousedown="(event) => {selectModal(event)}" @mousemove="(event) => {moveModal(event)}" @mouseup="(event) => {deselectModal(event)}" @mouseleave="(event) => {deselectModal(event)}">
                     <slot name="header"></slot>
                     <button type='button' :class="getDarkTheme ? 'btn-close btn-close-white' : 'btn-close'" id='close-button' aria-label="Close" @click='closeHelp'></button>
                   </div>
@@ -42,7 +41,7 @@ import { mapGetters } from 'vuex';
 
 export default {
 
-  name: 'PopupHelp',
+  name: 'PopupPlotting',
   props:{
       'id': String
   },

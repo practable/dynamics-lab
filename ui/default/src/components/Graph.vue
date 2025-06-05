@@ -45,11 +45,105 @@
             </template>
         </popup-help>
 
-        <button type='button' class="button-toolbar button-secondary me-2" id="show-plotting-button" aria-label="show plotting functions" @click="showPlotting = true" data-bs-toggle="tooltip" title="Function Plotting">
+        <popup-plotting class="me-2" id="popup-plotting">
+            <template v-slot:header>
+                <h5>Plot Function</h5>
+            </template>
+            <template v-slot:body>
+               <div id="chart-functions" @mousedown="setDraggable(false)" @mouseup="setDraggable(true)" @mouseleave="setDraggable(true)">
+					<div class="dropdown">
+						<button class="button-sm button-dropdown dropdown-toggle" type="button" id="function-select-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+							{{ currentFunction }}
+						</button>
+						<ul class="dropdown-menu" aria-labelledby="function-dropdown-menu">
+							<li><a class="dropdown-item" id='select-linear-option' aria-label="select linear function" @click="currentFunction = 'linear'">Linear</a></li>
+							<li><a class="dropdown-item" id='select-quadratic-option' aria-label="select quadratic function" @click="currentFunction = 'quadratic'">Quadratic</a></li>
+                            <li><a class="dropdown-item" id='select-trigonometric-option' aria-label="select trigonometric function" @click="currentFunction = 'trigonometric'">Trigonometric</a></li>
+                            <li><a class="dropdown-item" id='select-exponential-option' aria-label="select exponential function" @click="currentFunction = 'exponential'">Exponential</a></li>
+                        </ul>
+					</div>
+      
+   
+                    <div v-if="currentFunction === 'linear'">
+                            <img id='linear_function' src='/images/LinearFunction.png' alt="linear function equation">
+
+                            <div class='input-group mt-2 mb-2'>
+                                <label class='input-group-text' for="func_a">a = </label>
+                                <input type="number" class='form-control' id="func_a" v-model="func_a">
+                            </div>
+                        
+                            <div class='input-group mt-2 mb-2'>
+                                <label class='input-group-text' for="func_b">b = </label>
+                                <input type="number" class='form-control' id="func_b" v-model="func_b">
+                            </div>
+                    </div>
+
+                    <div v-else-if="currentFunction === 'quadratic'">
+                            <img id='linear_function' src='/images/QuadraticFunction.png' alt="quadratic function equation">
+                        
+                            <div class='input-group mt-2 mb-2'>
+                                <label class='input-group-text' for="func_a">a = </label>
+                                <input type="number" class='form-control' id="func_a" v-model="func_a">
+                            </div>
+                     
+                            <div class='input-group mt-2 mb-2'>
+                                <label class='input-group-text' for="func_b">b = </label>
+                                <input type="number" class='form-control' id="func_b" v-model="func_b">
+                            </div>
+                    </div>
+
+                    <div v-else-if="currentFunction === 'trigonometric'">
+                        <img id='trig_function' src='/images/TrigFunction.png' alt="trigonometric function equation">
+                       
+                        <div class='input-group mt-2 mb-2'>
+                            <label class='input-group-text' for="func_a">A = </label>
+                            <input type="number" class='form-control' id="func_a" v-model="func_a">
+                        </div>
+
+                        <div class='input-group mt-2 mb-2'>
+                            <label class='input-group-text' for="func_b">&omega; = </label>
+                            <input type="number" class='form-control' id="func_b" v-model="func_b">
+                        </div>
+                          
+                        <div class='input-group mt-2 mb-2'>
+                            <label class='input-group-text' for="func_c">&phi; = </label>
+                            <input type="number" class='form-control' id="func_c" v-model="func_c">
+                        </div>
+                    </div>
+
+                    <div v-else-if="currentFunction === 'exponential'">
+                            <img id='linear_function' src='/images/ExpFunction.png' alt="exponential function equation">
+
+                            <div class='input-group mt-2 mb-2'>
+                                <label class='input-group-text' for="func_a">A = </label>
+                                <input type="number" class='form-control' id="func_a" v-model="func_a">
+                            </div>
+                    
+                            <div class='input-group mt-2 mb-2'>
+                                <label class='input-group-text' for="func_b">b = </label>
+                                <input type="number" class='form-control' id="func_b" v-model="func_b">
+                            </div>
+                    </div>
+
+
+                </div>
+            </template>
+
+            <template v-slot:footer>
+                 <button v-if="currentFunction === 'linear'" class="button-sm button-primary m-1" id="plotFunctionButton" @click="plotFunc(linear)">Plot</button>
+                <button v-else-if="currentFunction === 'quadratic'" class="button-sm button-primary m-1" id="plotFunctionButton" @click="plotFunc(quadratic)">Plot</button>
+                <button v-else-if="currentFunction === 'trigonometric'" class="button-sm button-primary m-1" id="plotFunctionButton" @click="plotFunc(trigonometric)">Plot</button>
+                <button v-else-if="currentFunction === 'exponential'" class="button-sm button-primary m-1" id="plotFunctionButton" @click="plotFunc(exponential)">Plot</button>
+                    
+                <button class="button-sm button-warning m-1" id="clearFunctionButton" @click="deleteFunctionDataset">Clear</button>
+            </template>
+        </popup-plotting>
+
+        <!-- <button type='button' class="button-toolbar button-secondary me-2" id="show-plotting-button" aria-label="show plotting functions" @click="showPlotting = true" data-bs-toggle="tooltip" title="Function Plotting">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07"/>
             </svg>
-        </button>
+        </button> -->
         
         <div>
             <span v-if="getNumData < maxDataPoints" class="align-middle">Plotted: {{ getNumData }} / {{ maxDataPoints }}</span>
@@ -64,9 +158,9 @@
     
     
     
-    <transition name='fade'>
+    <!-- <transition name='fade'>
       <div v-if="showPlotting" class="modal" id='modal-show' tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-scrollable">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">Plot Function</h5>
@@ -167,7 +261,7 @@
           </div>
         </div>
       </div>
-      </transition>
+      </transition> -->
     
     
    
@@ -181,6 +275,7 @@ import Chart from 'chart.js/auto';
 import { mapGetters, mapActions } from 'vuex';
 import DownloadImageButton from './elements/DownloadImageButton.vue';
 import PopupHelp from './elements/PopupHelp.vue';
+import PopupPlotting from './elements/PopupPlotting.vue';
 
 var scatterChart = null;        //if part of the responsive Vue data then causes a recursion error on dynamically adding datasets.
 
@@ -190,7 +285,8 @@ export default {
     emits: [],
     components:{
         DownloadImageButton,
-        PopupHelp
+        PopupHelp,
+        PopupPlotting
     },
     data(){
         return{
@@ -698,6 +794,14 @@ export default {
 #chart-functions{
     min-height: 40dvh;
 }
+
+/* .modal-content{
+   position: absolute;
+  top: 100px;
+  right: 100px;
+  bottom: 0;
+  left: -25dvw;
+} */
 
 
 </style>
