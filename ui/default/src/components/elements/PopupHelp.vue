@@ -85,15 +85,21 @@ export default {
         
       },
       closeHelp(){
-        let modal = document.getElementById('modal-popup-help');
-        //document.body.removeChild(modal);
-        let here = document.getElementById(this.id);
-        here.appendChild(modal);
+        if(this.popup_showing){
+          let modal = document.getElementById('modal-popup-help');
+          //document.body.removeChild(modal);
+          let here = document.getElementById(this.id);
+          try{
+            here.appendChild(modal);
+          } catch(e){
+            console.log(e)
+          }
 
-        this.$nextTick(() => {
           this.popup_showing = false;
           this.popup_clicked = false;
-        });
+          
+        }
+        
       },
       selectModal(event){
         event.preventDefault();
