@@ -2,7 +2,7 @@
 
 <template>
 <div :id='id'>
-    <button type='button' class='button-toolbar button-secondary' :id='id + "-button"' @blur="closeHelp" @click='openHelp' aria-label="popup help" data-bs-toggle="tooltip" title="Help">
+    <button type='button' class='button-toolbar button-secondary' :id='id + "-button"' @blur='closeHelp' @click='openHelp' aria-label="popup help" data-bs-toggle="tooltip" title="Help">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-square" viewBox="0 0 16 16">
             <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
             <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
@@ -12,12 +12,12 @@
 
     <!-- <transition name='fade'> -->
         <div v-if='popup_showing' class="modal" id='modal-popup-help' tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
+            <div class="modal-dialog model-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" @mousedown="(event) => {selectModal(event)}" @mousemove="(event) => {moveModal(event)}" @mouseup="(event) => {deselectModal(event)}">
+                <div class="modal-header" >
                     <slot name="header"></slot>
                     <button type='button' :class="getDarkTheme ? 'btn-close btn-close-white' : 'btn-close'" id='close-button' aria-label="Close" @click='closeHelp'></button>
-                </div>
+                  </div>
                 <div class="modal-body">
                     <slot name="body"></slot>
 
@@ -49,8 +49,10 @@ export default {
   data () {
     return {
         popup_showing: false,
-        // popupWidth: 50,
-        // popupHeight: 50,
+        popup_clicked: false,
+        popup_ready: false,
+        mouse_intial_X: 0,
+        mouse_initial_Y: 0,
     }
   },
   components: {
@@ -90,11 +92,43 @@ export default {
 
         this.$nextTick(() => {
           this.popup_showing = false;
+          this.popup_clicked = false;
         });
-       
-        
-        
-      }
+      },
+      selectModal(event){
+        event.preventDefault();
+        const target = document.querySelector('.modal-content');
+        this.popup_clicked = true;
+        this.mouse_intial_X = event.clientX;
+        this.mouse_initial_Y = event.clientY;
+        target.style.cursor = 'move';
+
+        this.popup_ready = false;
+      },
+      moveModal(event){
+        if(this.popup_clicked){
+          event.preventDefault();
+          const target = document.querySelector('.modal-content');
+          const x = this.mouse_intial_X - event.clientX;
+          const y = this.mouse_intial_Y - event.clientY;
+          this.mouse_intial_X = event.clientX;
+          this.mouse_intial_Y = event.clientY;
+
+          //requires one loop of setting parameters before you should actually set position
+          if(this.popup_ready){
+            target.style.top = (target.offsetTop - y) + "px";
+            target.style.left = (target.offsetLeft - x) + "px";
+          } else{
+            this.popup_ready = true;
+          }
+        }
+      },
+      deselectModal(event){
+        const target = document.querySelector('.modal-content');
+        this.popup_clicked = false;
+        target.style.cursor = 'default';
+        this.popup_ready = false;
+      },
   }
 }
 </script>
@@ -103,6 +137,7 @@ export default {
 #modal-popup-help{
   display: block;
 }
+
 
 #close-button{
     position:absolute;

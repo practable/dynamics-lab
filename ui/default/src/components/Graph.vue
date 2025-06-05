@@ -45,7 +45,7 @@
             </template>
         </popup-help>
 
-        <button type='button' class="button-toolbar button-secondary me-2" id="show-plotting-button" aria-label="show plotting functions" @click="showPlotting = !showPlotting" data-bs-toggle="tooltip" title="Function Plotting">
+        <button type='button' class="button-toolbar button-secondary me-2" id="show-plotting-button" aria-label="show plotting functions" @click="showPlotting = true" data-bs-toggle="tooltip" title="Function Plotting">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07"/>
             </svg>
@@ -337,7 +337,7 @@ export default {
                         display: 'auto',    //only displays when a dataset is added
                         title:{
                             display: true,
-                            text: 'relative driving force',
+                            text: 'normalised driver position',
                             color: _this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
                         },
                         type: 'linear',
@@ -658,8 +658,7 @@ export default {
         countDataSets(){
                 let datasets = scatterChart.data.datasets.filter(set => set.id.includes("dataset"));
                 return datasets.length;
-        }
-
+        },
       },
       
 }
@@ -699,5 +698,6 @@ export default {
 #chart-functions{
     min-height: 40dvh;
 }
+
 
 </style>
