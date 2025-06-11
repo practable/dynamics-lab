@@ -26,7 +26,7 @@
 
 // Program Attributes
 #define EXPERIMENT_NAME "dynamics-lab"
-#define FIRMWARE_VERSION "V0.2.2"
+#define FIRMWARE_VERSION "V0.3.0"
 #define DEVELOPER "Imogen-Heard"
 
 // Hardware Definitions
@@ -40,8 +40,9 @@
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
 #define STEPPER_HOLD_CURRENT 10  // percent
 #define MAX_MOTOR_STEPS_S 800
-#define MAX_MOTOR_ACC_STEPS_S_S 800
+#define MAX_MOTOR_ACC_STEPS_S_S 300
 #define HOMING_TIMEOUT_S 10  // homing algorithm exits if home not found within this timeframe
+#define PRINT_HOMING_RESULT true
 
 #define PRINT_JSON true
 #define PRETTY_PRINT_JSON false
@@ -125,6 +126,8 @@ const int WRITTEN_SIGNATURE = 0x98C7AB1E;    // Arbitary signature to check for 
 
 // Servo Vars
 bool servo_pos = false;
+uint32_t servo_attach_time_mS = 0;
+#define SERVO_TIMEOUT_mS 3000
 
 // Sampling Vars
 bool streaming_active = true;

@@ -105,17 +105,28 @@ void setup() {
   //  mpu.RegisterWrite(MPU6050_ACCEL_CONFIG, 0b00011000);  // It does this in Initialize, set to 0x08 (+-4G)
   //  mpu.Calibrate();
   mpu_setup();
-  get_offset_from_memory();  // get encoder_offset from persistant memory before stepper setup
+  get_offset_from_memory();  // get encoder_offset from persistant memory before stepper setup (does nothing atm)
   stepper_setup(false);      // if true run old homing scripts
 
 
 
-  servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);  // default width is hopefully at one end of travel  -> moving this function to the "ping" state to try and avoid chattering (this doesnt work, but may be a good reason to use servoBasic lib instead)
+  //servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);  // default width is hopefully at one end of travel  -> moving this function to the "ping" state to try and avoid chattering (this doesnt work, but may be a good reason to use servoBasic lib instead)
 
-  stepper.encoder.setHomeActual(18192);
+  stepper.encoder.setHomeActual(32440);
 
   // display_mallinfo();
   servo_pos = false;
+  // fix for resetting servo at startup
+  servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);
+  servo_attach_time_mS = millis();
+  if (servo_pos) {
+    servo.writeMicroseconds(SERVO_ZERO_uS);
+    servo_pos = false;
+  } else {
+    servo.writeMicroseconds(SERVO_OPEN_uS);
+    servo_pos = true;
+  }
+  //sm_state_ping();   // make sure servo is homed correctly
   //  delay(1000);
 }
 
@@ -205,7 +216,7 @@ void loop() {
   mpu.getEvent(&a, &g, &temp);
 
   // Do sampling Data at the specified rate
-  if (sampleDelay.millisDelay(sampleDelay_mS) || samples_written == 0) {  // added OR if samples written has been reset to 0 after printing
+  if (sampleDelay.millisDelay(sampleDelay_mS) || samples_written == 0) {           // added OR if samples written has been reset to 0 after printing
     if (samples_written < num_samples_req && samples_written < DATA_ARRAY_SIZE) {  // check to make sure collecting the correct number of samples for the samplerate, and smaller than the
       timestamp_array[samples_written] = millis();
       encode_array[samples_written] = stepper.encoder.getAngle();
@@ -218,24 +229,31 @@ void loop() {
       samples_written++;
     }
     // else if (samples_written == DATA_ARRAY_SIZE) {
-      // we have written our last sample to the array, if it was a string, would append with a /n
-      // but as floats this isnt needed
-   // }
+    // we have written our last sample to the array, if it was a string, would append with a /n
+    // but as floats this isnt needed
+    // }
   }
 
   // do streaming data at the specified rate
   if (streaming_active || snapshop_active) {
-   // if (printDelay.millisDelay(print_delay_mS)) {
-    if (samples_written >= num_samples_req){               // REMOVED PRINT TIMER
-      sampleDelay.resetDelayTime_mS(); // makes sure that the sample loop is synced to the printing loop //moved to try and improve timings (doing this first so next sample is sooner)
+    // if (printDelay.millisDelay(print_delay_mS)) {
+    if (samples_written >= num_samples_req) {  // REMOVED PRINT TIMER
+      sampleDelay.resetDelayTime_mS();         // makes sure that the sample loop is synced to the printing loop //moved to try and improve timings (doing this first so next sample is sooner)
       //print the sampled data
       update_json(samples_written);
-      samples_written = 0;      
+      samples_written = 0;
     }
     if (snapshop_active) {
       if (millis() - snapshot_starttime_mS >= snapshot_timer_mS) {
         snapshop_active = false;
       }
+    }
+  }
+
+  // Fix for servo chattering, servo is attached during PING state
+  if (servo.attached()) {
+    if (millis() - servo_attach_time_mS >= SERVO_TIMEOUT_mS) {
+      servo.detach();
     }
   }
 
