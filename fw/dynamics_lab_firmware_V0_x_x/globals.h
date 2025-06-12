@@ -34,7 +34,7 @@
 #define HALL_NORMALLY_HIGH true  // define if normally high, triggered by low pulse (true) or normally low triggered by high pulse (false)
 
 // User Options & program config
-#define INIT_SAMPLE_RATE_Hz 60
+#define INIT_SAMPLE_RATE_Hz 75
 #define INIT_PRINT_RATE_Hz 15
 #define PRINT_PERIODIC_UPDATES true
 #define ENCODE_RAW_ANGLE_OFFSET 0.0

@@ -216,7 +216,7 @@ void loop() {
   mpu.getEvent(&a, &g, &temp);
 
   // Do sampling Data at the specified rate
-  if (sampleDelay.millisDelay(sampleDelay_mS) || samples_written == 0) {           // added OR if samples written has been reset to 0 after printing
+  if (sampleDelay.millisDelay(sampleDelay_mS)) {           // added OR if samples written has been reset to 0 after printing || samples_written == 0
     if (samples_written < num_samples_req && samples_written < DATA_ARRAY_SIZE) {  // check to make sure collecting the correct number of samples for the samplerate, and smaller than the
       timestamp_array[samples_written] = millis();
       encode_array[samples_written] = stepper.encoder.getAngle();
