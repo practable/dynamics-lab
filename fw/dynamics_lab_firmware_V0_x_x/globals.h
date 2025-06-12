@@ -34,15 +34,15 @@
 #define HALL_NORMALLY_HIGH true  // define if normally high, triggered by low pulse (true) or normally low triggered by high pulse (false)
 
 // User Options & program config
-#define INIT_SAMPLE_RATE_Hz 200
-#define INIT_PRINT_RATE_Hz 200
+#define INIT_SAMPLE_RATE_Hz 60
+#define INIT_PRINT_RATE_Hz 15
 #define PRINT_PERIODIC_UPDATES true
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
 #define STEPPER_HOLD_CURRENT 10  // percent
 #define MAX_MOTOR_STEPS_S 800
 #define MAX_MOTOR_ACC_STEPS_S_S 300
 #define HOMING_TIMEOUT_S 10  // homing algorithm exits if home not found within this timeframe
-#define PRINT_HOMING_RESULT false
+#define PRINT_HOMING_RESULT true
 
 #define PRINT_JSON true
 #define PRETTY_PRINT_JSON false
@@ -103,7 +103,7 @@ errorRep errors;
 
 // why is this defined in globals?!?
 // moving it to local
-#define JSON_TX_BUFFER_SIZE 20000
+#define JSON_TX_BUFFER_SIZE 10000
 //StaticJsonDocument<JSON_TX_BUFFER_SIZE> jsonTX;
 
 

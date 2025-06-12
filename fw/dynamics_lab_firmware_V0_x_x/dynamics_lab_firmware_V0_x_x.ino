@@ -112,7 +112,7 @@ void setup() {
 
   //servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);  // default width is hopefully at one end of travel  -> moving this function to the "ping" state to try and avoid chattering (this doesnt work, but may be a good reason to use servoBasic lib instead)
 
-  stepper.encoder.setHomeActual(32440);
+  stepper.encoder.setHomeActual(30700); 
 
   // display_mallinfo();
   servo_pos = false;
