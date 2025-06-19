@@ -122,7 +122,7 @@ void run_stepper_calibration() {
 
 
 void stepper_setup(bool run_calibration = true) {
-  stepper.setup(NORMAL, 400, 10, 0.2, 0.0, 16, true, false, 100, 1);  //Initialize uStepper S32
+  stepper.setup(NORMAL, STEPPER_STEPS, 10, 0.2, 0.0, 16, true, false, 100, 1);  //Initialize uStepper S32
   stepper.setCurrent(100);                                            // set motor current as percentage not useable unless current jumper placed in I-PWM position
   stepper.setHoldCurrent(STEPPER_HOLD_CURRENT);                       // set holding current as percentage
   if (run_calibration) {

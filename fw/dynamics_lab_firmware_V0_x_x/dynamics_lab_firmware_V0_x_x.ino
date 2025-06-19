@@ -112,7 +112,7 @@ void setup() {
 
   //servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);  // default width is hopefully at one end of travel  -> moving this function to the "ping" state to try and avoid chattering (this doesnt work, but may be a good reason to use servoBasic lib instead)
 
-  stepper.encoder.setHomeActual(30700); 
+  stepper.encoder.setHomeActual(30700);
 
   // display_mallinfo();
   servo_pos = false;
@@ -128,6 +128,8 @@ void setup() {
   }
   //sm_state_ping();   // make sure servo is homed correctly
   //  delay(1000);
+  pinMode(LED_BEACON, OUTPUT);
+  digitalWrite(LED_BEACON, true);
 }
 
 
@@ -216,7 +218,7 @@ void loop() {
   mpu.getEvent(&a, &g, &temp);
 
   // Do sampling Data at the specified rate
-  if (sampleDelay.millisDelay(sampleDelay_mS)) {           // added OR if samples written has been reset to 0 after printing || samples_written == 0
+  if (sampleDelay.millisDelay(sampleDelay_mS)) {                                   // added OR if samples written has been reset to 0 after printing || samples_written == 0
     if (samples_written < num_samples_req && samples_written < DATA_ARRAY_SIZE) {  // check to make sure collecting the correct number of samples for the samplerate, and smaller than the
       timestamp_array[samples_written] = millis();
       encode_array[samples_written] = stepper.encoder.getAngle();

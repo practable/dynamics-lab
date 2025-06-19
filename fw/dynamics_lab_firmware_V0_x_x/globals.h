@@ -32,6 +32,8 @@
 // Hardware Definitions
 #define HALL_SENSOR_PIN A4
 #define HALL_NORMALLY_HIGH true  // define if normally high, triggered by low pulse (true) or normally low triggered by high pulse (false)
+#define STEPPER_STEPS 200
+#define LED_BEACON 4
 
 // User Options & program config
 #define INIT_SAMPLE_RATE_Hz 75
@@ -42,7 +44,7 @@
 #define MAX_MOTOR_STEPS_S 800
 #define MAX_MOTOR_ACC_STEPS_S_S 300
 #define HOMING_TIMEOUT_S 10  // homing algorithm exits if home not found within this timeframe
-#define PRINT_HOMING_RESULT true
+#define PRINT_HOMING_RESULT false
 
 #define PRINT_JSON true
 #define PRETTY_PRINT_JSON false
