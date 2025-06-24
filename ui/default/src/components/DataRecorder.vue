@@ -187,7 +187,7 @@ export default {
               csv += ",";
               csv += d.mode.toString();
               csv += ",";
-              csv += d.freq.toString();
+              csv += d.freq.toFixed(2);
               csv += ",";
               csv += d.pos.toString();
               csv += ',';
