@@ -71,6 +71,19 @@
                   <td>{{ rmsGyro.z.toFixed(3) }}</td>
                 </tr>
 
+                <tr></tr>
+
+                <tr>
+                  <td class="ps-2" colspan="3">Mode</td>
+                  <td class="">{{ mode }}</td>
+                </tr>
+
+                <tr v-if="mode == 'driving'">
+                  <td class="ps-2" colspan="3">Driving Freq. [Hz]</td>
+                  <td class="">{{ driving_freq }}</td>
+                </tr>
+
+
               </tbody>        
           </table> 
 
@@ -96,6 +109,8 @@ export default {
       maxGyro: {x:0,y:0,z:0},
       rmsAcc: {x:0,y:0,z:0},
       rmsGyro: {x:0,y:0,z:0},
+      mode: null,
+      driving_freq: null
     }
   },
   components: {
@@ -162,6 +177,7 @@ export default {
           this.maxGyro = {x:0,y:0,z:0};
           this.rmsAcc = {x:0,y:0,z:0};
           this.rmsGyro = {x:0,y:0,z:0};
+          this.driving_freq = 0;
         }
       }
   },
@@ -188,6 +204,9 @@ export default {
         this.rmsGyro.x = this.rootMeanSquare(data, 'gyro', 'x');
         this.rmsGyro.y = this.rootMeanSquare(data, 'gyro', 'y');
         this.rmsGyro.z = this.rootMeanSquare(data, 'gyro', 'z');
+
+        this.driving_freq = data[0]['freq'];
+        this.mode = data[0]['mode'];
       }
       
     },

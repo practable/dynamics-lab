@@ -411,7 +411,7 @@ export default {
                     y: {
                         title:{
                             display: true,
-                            text: 'acceleration[x g m/s^2]',
+                            text: 'acceleration [x 9.81m/s/s]',
                             color: _this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
                         },
                         type: 'linear',

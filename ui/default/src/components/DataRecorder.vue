@@ -88,7 +88,7 @@ export default {
     ...mapGetters([
         'getIsRecording',
         'getCurrentTime',
-        'getInputMode',
+        'getCurrentMode',
         'getNumData',
         'getMaxDataPoints',
         'getDatasetIndex',
@@ -140,6 +140,7 @@ export default {
         let acc = this.getCurrentAcceleration; 
         let gyro = this.getCurrentGyro; 
         let driving_freq = this.getReportedDrivingFrequencyHz;
+        let mode = this.getCurrentMode;
         
         pos.forEach((pos, index) => {
           let data_object = {
@@ -150,6 +151,7 @@ export default {
               acc: {x: parseFloat(acc['x'][index]), y: parseFloat(acc['y'][index]), z: parseFloat(acc['z'][index])}, 
               gyro: {x: parseFloat(gyro['x'][index]), y: parseFloat(gyro['y'][index]), z: parseFloat(gyro['z'][index])},
               freq: driving_freq,
+              mode: mode,
               showDataPoint: true};
 
           this.$store.dispatch('addData', data_object);
@@ -166,7 +168,7 @@ export default {
       outputToCSV(){
         let data = this.$store.getters.getData;
         let current_dataset = 0;
-        let csv = 'Time[s],Driving_Freq.[Hz],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g], Gyro_x[rad/s], Gyro_y[rad/s], Gyro_z[rad/s]\n';
+        let csv = 'Time[s],Mode,Driving_Freq.[Hz],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g], Gyro_x[rad/s], Gyro_y[rad/s], Gyro_z[rad/s]\n';
         let date = new Date();
 
         data.forEach(function(d){
@@ -177,11 +179,13 @@ export default {
                 hiddenElement.download = `dynamics-${date.getHours()}-${date.getMinutes()}-dataset${current_dataset}.csv`;
                 hiddenElement.click();
 
-                csv = 'Time[s],Driving_Freq.[Hz],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g], Gyro_x[rad/s], Gyro_y[rad/s], Gyro_z[rad/s]\n';
+                csv = 'Time[s],Mode,Driving_Freq.[Hz],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g], Gyro_x[rad/s], Gyro_y[rad/s], Gyro_z[rad/s]\n';
                 current_dataset += 1;
               }
 
               csv += d.t.toString();
+              csv += ",";
+              csv += d.mode.toString();
               csv += ",";
               csv += d.freq.toString();
               csv += ",";
