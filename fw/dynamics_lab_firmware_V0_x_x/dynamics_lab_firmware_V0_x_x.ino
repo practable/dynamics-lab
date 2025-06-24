@@ -112,7 +112,7 @@ void setup() {
 
   //servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);  // default width is hopefully at one end of travel  -> moving this function to the "ping" state to try and avoid chattering (this doesnt work, but may be a good reason to use servoBasic lib instead)
 
-  stepper.encoder.setHomeActual(30700);
+  stepper.encoder.setHomeActual(ENCODER_HOME_OFFSET);
 
   // display_mallinfo();
   servo_pos = false;
@@ -222,12 +222,12 @@ void loop() {
     if (samples_written < num_samples_req && samples_written < DATA_ARRAY_SIZE) {  // check to make sure collecting the correct number of samples for the samplerate, and smaller than the
       timestamp_array[samples_written] = millis();
       encode_array[samples_written] = stepper.encoder.getAngle();
-      accX_array[samples_written] = (a.acceleration.x / G_CONST);  // - acc_offset.X;  //mpu.GetAccX();
-      accY_array[samples_written] = (a.acceleration.y / G_CONST);  /// - acc_offset.Y;  //mpu.GetAccY();
-      accZ_array[samples_written] = (a.acceleration.z / G_CONST);  // Added 0.3 offset due to sensor calibration issue  // - acc_offset.Z;  //mpu.GetAccZ();
-      gyroX_array[samples_written] = g.gyro.x - gyro_offset.X;     // mpu.GetGyroX();
-      gyroY_array[samples_written] = g.gyro.y - gyro_offset.Y;     //mpu.GetGyroY();
-      gyroZ_array[samples_written] = g.gyro.z - gyro_offset.Z;     //mpu.GetGyroZ();
+      accX_array[samples_written] = ((a.acceleration.x / G_CONST) - acc_offset.X);  // - acc_offset.X;  //mpu.GetAccX();
+      accY_array[samples_written] = ((a.acceleration.y / G_CONST) - acc_offset.Y);  /// - acc_offset.Y;  //mpu.GetAccY();
+      accZ_array[samples_written] = ((a.acceleration.z / G_CONST) - acc_offset.Z);  // Added 0.3 offset due to sensor calibration issue  // - acc_offset.Z;  //mpu.GetAccZ();
+      gyroX_array[samples_written] = g.gyro.x - gyro_offset.X;                      // mpu.GetGyroX();
+      gyroY_array[samples_written] = g.gyro.y - gyro_offset.Y;                      //mpu.GetGyroY();
+      gyroZ_array[samples_written] = g.gyro.z - gyro_offset.Z;                      //mpu.GetGyroZ();
       samples_written++;
     }
     // else if (samples_written == DATA_ARRAY_SIZE) {

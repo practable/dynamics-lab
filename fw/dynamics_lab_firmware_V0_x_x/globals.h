@@ -44,6 +44,8 @@
 #define MAX_MOTOR_STEPS_S 800
 #define MAX_MOTOR_ACC_STEPS_S_S 300
 #define HOMING_TIMEOUT_S 10  // homing algorithm exits if home not found within this timeframe
+
+#define ENCODER_HOME_OFFSET 11700
 #define PRINT_HOMING_RESULT false
 
 #define PRINT_JSON true
@@ -80,7 +82,7 @@
 
 
 // Utility
-#define EEPROM_ENCODE_OFFSET_ADDRESS 0xFF    // The first 15 values in EEprom are used by uStepper lib. 0xFF is arbitraty address away from first 15 addresses
+#define EEPROM_ENCODE_OFFSET_ADDRESS 0xFF  // The first 15 values in EEprom are used by uStepper lib. 0xFF is arbitraty address away from first 15 addresses
 
 
 
@@ -120,11 +122,11 @@ int16_t hall_low_point;
 int16_t step_low_angle;
 int16_t persistant_encoder_offset;
 
-float goto_target = 0;   // goto state sets global var then uses this while remaining in goto state until target position has been reached
+float goto_target = 0;  // goto state sets global var then uses this while remaining in goto state until target position has been reached
 bool goto_triggered = false;
 
 //EEprom Variables
-const int WRITTEN_SIGNATURE = 0x98C7AB1E;    // Arbitary signature to check for existing encoder offset value in persistant memory (practable)
+const int WRITTEN_SIGNATURE = 0x98C7AB1E;  // Arbitary signature to check for existing encoder offset value in persistant memory (practable)
 
 // Servo Vars
 bool servo_pos = false;
@@ -137,12 +139,12 @@ bool snapshop_active = false;
 uint16_t snapshot_timer_mS = 25000;
 uint32_t snapshot_starttime_mS;
 
-#define SAMPLE_DELAY_OFFSET 0 // offset in mS
+#define SAMPLE_DELAY_OFFSET 0  // offset in mS
 
 autoDelay sampleDelay;
 uint16_t sampleRate_Hz = INIT_SAMPLE_RATE_Hz;
 //uint32_t sampleDelay_mS = uint32_t(1000 / sampleRate_Hz) - 4;  // added -5 to make the delay just a little shorter, and ensure we get all samples in before they are sent.
-uint32_t sampleDelay_mS = uint32_t(1E3 / sampleRate_Hz) - SAMPLE_DELAY_OFFSET; // 
+uint32_t sampleDelay_mS = uint32_t(1E3 / sampleRate_Hz) - SAMPLE_DELAY_OFFSET;  //
 // The function will stop sampling once buffer it full, so this should make more consistant outputs
 // #TODO MAKE SURE STATE FUNCTION IS UPDATED TO MATCH
 
@@ -176,7 +178,7 @@ struct accOffsets {
   float X;
   float Y;
   float Z;
-} acc_offset = { 0, 0, 0 };
+} acc_offset = {0.0, 0.0, 0.0};     //{ 0.101, -0.02, -0.147 };
 
 struct gyroOffsets {
   float X;
