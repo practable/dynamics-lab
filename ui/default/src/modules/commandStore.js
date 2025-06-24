@@ -13,7 +13,7 @@ const commandStore = {
             'from_hardware': {'hz': 1, 'rpm': 60,}, 
             'max':10, 
             'min':1, 
-            'step':0.05},
+            'step':0.05},   //for the input slider only, buttons can make the step smaller
 
        }),
        mutations:{

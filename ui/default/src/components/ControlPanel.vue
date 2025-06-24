@@ -53,8 +53,25 @@
 				<label v-if="hideCurrentFrequency == false" id="driving-frequency-slider-label" for="driving-frequency-slider">Current: {{ getReportedDrivingFrequencyHz.toFixed(2) }}Hz</label>
 				<label v-else id="driving-frequency-slider-label" for="driving-frequency-slider">Current: 0.00 Hz</label>
 
-				<input class="ms-2" type="range" :min="getDrivingFrequencyMin" :max="getDrivingFrequencyMax" :step="getDrivingFrequencyStep" v-model="driving_frequency" id="driving-frequency-slider" @mousedown="setDraggable(false)" @mouseup="setDraggable(true)" @mouseleave="setDraggable(true)">
-				<button id="update-driving-frequency-button" class="button-lg button-primary" aria-label="update driving frequency" @click="updateDrivingFrequency(); hideCurrentFrequency = false"><u>R</u>un</button>
+				<div class="d-flex flex-row">
+					<input class="ms-2" type="range" :min="getDrivingFrequencyMin" :max="getDrivingFrequencyMax" :step="getDrivingFrequencyStep" v-model="driving_frequency" id="driving-frequency-slider" @mousedown="setDraggable(false)" @mouseup="setDraggable(true)" @mouseleave="setDraggable(true)">
+					<button id="update-driving-frequency-button" class="button-lg button-primary" aria-label="update driving frequency" @click="updateDrivingFrequency(); hideCurrentFrequency = false"><u>R</u>un</button>
+				</div>
+				
+				<div class="d-flex flex-row align-items-center">
+					<label id="frequency-step-negative-01-label" for="frequency-step-negative-01">-0.1Hz</label>
+					<button id="frequency-step-negative-01" class="button-sm button-primary" aria-label="reduce frequency by 0.1 hertz" @click="driving_frequency -= 0.1">&nbsp; - &nbsp;</button>
+					<button id="frequency-step-positive-01" class="button-sm button-primary" aria-label="increase frequency by 0.1 hertz" @click="driving_frequency += 0.1">&nbsp; + &nbsp;</button>
+					<label id="frequency-step-positive-01-label" for="frequency-step-positive-01">+0.1Hz</label>
+				</div>
+
+				<div class="d-flex flex-row align-items-center">
+					<label id="frequency-step-negative-001-label" for="frequency-step-negative-001">-0.01Hz</label>
+					<button id="frequency-step-negative-001" class="button-sm button-primary" aria-label="reduce frequency by 0.01 hertz" @click="driving_frequency -= 0.01">&nbsp; - &nbsp;</button>
+					<button id="frequency-step-positive-001" class="button-sm button-primary" aria-label="increase frequency by 0.01 hertz" @click="driving_frequency += 0.01">&nbsp; + &nbsp;</button>
+					<label id="frequency-step-positive-001-label" for="frequency-step-positive-001">+0.01Hz</label>
+				</div>
+				
 			</div>
 
 			<!-- STOPPED mode settings -->
