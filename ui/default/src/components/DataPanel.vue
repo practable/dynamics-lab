@@ -71,18 +71,20 @@
                   <td>{{ rmsGyro.z.toFixed(3) }}</td>
                 </tr>
 
-                <tr></tr>
+                <tr>
+                  <td class="ps-2" colspan="7">&nbsp;</td>
+                </tr>
 
                 <tr>
-                  <td class="ps-2" colspan="3">Mode</td>
+                  <td class="ps-2">Mode</td>
                   <td class="">{{ mode }}</td>
-                </tr>
 
-                <tr v-if="mode == 'driving'">
-                  <td class="ps-2" colspan="3">Driving Freq. [Hz]</td>
-                  <td class="">{{ driving_freq }}</td>
-                </tr>
+                  <td v-if="mode == 'driven'" class="ps-2" colspan="2">Driving Freq. [Hz]</td>
+                  <td v-if="mode == 'driven'" class="">{{ driving_freq }}</td>
 
+                  <td v-if="mode == 'driven'" class="ps-2" colspan="2">&nbsp;</td>
+                  <td v-else class="ps-2" colspan="5">&nbsp;</td>
+                </tr>
 
               </tbody>        
           </table> 

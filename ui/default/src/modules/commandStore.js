@@ -4,7 +4,7 @@
 const commandStore = {
     state: () => ({
         dataSocket: null,
-        currentMode: 'stopped',
+        currentMode: 'stopped',     //'driven', 'undriven'
         currentState: 'STATE_WAIT',      //reported state from hardware, do I need this in the UI?
         samplingRate: {'value': 20, 'max':40, 'min':1, 'step':1},
         drivingFrequency: {
