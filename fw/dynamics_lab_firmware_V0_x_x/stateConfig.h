@@ -279,7 +279,12 @@ void sm_state_home(void) {
   stepper.setMaxVelocity(800);
   stepper.setMaxAcceleration(4000);
   float currentAngle = stepper.encoder.getAngle();
-  if ((!currentAngle < 0.3) && !(currentAngle > 359.7)) {
+#if PRINT_HOMING_RESULT == true
+  Serial.print(stepper.encoder.getAngleRaw());
+  Serial.print(" ");
+  Serial.println(currentAngle);
+#endif
+  if ((!currentAngle < 0.4) && !(currentAngle > 359.6)) {
     stepper.setRPM(50);
   } else {
     stepper.stop();
@@ -353,8 +358,8 @@ void sm_state_goto(jsonStateData stateData) {
     lastState = smState;
     goto_triggered = true;
     stepper.stop();
-  //  stepper.setMaxVelocity(800);
-  //  stepper.setMaxAcceleration(4000);
+    //  stepper.setMaxVelocity(800);
+    //  stepper.setMaxAcceleration(4000);
     goto_target = stateData.numeric;
   }
 
@@ -512,6 +517,8 @@ void sm_state_ping(void) {
 #endif
     lastState = smState;
   }
+  servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);
+  servo_attach_time_mS = millis();
   if (servo_pos) {
     servo.writeMicroseconds(SERVO_ZERO_uS);
     servo_pos = false;
@@ -519,6 +526,7 @@ void sm_state_ping(void) {
     servo.writeMicroseconds(SERVO_OPEN_uS);
     servo_pos = true;
   }
+ // servo.detach();
   smState = STATE_WAIT;
 }
 

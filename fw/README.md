@@ -3,6 +3,14 @@
 ## Current Version 
 -> [dynamics-lab-firmware-V0.1.1](https://github.com/practable/dynamics-lab/tree/fw-dev/fw/dynamics_lab_firmware_V0_1_x)
 
+## Setting home position (prototype - pre-alpha firmware (still in development))
+- Set mode to "free" to remove the brake
+- `{"free":1}`
+- Spin blades to home position.
+- Note down "pos (raw)" value from Serial JSON message
+- enter offset into `  stepper.encoder.setHomeActual(30700);` function in setup()
+- Upload program and run, motor should home, if not offset value may need some adjustment
+- try increasing or decreasing offset value +-100 until desired home position is reached after sending `{"home":1}` command
 
 _Verbose Command Structure_
 ```
