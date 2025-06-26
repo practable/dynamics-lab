@@ -430,7 +430,7 @@ export default {
                         sampleSize: 2,
                     },
                     y2: {
-                        display: 'auto',    //only displays when a dataset is added
+                        display: 'auto',    //only displays when a dataset is added and not hidden
                         title:{
                             display: true,
                             text: 'normalised driver position',
@@ -515,7 +515,8 @@ export default {
                 if(this.getCurrentMode == 'driven'){
                     this.addTwoEmptyDataSets(dataset_index);
                 } else{
-                    this.addEmptyDataSet(dataset_index);
+                    //this.addEmptyDataSet(dataset_index);
+                    this.addOneEmptyOneHiddenDataSets(dataset_index);   //position data plotted but not shown by default
                 }
                 
             }
@@ -542,13 +543,15 @@ export default {
                 let data = this.getData[i];
                 let x_data = data.t;
                 let y_data = data.acc.x;
-                let y_data_two = -1*Math.sin(Math.PI*data.pos/180);
+                let y_data_two = Math.sin(Math.PI*data.pos/180);
 
                 if(this.getCurrentMode == 'driven'){
                     this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));
                     this.addDataToChart({x: x_data, y: y_data_two}, 2*parseInt(data.set) + 1);
                 } else{
-                    this.addDataToChart({x: x_data, y: y_data}, data.set);
+                    //this.addDataToChart({x: x_data, y: y_data}, data.set);
+                    this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));
+                    this.addDataToChart({x: x_data, y: y_data_two}, 2*parseInt(data.set) + 1);
                 }
                 
 
@@ -576,13 +579,15 @@ export default {
                 let data = this.getData[index];
                 let x_data = data.t;
                 let y_data = data.acc.x;
-                let y_data_two = -1*Math.sin(Math.PI*data.pos/180);
+                let y_data_two = Math.sin(Math.PI*data.pos/180);
 
                 if(this.getCurrentMode == 'driven'){
                     this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));
                     this.addDataToChart({x: x_data, y: y_data_two}, 2*parseInt(data.set) + 1);
                 } else{
-                    this.addDataToChart({x: x_data, y: y_data}, data.set);
+                    //this.addDataToChart({x: x_data, y: y_data}, data.set);
+                    this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));
+                    this.addDataToChart({x: x_data, y: y_data_two}, 2*parseInt(data.set) + 1);
                 }
                 
             } 
@@ -593,13 +598,15 @@ export default {
                 let data = this.getData[index];
                 let x_data = data.t;
                 let y_data = data.acc.x;
-                let y_data_two = -1*Math.sin(Math.PI*data.pos/180);
+                let y_data_two = Math.sin(Math.PI*data.pos/180);
                 
                 if(this.getCurrentMode == 'driven'){
                     this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));
                     this.addDataToChart({x: x_data, y: y_data_two}, 2*parseInt(data.set) + 1);
                 } else{
-                    this.addDataToChart({x: x_data, y: y_data}, data.set);
+                    //this.addDataToChart({x: x_data, y: y_data}, data.set);
+                    this.addDataToChart({x: x_data, y: y_data}, 2*parseInt(data.set));
+                    this.addDataToChart({x: x_data, y: y_data_two}, 2*parseInt(data.set) + 1);
                 }
 
                 
@@ -743,6 +750,33 @@ export default {
                 pointRadius: 5,
                 data: [],
                 showLine: true
+                });
+
+            scatterChart.update(0);
+        },
+        addOneEmptyOneHiddenDataSets(new_index){
+            scatterChart.data.datasets.push({
+                yAxisID: 'y',
+                id: `dataset${new_index}`,
+                label:`acceleration${parseInt(new_index)/2}`,
+                pointBackgroundColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
+                borderColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
+                data: [],
+                showLine: true
+                });
+
+            scatterChart.data.datasets.push({
+                yAxisID: 'y2',
+                id: `dataset${new_index+1}`,
+                label:`position${parseInt(new_index)/2}`,
+                pointBackgroundColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
+                borderColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
+                //borderColor: this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)',
+                pointStyle: 'triangle',
+                pointRadius: 5,
+                data: [],
+                showLine: true,
+                hidden: true
                 });
 
             scatterChart.update(0);

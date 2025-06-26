@@ -75,12 +75,12 @@
                   <td class="ps-2" colspan="7">&nbsp;</td>
                 </tr>
 
-                <tr>
+                <tr v-if="getDataSets.length != 0">
                   <td class="ps-2">Mode</td>
                   <td class="">{{ mode }}</td>
 
                   <td v-if="mode == 'driven'" class="ps-2" colspan="2">Driving Freq. [Hz]</td>
-                  <td v-if="mode == 'driven'" class="">{{ driving_freq }}</td>
+                  <td v-if="mode == 'driven'" class="">{{ driving_freq.toFixed(2) }}</td>
 
                   <td v-if="mode == 'driven'" class="ps-2" colspan="2">&nbsp;</td>
                   <td v-else class="ps-2" colspan="5">&nbsp;</td>
