@@ -433,7 +433,7 @@ export default {
                         display: 'auto',    //only displays when a dataset is added and not hidden
                         title:{
                             display: true,
-                            text: 'normalised driver position',
+                            text: 'normalised driving force',
                             color: _this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)'
                         },
                         type: 'linear',
@@ -713,7 +713,8 @@ export default {
                 label:"function",
                 pointBackgroundColor: colour,
                 borderColor: colour,
-                data: data
+                data: data,
+                showLine: true
                 });
                 scatterChart.update(0);
         },
@@ -742,7 +743,7 @@ export default {
             scatterChart.data.datasets.push({
                 yAxisID: 'y2',
                 id: `dataset${new_index+1}`,
-                label:`position${parseInt(new_index)/2}`,
+                label:`force${parseInt(new_index)/2}`,
                 pointBackgroundColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
                 borderColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
                 //borderColor: this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)',
@@ -768,7 +769,7 @@ export default {
             scatterChart.data.datasets.push({
                 yAxisID: 'y2',
                 id: `dataset${new_index+1}`,
-                label:`position${parseInt(new_index)/2}`,
+                label:`force${parseInt(new_index)/2}`,
                 pointBackgroundColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
                 borderColor: this.getDarkTheme ? this.dark_colours[(new_index/2) % this.dark_colours.length] : this.light_colours[(new_index/2) % this.light_colours.length],
                 //borderColor: this.getDarkTheme ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)',
