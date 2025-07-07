@@ -82,8 +82,8 @@
                   <td v-if="mode == 'driven'" class="ps-2" colspan="1">Driving Freq. [Hz]</td>
                   <td v-if="mode == 'driven'" class="">{{ driving_freq.toFixed(2) }}</td>
 
-                  <!-- <td v-if="mode == 'driven'" class="ps-2" colspan="0">&nbsp;</td>
-                  <td v-else class="ps-2" colspan="3">&nbsp;</td> -->
+                  <td v-if="mode != 'driven'" class="ps-2" colspan="2">&nbsp;</td>
+                  <!-- <td v-else class="ps-2" colspan="3">&nbsp;</td> -->
                 </tr>
 
               </tbody>        
