@@ -7,7 +7,7 @@ const dataStore = {
       currentTime: [],
       currentPos: [],
       currentAcc: {},
-      currentGyro: {},
+      //currentGyro: {},
       //recorded data
       data: [],
       data_set_index: 0,

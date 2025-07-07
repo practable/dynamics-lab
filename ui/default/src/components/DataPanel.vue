@@ -24,7 +24,7 @@
                       <th scope="col"></th>
                       <!-- <th scope="col">Pos[deg]</th> -->
                       <th scope="col" colspan="3">Acc[g]</th>
-                      <th scope="col" colspan="3">Gyro[rad/s]</th>
+                      <!-- <th scope="col" colspan="3">Gyro[rad/s]</th> -->
                   </tr>
                   <tr>
                       <th scope="col"></th>
@@ -32,9 +32,9 @@
                       <th scope="col">x</th>
                       <th scope="col">y</th>
                       <th scope="col">z</th>
-                      <th scope="col">x</th>
+                      <!-- <th scope="col">x</th>
                       <th scope="col">y</th>
-                      <th scope="col">z</th>
+                      <th scope="col">z</th> -->
                   </tr>
               </thead>
               <tbody>
@@ -44,9 +44,9 @@
                   <td>{{getCurrentAcceleration.x[0]}}</td>
                   <td>{{getCurrentAcceleration.y[0]}}</td>
                   <td>{{getCurrentAcceleration.z[0]}}</td>
-                  <td>{{getCurrentGyro.x[0]}}</td>
+                  <!-- <td>{{getCurrentGyro.x[0]}}</td>
                   <td>{{getCurrentGyro.y[0]}}</td>
-                  <td>{{getCurrentGyro.z[0]}}</td>
+                  <td>{{getCurrentGyro.z[0]}}</td> -->
                 </tr>
 
                 <tr v-if="getDataSets.length != 0">
@@ -55,9 +55,9 @@
                   <td>{{ maxAcc.x.toFixed(3) }}</td>
                   <td>{{ maxAcc.y.toFixed(3) }}</td>
                   <td>{{ maxAcc.z.toFixed(3) }}</td>
-                  <td>{{ maxGyro.x.toFixed(3) }}</td>
+                  <!-- <td>{{ maxGyro.x.toFixed(3) }}</td>
                   <td>{{ maxGyro.y.toFixed(3) }}</td>
-                  <td>{{ maxGyro.z.toFixed(3) }}</td>
+                  <td>{{ maxGyro.z.toFixed(3) }}</td> -->
                 </tr>
 
                 <tr v-if="getDataSets.length != 0">
@@ -66,24 +66,24 @@
                   <td>{{ rmsAcc.x.toFixed(3) }}</td>
                   <td>{{ rmsAcc.y.toFixed(3) }}</td>
                   <td>{{ rmsAcc.z.toFixed(3) }}</td>
-                  <td>{{ rmsGyro.x.toFixed(3) }}</td>
+                  <!-- <td>{{ rmsGyro.x.toFixed(3) }}</td>
                   <td>{{ rmsGyro.y.toFixed(3) }}</td>
-                  <td>{{ rmsGyro.z.toFixed(3) }}</td>
+                  <td>{{ rmsGyro.z.toFixed(3) }}</td> -->
                 </tr>
 
                 <tr>
-                  <td class="ps-2" colspan="7">&nbsp;</td>
+                  <td class="ps-2" colspan="4">&nbsp;</td>
                 </tr>
 
                 <tr v-if="getDataSets.length != 0">
                   <td class="ps-2">Mode</td>
                   <td class="">{{ mode }}</td>
 
-                  <td v-if="mode == 'driven'" class="ps-2" colspan="2">Driving Freq. [Hz]</td>
+                  <td v-if="mode == 'driven'" class="ps-2" colspan="1">Driving Freq. [Hz]</td>
                   <td v-if="mode == 'driven'" class="">{{ driving_freq.toFixed(2) }}</td>
 
-                  <td v-if="mode == 'driven'" class="ps-2" colspan="2">&nbsp;</td>
-                  <td v-else class="ps-2" colspan="5">&nbsp;</td>
+                  <!-- <td v-if="mode == 'driven'" class="ps-2" colspan="0">&nbsp;</td>
+                  <td v-else class="ps-2" colspan="3">&nbsp;</td> -->
                 </tr>
 
               </tbody>        
@@ -106,11 +106,11 @@ export default {
       selectedDataSet: 0,
       avgPos: 0,
       avgAcc: {x:0,y:0,z:0},
-      avgGyro: {x:0,y:0,z:0},
+      //avgGyro: {x:0,y:0,z:0},
       maxAcc: {x:0,y:0,z:0},
-      maxGyro: {x:0,y:0,z:0},
+      //maxGyro: {x:0,y:0,z:0},
       rmsAcc: {x:0,y:0,z:0},
-      rmsGyro: {x:0,y:0,z:0},
+      //rmsGyro: {x:0,y:0,z:0},
       mode: null,
       driving_freq: null
     }
@@ -174,11 +174,11 @@ export default {
           this.selectedDataSet = 0;
           this.avgPos = 0;
           this.avgAcc = {x:0,y:0,z:0};
-          this.avgGyro = {x:0,y:0,z:0};
+          //this.avgGyro = {x:0,y:0,z:0};
           this.maxAcc = {x:0,y:0,z:0};
-          this.maxGyro = {x:0,y:0,z:0};
+          //this.maxGyro = {x:0,y:0,z:0};
           this.rmsAcc = {x:0,y:0,z:0};
-          this.rmsGyro = {x:0,y:0,z:0};
+          //this.rmsGyro = {x:0,y:0,z:0};
           this.driving_freq = 0;
         }
       }
@@ -196,16 +196,16 @@ export default {
         this.maxAcc.x = this.getAbsMaxValueFromDataSetWithAxis(data, 'acc', 'x');
         this.maxAcc.y = this.getAbsMaxValueFromDataSetWithAxis(data, 'acc', 'y');
         this.maxAcc.z = this.getAbsMaxValueFromDataSetWithAxis(data, 'acc', 'z');
-        this.maxGyro.x = this.getAbsMaxValueFromDataSetWithAxis(data, 'gyro', 'x');
-        this.maxGyro.y = this.getAbsMaxValueFromDataSetWithAxis(data, 'gyro', 'y');
-        this.maxGyro.z = this.getAbsMaxValueFromDataSetWithAxis(data, 'gyro', 'z');
+        // this.maxGyro.x = this.getAbsMaxValueFromDataSetWithAxis(data, 'gyro', 'x');
+        // this.maxGyro.y = this.getAbsMaxValueFromDataSetWithAxis(data, 'gyro', 'y');
+        // this.maxGyro.z = this.getAbsMaxValueFromDataSetWithAxis(data, 'gyro', 'z');
 
         this.rmsAcc.x = this.rootMeanSquare(data, 'acc', 'x');
         this.rmsAcc.y = this.rootMeanSquare(data, 'acc', 'y');
         this.rmsAcc.z = this.rootMeanSquare(data, 'acc', 'z');
-        this.rmsGyro.x = this.rootMeanSquare(data, 'gyro', 'x');
-        this.rmsGyro.y = this.rootMeanSquare(data, 'gyro', 'y');
-        this.rmsGyro.z = this.rootMeanSquare(data, 'gyro', 'z');
+        // this.rmsGyro.x = this.rootMeanSquare(data, 'gyro', 'x');
+        // this.rmsGyro.y = this.rootMeanSquare(data, 'gyro', 'y');
+        // this.rmsGyro.z = this.rootMeanSquare(data, 'gyro', 'z');
 
         this.driving_freq = data[0]['freq'];
         this.mode = data[0]['mode'];

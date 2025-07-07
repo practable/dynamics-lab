@@ -138,7 +138,7 @@ export default {
         let time = this.getTimeFromStart;     
         let pos = this.getCurrentPosition; 
         let acc = this.getCurrentAcceleration; 
-        let gyro = this.getCurrentGyro; 
+        //let gyro = this.getCurrentGyro; 
         let driving_freq = this.getReportedDrivingFrequencyHz;
         let mode = this.getCurrentMode;
         
@@ -149,8 +149,8 @@ export default {
               t: parseFloat(time[index]), 
               pos: parseFloat(pos), 
               acc: {x: parseFloat(acc['x'][index]), y: parseFloat(acc['y'][index]), z: parseFloat(acc['z'][index])}, 
-              gyro: {x: parseFloat(gyro['x'][index]), y: parseFloat(gyro['y'][index]), z: parseFloat(gyro['z'][index])},
-              freq: driving_freq,
+              //gyro: {x: parseFloat(gyro['x'][index]), y: parseFloat(gyro['y'][index]), z: parseFloat(gyro['z'][index])},
+              freq: mode == 'driven' ? driving_freq : 0,
               mode: mode,
               showDataPoint: true};
 
@@ -168,7 +168,8 @@ export default {
       outputToCSV(){
         let data = this.$store.getters.getData;
         let current_dataset = 0;
-        let csv = 'Time[s],Mode,Driving_Freq.[Hz],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g], Gyro_x[rad/s], Gyro_y[rad/s], Gyro_z[rad/s]\n';
+        //let csv = 'Time[s],Mode,Driving_Freq.[Hz],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g], Gyro_x[rad/s], Gyro_y[rad/s], Gyro_z[rad/s]\n';
+        let csv = 'Time[s],Mode,Driving_Freq.[Hz],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g]\n';
         let date = new Date();
 
         data.forEach(function(d){
@@ -179,7 +180,8 @@ export default {
                 hiddenElement.download = `dynamics-${date.getHours()}-${date.getMinutes()}-dataset${current_dataset}.csv`;
                 hiddenElement.click();
 
-                csv = 'Time[s],Mode,Driving_Freq.[Hz],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g], Gyro_x[rad/s], Gyro_y[rad/s], Gyro_z[rad/s]\n';
+                //csv = 'Time[s],Mode,Driving_Freq.[Hz],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g], Gyro_x[rad/s], Gyro_y[rad/s], Gyro_z[rad/s]\n';
+                csv = 'Time[s],Mode,Driving_Freq.[Hz],Pos[deg],Acc_x[g], Acc_y[g], Acc_z[g]\n';
                 current_dataset += 1;
               }
 
@@ -196,12 +198,12 @@ export default {
               csv += d.acc.y.toString();
               csv += ',';
               csv += d.acc.z.toString();
-              csv += ',';
-              csv += d.gyro.x.toString();
-              csv += ',';
-              csv += d.gyro.y.toString();
-              csv += ',';
-              csv += d.gyro.z.toString();
+              // csv += ',';
+              // csv += d.gyro.x.toString();
+              // csv += ',';
+              // csv += d.gyro.y.toString();
+              // csv += ',';
+              // csv += d.gyro.z.toString();
               
               csv += "\n";
         });

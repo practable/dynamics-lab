@@ -381,7 +381,7 @@ export default {
 						//let state = obj.payload.state		//string
 						let pos = obj.payload.encode.pos;		//float array pos in degrees
 						let acc = obj.payload.mpu.acc;		//object
-						let gyro = obj.payload.mpu.gyro;	//object
+						//let gyro = obj.payload.mpu.gyro;	//object
 
 						
 
@@ -420,7 +420,7 @@ export default {
 							_this.setCurrentTime(time);
 							_this.setCurrentPosition(pos);
 							_this.setCurrentAcceleration(acc);
-							_this.setCurrentGyro(gyro);
+							//_this.setCurrentGyro(gyro);
 
 							for(let i=0; i<time.length;i++){
 								series_position.append(time[i] + thisDelay, pos[i]);

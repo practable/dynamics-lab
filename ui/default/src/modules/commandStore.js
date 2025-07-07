@@ -136,6 +136,7 @@ const commandStore = {
             context.commit('COMMAND_START');
         },
         sendCommandPing(context){
+            context.dispatch('setIsRecording', true);
             context.commit('COMMAND_PING');
         },
         updateDrivingFrequencyHz(context, val){
