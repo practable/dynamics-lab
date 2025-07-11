@@ -48,7 +48,7 @@
 #define MAX_MOTOR_ACC_STEPS_S_S 300
 #define HOMING_TIMEOUT_S 10  // homing algorithm exits if home not found within this timeframe
 
-#define ENCODER_HOME_OFFSET 2045
+#define ENCODER_HOME_OFFSET 5830
 #define PRINT_HOMING_RESULT false
 
 #define PRINT_JSON true

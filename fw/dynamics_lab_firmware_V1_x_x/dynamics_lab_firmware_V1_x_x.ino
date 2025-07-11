@@ -254,6 +254,14 @@ void loop() {
     }
   }
 
+// Stall detection should run in every state
+   if (motorState == RUNNING) {
+    if (check_for_stall()) {
+      Serial.println("Motor Maybe Stalled");
+      smState = STATE_STOP;
+    }
+  }
+
   errors.clear_warning();  // clear JSON (move this to bottom of loop later)
                            //  if (printDelay.millisDelay(20000)) {
                            // std::cout << "alive" << std::endl;

@@ -185,12 +185,7 @@ void sm_state_wait() {
     lastState = smState;
   }
 
-  if (motorState == RUNNING) {
-    if (check_for_stall()) {
-      Serial.println("Motor Maybe Stalled");
-      smState = STATE_STOP;
-    }
-  }
+ 
 
   //
   // smState = STATE_STOP;

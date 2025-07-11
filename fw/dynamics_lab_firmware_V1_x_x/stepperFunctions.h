@@ -106,8 +106,28 @@ int16_t step_move_home() {
   return 1;  // on success return 1
 }
 
+/* Stall Detection
+_Problem is its very hard to detect actual stalls and seperate them from "false stalls"_
 
+Option A:
+Stall check should register a stall event then start a counter, if stall events are still happening after time X then
+stall is returned true.
+ - Couldnt work out finer points of implementation
 
+Option B:
+Stall hits are accrued every time it detects non movement, but this scale decreases as a function of time, rather than every time a non-stall is detected
+  - Working out how fast to decay stall hits may require lots of tuning and be fragile
+
+Option C:
+ - Stop trying to compare the encoder value to itself, and instead compare the set velocity from the actual velocity
+*/
+
+uint32_t stall_trigger_time_mS;
+uint32_t last_stall_time_mS;
+#define STALL_TIME_OUT_mS 2000
+#define STALL_HIT_DECAY_mS 200
+
+// Option B
 bool check_for_stall() {
   uint16_t new_encoder_value = stepper.encoder.getAngleRaw();
   int16_t diff = new_encoder_value - last_encoder_value;
@@ -118,13 +138,19 @@ bool check_for_stall() {
   // Serial.print(" diff: ");
   //  Serial.println(diff);
   last_encoder_value = new_encoder_value;
-  if (diff > 2 || diff < -2) {  //// Stall condition unlikely
-    if (stalls_detected > 0) {
-      stalls_detected--;
+  if (diff > 3 || diff < -3) {  //// Stall condition unlikely
+    if (stalls_detected > 0) {  // prevent stall_detected var from rolling over negative
+      if (millis() - last_stall_time_mS >= STALL_HIT_DECAY_mS) {   /// lets make this a timer instead
+        stalls_detected--;
+      }
     }
     return false;
-  } else {  //Likely stall condition detected
-    stalls_detected = stalls_detected + 2;  // make it accumilate faster than deaccumilate
+  } else {                                         //Likely stall condition detected
+    last_stall_time_mS = millis();                 // get the time of this stall
+    if (stalls_detected == 0) {                    // if first time stall detected
+      stall_trigger_time_mS = last_stall_time_mS;  // record time
+    }
+    stalls_detected = stalls_detected + 1;  // make it accumilate faster than deaccumilate?
     Serial.print("stall limit: ");
     Serial.print(stall_limit);
     Serial.print(" Detected: ");
