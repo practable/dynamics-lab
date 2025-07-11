@@ -36,6 +36,12 @@ Version V1.0.0
 
 
 
+#define JSON_MESSENGER_VERSION "V1.2.2"
+#define PRINT_RX_COMMAND true   // JSON safe printing of command received
+#define PRINT_DESERIAL_ERROR true  // JSON safe printing of error status of deserialised command
+#define DEBUG_JSON_MESSENGER  true  // JSON safe printing of entire parsed message including ENUM values {"key":KEY,"num":KEY_ENUM,"dataType":DATATYPE_ENUM,"typeName":TYPENAME,"state":STATE_ENUM,"data":DATA}
+
+
 /*
 #if COMMAND_HINTS == true
 char exampleCommands[][32] = {

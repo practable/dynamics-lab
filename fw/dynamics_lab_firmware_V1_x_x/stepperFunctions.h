@@ -122,21 +122,12 @@ Option C:
  - Stop trying to compare the encoder value to itself, and instead compare the set velocity from the actual velocity
 */
 
-uint32_t stall_trigger_time_mS;
-uint32_t last_stall_time_mS;
-#define STALL_TIME_OUT_mS 2000
-#define STALL_HIT_DECAY_mS 200
+
 
 // Option B
 bool check_for_stall() {
   uint16_t new_encoder_value = stepper.encoder.getAngleRaw();
   int16_t diff = new_encoder_value - last_encoder_value;
-  // Serial.print("new: ");
-  //  Serial.print(new_encoder_value);
-  // Serial.print(" old: ");
-  // Serial.print(last_encoder_value);
-  // Serial.print(" diff: ");
-  //  Serial.println(diff);
   last_encoder_value = new_encoder_value;
   if (diff > 3 || diff < -3) {  //// Stall condition unlikely
     if (stalls_detected > 0) {  // prevent stall_detected var from rolling over negative
@@ -147,17 +138,17 @@ bool check_for_stall() {
     return false;
   } else {                                         //Likely stall condition detected
     last_stall_time_mS = millis();                 // get the time of this stall
-    if (stalls_detected == 0) {                    // if first time stall detected
-      stall_trigger_time_mS = last_stall_time_mS;  // record time
-    }
+//    if (stalls_detected == 0) {                    // if first time stall detected
+//      stall_trigger_time_mS = last_stall_time_mS;  // record time THIS DOES NOTHING
+//    }
     stalls_detected = stalls_detected + 1;  // make it accumilate faster than deaccumilate?
-    Serial.print("stall limit: ");
-    Serial.print(stall_limit);
-    Serial.print(" Detected: ");
-    Serial.println(stalls_detected);
+//    Serial.print("stall limit: ");
+//    Serial.print(stall_limit);
+//    Serial.print(" Detected: ");
+//    Serial.println(stalls_detected);
     if (stalls_detected > stall_limit) {
       stalls_detected = 0;
-      Serial.println("{\"WARNING\":\"Stall Limit Reached\"}");
+      Serial.println(F("{\"WARNING\":\"Motor may be stalled, stopping\"}"));
       return true;
     } else {
       return false;

@@ -16,7 +16,9 @@ jsonMessenger::jsonMessenger() {
 
 void jsonMessenger::jsonBegin() {
   Serial.begin(115200);
-  Serial.println(F("{\"json\":\"messenger\",\"version\":\"V0.2.0\"}"));
+  Serial.print(F("{\"json\":\"messenger\",\"version\":\""));
+  Serial.print(JSON_MESSENGER_VERSION);
+  Serial.println(F("\"}"));
 }
 
 
@@ -49,9 +51,18 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
     // Receive Command
     Serial.readBytesUntil(10, command, JSON_RX_SIZE);  // 10 = "\n"
 
-    Serial.print(F("{\"rxed\": \""));
+    for (int i = 0; i < JSON_RX_SIZE; i++) {  // trim command down to remove redundent characters
+      if (command[i] == '}') {
+        command[i + 1] = '\0';
+        break;
+      }
+    }
+
+#if PRINT_RX_COMMAND == true
+    Serial.print(F("\n{\"rxed\": \""));
     Serial.print(command);
     Serial.println(F("\"}"));
+#endif
 
     //Serial.read();  // clear any additional data left in the buffer
 
@@ -59,10 +70,11 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
     // deserializeJson(jsonRXdoc, Serial);  // less overhead but harder to debug
     DeserializationError error = deserializeJson(jsonRXdoc, command);  // more overhead but can print message before processing (good for debugging)
 
+#if PRINT_DESERIAL_ERROR == true
     Serial.print("{\"deserialization\":\"");
     Serial.print(error.c_str());
     Serial.println(F("\"}"));
-
+#endif
     JsonObject root = jsonRXdoc.as<JsonObject>();  // this was previously doc.to<JsonObject>(); DID NOT WORK! does now with "as"
                                                    // Now to parse the JSON message
                                                    // First get number of elements in the jsonStates enum numValues = NUM_VALUES;
@@ -83,32 +95,25 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 
       if (root.containsKey(jsonCommandKeys[i]) || strcmp(keyString, jsonCommandKeys[i]) == 0) {  // Match is found, i holds the correct ENUM reference for the state
 
-        Serial.print("{\"key\":\"");
+        jsonRX_data.data_type = dataTypes_array[jsonStateMap[i][1]];  // this should contain the correct enum for the datatype
+
+#if DEBUG_JSON_MESSENGER == true
+        Serial.print(F("{\"key\":\""));
         Serial.print(jsonCommandKeys[i]);
-        Serial.print("\",\"num\":\"");
+        Serial.print(F("\",\"num\":\""));
         Serial.print(i);
-        // Serial.print("\"}");
-        //Serial.println();
-
-        // Old Version using <map>
-        //   auto map_item = jsonStateMap.find(i);      // This returns an iterator type
-        //  dataTypes data_type = map_item->second;  // the second value contains the dataType enum
-        //   jsonRX_data.data_type = map_item->second;  // the second value contains the dataType enum (trying to cut out some middleman vars that are not doing anything)
-
-        // new version using 2D array
         Serial.print(F("\",\"dataType\":\""));
         Serial.print(jsonStateMap[i][1]);
         Serial.print("\",\"typeName\":\"");
         Serial.print(typeNames[jsonStateMap[i][1]]);
         Serial.print("\",");
-
-        jsonRX_data.data_type = dataTypes_array[jsonStateMap[i][1]];  // this should contain the correct enum for the datatype
-
-
         // Set the flags to trigger the state change
         Serial.print("\"state\":\"");
         Serial.print(jsonStateMap[i][0]);
         Serial.print("\",");
+        Serial.print(F("\"data\":\""));
+#endif
+
 
         //  jsonRX_data.cmdState = i;  //
         jsonRX_data.cmdState = jsonStates(jsonStateMap[i][0]);  // these two lines should be identical, except one passes the ENUM, the other (the same) int value
@@ -116,11 +121,9 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 
 
 
-
-
         // Copy data into  correct place in data structure, and convert to string for debugging printing
         // then deal with data depending on state
-        Serial.print(F("\"data\":\""));
+
 
         if (jsonRX_data.data_type == EMPTY) {
           // Do nothing
@@ -130,7 +133,9 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
           } else {
             jsonRX_data.numeric = jsonRXdoc[jsonCommandKeys[i]].as<int16_t>();
           }
+#if DEBUG_JSON_MESSENGER == true
           Serial.print(jsonRX_data.numeric);
+#endif
         } else if (jsonRX_data.data_type == FLOAT) {
           if (set_keyword_used) {
             jsonRX_data.floatData = root["to"].as<float>();
@@ -138,7 +143,9 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
             // jsonRX_data.floatData = jsonRXdoc[jsonCommandKeys[i]].as<float>();   // this line not working and stalling everything ( may have been unrelated!)
             jsonRX_data.floatData = root[jsonCommandKeys[i]].as<float>();  // try extracted from root doc instead
           }
+#if DEBUG_JSON_MESSENGER == true
           Serial.print(jsonRX_data.floatData);
+#endif
         } else if (jsonRX_data.data_type == CSTRING) {
           const char *extracted;
           if (set_keyword_used) {
@@ -148,19 +155,27 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
           }
           memcpy(jsonRX_data.msg, extracted, JSON_MSG_LENGTH);
           jsonRX_data.msg[JSON_MSG_LENGTH - 1] = '\0';
+#if DEBUG_JSON_MESSENGER == true
           Serial.print(jsonRX_data.msg);
+#endif
         } else {
+#if DEBUG_JSON_MESSENGER == true
           Serial.println(F("dataType-exception"));
+#endif
         }
+#if DEBUG_JSON_MESSENGER == true
         Serial.println("\"}");
-
+#endif
 #if JSON_USE_QUEUE == true
         if (jsonMessenger::enque_cmd(&jsonRX_data) == -1) {
-          Serial.println(F("Enque cmd failed"));
+          Serial.println(F("{\cmd\":\"enque-failed\"}"));
         }
 #endif
         return jsonRX_data;  // return the structure as the data has been extracted
       } else {
+        if (i == NUM_VALUES - 1) {  // if i = NUM_VALUES we have reached the end of the for loop, if no match has been found, print the unknown cmd
+          Serial.println(F("{\"cmd\":\"unknown\"}"));
+        }
         // We have pre-parsed the alternative set command so now else doesnt need to do anything
       }
     }

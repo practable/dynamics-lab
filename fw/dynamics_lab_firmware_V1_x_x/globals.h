@@ -38,9 +38,9 @@
 // User Options & program config
 #define INIT_SAMPLE_RATE_Hz 75
 #define INIT_PRINT_RATE_Hz 15
-//#define STALL_LIMIT 5  hard coded (for now) due to maths and logic issues
+const int RUNNING_MODE_TIMEOUT_S = 300;
 
-//#define PRINT_PERIODIC_UPDATES true
+
 #define STREAMING_DEFAULT_ACTIVE false
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
 #define STEPPER_HOLD_CURRENT 10  // percent
@@ -95,16 +95,10 @@
 
 // Create objects
 jsonMessenger jsonRX;  // create a jsonMessenger object to handle commands received over Serial connection
-
-
-
-
-UstepperS32 stepper;
+UstepperS32 stepper;    // uStepper32 control for stepper motor
 //MPU6050 mpu;   /// replaced with Adafruit library
-Adafruit_MPU6050 mpu;
-
+Adafruit_MPU6050 mpu; 
 Servo servo;
-
 errorRep errors;
 
 
@@ -116,6 +110,9 @@ errorRep errors;
 
 
 // Global Variables
+// Global Timers
+uint32_t last_command_rx_mS = 0;
+
 // Stepper State
 typedef enum {  // enum to pass variable types between functions
   STOPPED,
@@ -135,6 +132,10 @@ int16_t persistant_encoder_offset;
 uint16_t last_encoder_value = 0;
 int16_t stalls_detected = 0;
 const int16_t stall_limit = 30;   // number of times stall can be triggered before registering as a full stall set to high enough number not to trigger on start
+//uint32_t stall_trigger_time_mS;
+uint32_t last_stall_time_mS;
+#define STALL_TIME_OUT_mS 2000
+#define STALL_HIT_DECAY_mS 200
 
 float goto_target = 0;  // goto state sets global var then uses this while remaining in goto state until target position has been reached
 bool goto_triggered = false;

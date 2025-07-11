@@ -137,7 +137,7 @@ void loop() {
 
   if (nextState_data.cmd_received) {  // If command is receive   //delay(10);
 
-
+    last_command_rx_mS = millis();
 
     const char* cmd = jsonRX.getCMDkey(nextState_data.cmdState);  // I feel like the entire point of using ENUMs is being totally lost by doing this, but it is working
     //std::cout << std::endl;
@@ -254,11 +254,15 @@ void loop() {
     }
   }
 
-// Stall detection should run in every state
-   if (motorState == RUNNING) {
-    if (check_for_stall()) {
-      Serial.println("Motor Maybe Stalled");
+
+  if (motorState == RUNNING) {
+    if (check_for_stall()) {  // Stall detection should run in every state while the motor is running
+      //Serial.println("Motor Maybe Stalled"); warning is generated from stall check function
       smState = STATE_STOP;
+    }
+    if (millis() - last_command_rx_mS >= RUNNING_MODE_TIMEOUT_S*1000){   // running mode timeout
+      Serial.println("{\"WARNING\":\"Running Mode Time Out\"}");
+        smState = STATE_STOP;
     }
   }
 
