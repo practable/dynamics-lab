@@ -237,11 +237,18 @@ void loop() {
       smState = STATE_STOP;
     }
     if (millis() - last_command_rx_mS >= RUNNING_MODE_TIMEOUT_S * 1000) {  // running mode timeout
-      Serial.println("{\"WARNING\":\"Running Mode Time Out\"}");
+      Serial.println(F("{\"WARNING\":\"Running Mode Time Out\"}"));
       smState = STATE_STOP;
     }
   }
 
+
+  if (!motorState == FREE) {
+    if (millis() - last_command_rx_mS >= FREEWHEEL_BRAKE_TIMEOUT_S * 1000) {  // makes sure brake mode is set to freewheel to avoid heating motor when not in use
+      Serial.println(F("{\"INFO\":\"Freewheel Brake Mode Applied\"}"));
+      smState = STATE_FREEWHEEL;
+    }
+  }
 
 
   errors.clear_warning();  // clear JSON (move this to bottom of loop later)

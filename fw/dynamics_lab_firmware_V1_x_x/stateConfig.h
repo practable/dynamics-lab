@@ -341,7 +341,7 @@ void sm_state_calibrate(void) {
 
 
 
-// Set brake mode to freewheel (does not stop the motor or enter brake mode -> Still trying to figure out how to enter brake mode)
+// Set brake mode to freewheel
 void sm_state_freewheel(void) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -351,7 +351,7 @@ void sm_state_freewheel(void) {
   }
   stepper.setBrakeMode(FREEWHEELBRAKE);
    stepper.stop(SOFT);
-  motorState = STOPPED;
+  motorState = FREE;
   smState = STATE_WAIT;
 }
 
@@ -407,6 +407,7 @@ void sm_state_goto(jsonStateData stateData) {
   }
 */
   stepper.moveToAngle(stateData.numeric);
+  motorState = RUNNING;
 
   smState = STATE_WAIT;
 

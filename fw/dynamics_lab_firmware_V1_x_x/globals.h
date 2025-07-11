@@ -38,7 +38,8 @@
 // User Options & program config
 #define INIT_SAMPLE_RATE_Hz 75
 #define INIT_PRINT_RATE_Hz 15
-const int RUNNING_MODE_TIMEOUT_S = 300;
+const int RUNNING_MODE_TIMEOUT_S = 300;       // Times out running mode/movement after time delay from recieving last command
+const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;   // times out the brake mode and prevents motor heating when not in use
 
 
 #define STREAMING_DEFAULT_ACTIVE false
@@ -62,7 +63,7 @@ const int RUNNING_MODE_TIMEOUT_S = 300;
 
 // Stall Detection Options
 // this is definatly better done as a timer
-#define STALL_TIME_LIMIT_mS 2000
+#define STALL_TIME_LIMIT_mS 2000  // DONT THINK THIS IS USED ANYMORE
 
 
 // Servo Options
@@ -118,6 +119,7 @@ typedef enum {  // enum to pass variable types between functions
   STOPPED,
   RUNNING,
   STALLED,
+  FREE
 } stepState;
 
 stepState motorState = STOPPED;
