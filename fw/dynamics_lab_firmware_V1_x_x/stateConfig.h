@@ -185,7 +185,7 @@ void sm_state_wait() {
     lastState = smState;
   }
 
- 
+
 
   //
   // smState = STATE_STOP;
@@ -304,7 +304,7 @@ void sm_state_home(void) {
   Serial.println(currentAngle);
 #endif
   motorState = RUNNING;
-  if ((!currentAngle < 0.4) && !(currentAngle > 359.6)) {
+  if (!(currentAngle < 0.4) && !(currentAngle > 359.6)) {
     stepper.setRPM(50);
   } else {
     stepper.stop();
@@ -313,10 +313,6 @@ void sm_state_home(void) {
     stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
     smState = STATE_WAIT;
   }
-  // while ((!currentAngle < 0.3) && !(currentAngle > 359.7)) {    // replaced with non-blocking version
-  //   stepper.setRPM(50);
-  //   currentAngle = stepper.encoder.getAngle();
-  //  }
 }
 
 
@@ -350,7 +346,7 @@ void sm_state_freewheel(void) {
     lastState = smState;
   }
   stepper.setBrakeMode(FREEWHEELBRAKE);
-   stepper.stop(SOFT);
+  stepper.stop(SOFT);
   motorState = FREE;
   smState = STATE_WAIT;
 }
@@ -378,41 +374,62 @@ void sm_state_brake(void) {
 
 // Go to absolute angle (somewhat accurate if recently calibrated -> may take several rotations to find position)
 void sm_state_goto(jsonStateData stateData) {
+
   if (lastState != smState) {
+    lastState = smState;
 #if DEBUG_STATES == true
     Serial.println(F("state: GOTO"));
 #endif
-    lastState = smState;
-    goto_triggered = true;
     stepper.stop();
-    //  stepper.setMaxVelocity(800);
-    //  stepper.setMaxAcceleration(4000);
+    stepper.setMaxVelocity(800);
+    stepper.setMaxAcceleration(4000);
+    // set up target bounds
     goto_target = stateData.numeric;
+    if (goto_target == 360 || goto_target == 0 ) {   // avoid having to do the messy maths here
+      smState = STATE_HOME;
+      return;
+    }
+    target_lower = goto_target - 0.41;
+    target_higher = goto_target + 0.41;
+    if (target_lower < 0) {
+      target_lower += 360;
+    }
+    if (target_higher > 360) {
+      target_higher -= 360;
+    }
+    Serial.print("high: ");
+    Serial.print(target_higher);
+    Serial.print(" low: ");
+    Serial.println(target_lower);
+    if (target_higher < target_lower) {  // if the variables are the wrong way around for the logic to work, switch them
+      switchVariables(target_higher, target_lower);
+      Serial.println("the ol switcharoo");
+      Serial.print("high: ");
+      Serial.print(target_higher);
+      Serial.print(" low: ");
+      Serial.println(target_lower);
+    }
   }
-
-  //This will be way easier by writing a function that can tell if a number is close to another, knowing that 360 = 0
-  /*
+  // find angle through movement
   float currentAngle = stepper.encoder.getAngle();
-  float target_high = goto_target + 0.3;
-  float target_low = goto_target - 0.3;
-  if (target_high > 360.0) target_high += -360;
-  if (target_low < 0) target_low = 
-  if ((!currentAngle < goto_target + 0.3) && !(currentAngle > 359.7)) {
-    stepper.setRPM(50);
-  } else {
+  //#if PRINT_HOMING_RESULT == true
+  //Serial.print(stepper.encoder.getAngleRaw());
+  Serial.print(target_lower);
+  Serial.print(" ");
+  Serial.print(currentAngle);
+  Serial.print(" ");
+  Serial.println(target_higher);
+  //#endif
+  motorState = RUNNING;
+  if ((currentAngle < target_higher) && (currentAngle > target_lower)) {
     stepper.stop();
+    motorState = STOPPED;
     stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
     stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
     smState = STATE_WAIT;
+  } else {
+    stepper.setRPM(50);
   }
-*/
-  stepper.moveToAngle(stateData.numeric);
-  motorState = RUNNING;
-
-  smState = STATE_WAIT;
-
-  //  float goto_target = 0;   // goto state sets global var then uses this while remaining in goto state until target position has been reached
-  //bool goto_triggered = false;
 }
 
 

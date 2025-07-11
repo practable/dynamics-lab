@@ -21,6 +21,7 @@
 #include <Servo.h>  // [Arduino Library Manager]
 #include "errorRep.h"
 #include <ArduinoJson.h>  // installed version 6.21.5 [Arduino Library Manager]
+#include <ledObject.h>
 
 #include <FlashStorage_STM32.h>
 
@@ -38,8 +39,8 @@
 // User Options & program config
 #define INIT_SAMPLE_RATE_Hz 75
 #define INIT_PRINT_RATE_Hz 15
-const int RUNNING_MODE_TIMEOUT_S = 300;       // Times out running mode/movement after time delay from recieving last command
-const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;   // times out the brake mode and prevents motor heating when not in use
+const int RUNNING_MODE_TIMEOUT_S = 300;     // Times out running mode/movement after time delay from recieving last command
+const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;  // times out the brake mode and prevents motor heating when not in use
 
 
 #define STREAMING_DEFAULT_ACTIVE false
@@ -77,8 +78,8 @@ const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;   // times out the brake mode and pre
 
 
 // Debugging Options
-#define DEBUG_STATES false                // not JSON safe
-#define DEBUG_STATE_MACHINE true          // JSON safe
+#define DEBUG_STATES false        // not JSON safe
+#define DEBUG_STATE_MACHINE true  // JSON safe
 #define COMMAND_HINTS false
 
 // Physics Constants
@@ -96,11 +97,12 @@ const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;   // times out the brake mode and pre
 
 // Create objects
 jsonMessenger jsonRX;  // create a jsonMessenger object to handle commands received over Serial connection
-UstepperS32 stepper;    // uStepper32 control for stepper motor
+UstepperS32 stepper;   // uStepper32 control for stepper motor
 //MPU6050 mpu;   /// replaced with Adafruit library
-Adafruit_MPU6050 mpu; 
+Adafruit_MPU6050 mpu;
 Servo servo;
 errorRep errors;
+ledObject beacon(LED_BEACON);
 
 
 // why is this defined in globals?!?
@@ -133,14 +135,16 @@ int16_t step_low_angle;
 int16_t persistant_encoder_offset;
 uint16_t last_encoder_value = 0;
 int16_t stalls_detected = 0;
-const int16_t stall_limit = 30;   // number of times stall can be triggered before registering as a full stall set to high enough number not to trigger on start
+const int16_t stall_limit = 30;  // number of times stall can be triggered before registering as a full stall set to high enough number not to trigger on start
 //uint32_t stall_trigger_time_mS;
 uint32_t last_stall_time_mS;
 #define STALL_TIME_OUT_mS 2000
 #define STALL_HIT_DECAY_mS 200
 
 float goto_target = 0;  // goto state sets global var then uses this while remaining in goto state until target position has been reached
-bool goto_triggered = false;
+bool goto_triggered = false;  // DONT THINK THIS IS NEEDED
+float target_lower;
+float target_higher;
 
 //EEprom Variables
 const int WRITTEN_SIGNATURE = 0x98C7AB1E;  // Arbitary signature to check for existing encoder offset value in persistant memory (practable)
@@ -195,7 +199,7 @@ struct accOffsets {
   float X;
   float Y;
   float Z;
-} acc_offset = {0.0, 0.0, 0.0};     //{ 0.101, -0.02, -0.147 };
+} acc_offset = { 0.0, 0.0, 0.0 };  //{ 0.101, -0.02, -0.147 };
 
 struct gyroOffsets {
   float X;
@@ -207,7 +211,13 @@ struct gyroOffsets {
 
 //uint32_t print_delay_mS = 1000 / PRINT_RATE_Hz;
 
-
+// Utility functions
+void switchVariables(float &varA, float &varB) {
+  float b;
+  b = varA;
+  varA = varB;
+  varB = b;
+}
 
 
 
