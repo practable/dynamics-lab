@@ -350,6 +350,7 @@ void sm_state_freewheel(void) {
     lastState = smState;
   }
   stepper.setBrakeMode(FREEWHEELBRAKE);
+   stepper.stop(SOFT);
   motorState = STOPPED;
   smState = STATE_WAIT;
 }
@@ -364,6 +365,7 @@ void sm_state_brake(void) {
     lastState = smState;
   }
   stepper.setBrakeMode(COOLBRAKE);
+  stepper.stop();
   motorState = STOPPED;
   smState = STATE_WAIT;
 }
@@ -551,7 +553,7 @@ void sm_state_ping(void) {
     servo.writeMicroseconds(SERVO_OPEN_uS);
     servo_pos = true;
   }
-  // servo.detach();
+  // servo.detach();   // needs time to get to position without blocking, now a function in main loop
   smState = STATE_WAIT;
 }
 

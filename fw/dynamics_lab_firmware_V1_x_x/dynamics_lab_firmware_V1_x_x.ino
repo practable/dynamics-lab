@@ -85,10 +85,6 @@ void setup() {
   while (!Serial) {
     delay(1);  // give time for Serial object to start
   }
-
-  // delay(2000);  // give time for Serial object to start
-  // display_mallinfo();
-  //  std::cout << "\n{\"model\":\"" << EXPERIMENT_NAME << "\",\"version\":\"" << FIRMWARE_VERSION << "\",\"developed-by\":\"" << DEVELOPER << "\"}" << std::endl;
   Serial.print("\n{\"model\":\"");
   Serial.print(EXPERIMENT_NAME);
   Serial.print("\",\"version\":\"");
@@ -96,33 +92,21 @@ void setup() {
   Serial.print("\",\"fw-developed-by\":\"");
   Serial.print(DEVELOPER);
   Serial.println("\"}");
-  //  Serial.print("{\"no_samples_in_array\": \"");
-  //  Serial.print(num_samples_req);
-  //  Serial.println("\"}");
+
   jsonRX.jsonBegin();  // Start the json library to accept commands over serial connection
-  // replaced with adafruit library
-  //  mpu.Initialize();
-  //  mpu.RegisterWrite(MPU6050_ACCEL_CONFIG, 0b00011000);  // It does this in Initialize, set to 0x08 (+-4G)
-  //  mpu.Calibrate();
   mpu_setup();
   get_offset_from_memory();  // get encoder_offset from persistant memory before stepper setup (does nothing atm)
   stepper_setup(false);      // if true run old homing scripts
 
-
-
-  //servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);  // default width is hopefully at one end of travel  -> moving this function to the "ping" state to try and avoid chattering (this doesnt work, but may be a good reason to use servoBasic lib instead)
-
   stepper.encoder.setHomeActual(ENCODER_HOME_OFFSET);
 
-  // display_mallinfo();
   servo_pos = false;
   // fix for resetting servo at startup
   servo.attach(SERVO_PPM_PIN, SERVO_ZERO_uS);
   servo_attach_time_mS = millis();
   servo.writeMicroseconds(SERVO_OPEN_uS);
   servo_pos = true;
-  //sm_state_ping();   // make sure servo is homed correctly
-  //  delay(1000);
+
   pinMode(LED_BEACON, OUTPUT);
   digitalWrite(LED_BEACON, true);
 }
@@ -140,8 +124,7 @@ void loop() {
     last_command_rx_mS = millis();
 
     const char* cmd = jsonRX.getCMDkey(nextState_data.cmdState);  // I feel like the entire point of using ENUMs is being totally lost by doing this, but it is working
-    //std::cout << std::endl;
-    // std::cout << "{\"rx-cmd\":\"" << cmd << "\",\"datatype\":\"" << jsonRX.getDataType(nextState_data.data_type) << "\",\"data\":\"";
+
     Serial.print("{\"rx-cmd\":\"");
     Serial.print(cmd);
     Serial.print("\",\"datatype\":\"");
@@ -151,8 +134,6 @@ void loop() {
     if (nextState_data.data_type == FLOAT) Serial.print(nextState_data.floatData);  //std::cout << nextState_data.floatData;
     if (nextState_data.data_type == CSTRING) Serial.print(nextState_data.msg);      //std::cout << nextState_data.msg;
     if (nextState_data.data_type == EMPTY) Serial.print("n/a");                     //std::cout << "n/a";
-    // Is this now missing float clause?
-    //std::cout << "\"}" << std::endl;
     Serial.println("\"}");
 
     // This is the bit that parses the command recieved by user, and sets the state machine to go to the correct state
@@ -200,12 +181,7 @@ void loop() {
 
 
   sm_Run(nextState_data);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
-  // NOTE System design question here, passing this value as a local variable means it cannot be updated elsewhere. Making it global means that other states would be able to modify the data
-  // and pass it internally.
-  // Skipping over this question, I am going to do the thing this would solve a different way
-  // sm_Run();
 
-  // mpu.Execute();
 
 
   /* Get new sensor events with the readings */
@@ -247,7 +223,7 @@ void loop() {
     }
   }
 
-  // Fix for servo chattering, servo is attached during PING state
+  // Fix for servo chattering, servo is attached during PING state, and unattached on timer
   if (servo.attached()) {
     if (millis() - servo_attach_time_mS >= SERVO_TIMEOUT_mS) {
       servo.detach();
@@ -260,11 +236,13 @@ void loop() {
       //Serial.println("Motor Maybe Stalled"); warning is generated from stall check function
       smState = STATE_STOP;
     }
-    if (millis() - last_command_rx_mS >= RUNNING_MODE_TIMEOUT_S*1000){   // running mode timeout
+    if (millis() - last_command_rx_mS >= RUNNING_MODE_TIMEOUT_S * 1000) {  // running mode timeout
       Serial.println("{\"WARNING\":\"Running Mode Time Out\"}");
-        smState = STATE_STOP;
+      smState = STATE_STOP;
     }
   }
+
+
 
   errors.clear_warning();  // clear JSON (move this to bottom of loop later)
                            //  if (printDelay.millisDelay(20000)) {
