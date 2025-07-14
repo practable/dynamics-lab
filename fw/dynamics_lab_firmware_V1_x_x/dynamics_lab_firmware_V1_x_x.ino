@@ -177,11 +177,17 @@ void loop() {
       smState = STATE_PING;
     } else if (nextState_data.cmdState == OFFSET) {
       smState = STATE_OFFSET;
+    } else if (nextState_data.cmdState == SETSECRET) {
+      smState = STATE_SETSECRET;
+    } else if (nextState_data.cmdState == SETCAL) {
+      smState = STATE_SETCAL;
+    } else if (nextState_data.cmdState == GETCAL) {
+      smState = STATE_GETCAL;
     } else if (nextState_data.cmdState == HELP) {
       smState = STATE_HELP;
     } else {
       // std::cout << "{\"WARNING\":\"Unrecognised cmdState\"}" << std::endl;
-      Serial.println("{\"WARNING\":\"Unrecognised cmdState\"}");
+      Serial.println("{\"WARNING\":\"Unrecognised cmdState (loop)\"}");
     }
   }
 
@@ -249,8 +255,8 @@ void loop() {
     }
   }
 
-  if (motorState == MOMENTARY){
-    if (millis() - last_command_rx_mS >= 10000){
+  if (motorState == MOMENTARY) {
+    if (millis() - last_command_rx_mS >= 10000) {
       Serial.println(F("{\"INFO\":\"Momentary state ended\"}"));
       motorState = STOPPED;
     }

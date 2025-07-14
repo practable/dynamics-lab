@@ -54,9 +54,9 @@ Imogen Heard
 #define JSON_USE_QUEUE false        //At least one of these should be true
 #define JSON_USE_SINGLE_FRAME true  // Single frame is always valid, but this can be used to disable features not wanted when using queue
 
-#define JSON_RX_SIZE 32     // 32 Working on Arduino Nano
+#define JSON_RX_SIZE 64     // try 42 Need more for auth -> 32 Working on Arduino Nano
 #define CMD_QUEUE_LENGTH 3  // 3 Working on Arduino Nano
-#define JSON_MSG_LENGTH 8   // Length of msg array in json data structure
+#define JSON_MSG_LENGTH 9   // Length of msg array in json data structure
 
 
 // 1. Define an enum to define variable type used, These will be linked to a state enum so when a keyword is received, we can look up what data type should be sent with it
@@ -66,11 +66,12 @@ typedef enum {  // enum to pass variable types between functions
   INTEGER,
   FLOAT,
   CSTRING,
-  BOOL
+  BOOL,
+  AUTH  // 14/07/25 adding new datatype, this will tell jsonMessenger that 2 datas will be present, but will use already existing datatypes in RX data structure
 } dataTypes;
 
 // 1b. Place these enums into an array to enable lookup by index (This shouldnt be nessissary but it fixed a bug at one point)
-const dataTypes dataTypes_array[5] = { EMPTY, INTEGER, FLOAT, CSTRING, BOOL };
+const dataTypes dataTypes_array[6] = { EMPTY, INTEGER, FLOAT, CSTRING, BOOL, AUTH };
 
 
 // 1c. List the same enums as cStrings, this will enable human readability of enum above
@@ -79,8 +80,18 @@ static char typeNames[][8] = {
   "INTEGER",
   "FLOAT",
   "CSTRING",
-  "BOOL"
+  "BOOL",
+  "AUTH"
 };
+
+
+// this actually isnt needed at all
+/*
+struct {  // structure for returning data with an authorisation key
+  int16_t numericData;
+  char authKey[9];
+} authStruct;
+*/
 
 
 // 2. Declare a list of all possible key values as ENUM. These values will be passed out of the jsonMessenger Object and can be used to trigger different states
@@ -107,6 +118,9 @@ typedef enum {
   SNAPTIME,
   PING,
   OFFSET,
+  SETSECRET,
+  SETCAL,
+  GETCAL,
   HELP,
   NUM_VALUES  // Add sentinal NUM_VALUES to count number of elements, this is very important and will be used to size for loops inside the jsonMessenger object
 } jsonStates;
@@ -134,7 +148,10 @@ const uint16_t jsonStateMap[NUM_VALUES][2] = {
   { jsonStates::SNAPSHOT, dataTypes::EMPTY },
   { jsonStates::SNAPTIME, dataTypes::INTEGER },
   { jsonStates::PING, dataTypes::EMPTY },
-  { jsonStates::OFFSET, dataTypes::INTEGER },
+  { jsonStates::OFFSET, dataTypes::INTEGER },  // defunct given new secret methods
+  { jsonStates::SETSECRET, dataTypes::CSTRING },
+  { jsonStates::SETCAL, dataTypes::AUTH },
+  { jsonStates::GETCAL, dataTypes::CSTRING },
   { jsonStates::HELP, dataTypes::EMPTY }
 };
 
@@ -162,19 +179,12 @@ static char jsonCommandKeys[][7] = {
   "time",
   "ping",
   "offset",
+  "secret",
+  "setcal",
+  "getcal",
   "help"
 };
 // NOTE, this can also be used to turn the enums above back into strings for human readability
-
-//<depreciated>
-// Also including generic keys, these are used for more verbose JSON commands like:
-// {"set": "item", "to":"value"}
-//static char jsonGenerics[][5] = {
-//  "NULL",
-//  "set",
-//  "to",
-//  "get"
-//};
 
 
 
@@ -186,6 +196,7 @@ struct jsonStateData {
   int16_t numeric;      // empty generic data slots for each data type
   float floatData;
   char msg[JSON_MSG_LENGTH];
+  // authStruct authData;
   bool cmd_received;  // Flag set true by jsonLoop when cmd is received
 };
 

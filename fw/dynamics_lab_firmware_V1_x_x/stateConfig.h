@@ -39,6 +39,9 @@ typedef enum {
   STATE_SNAPTIME,
   STATE_PING,
   STATE_OFFSET,
+  STATE_SETSECRET,
+  STATE_SETCAL,
+  STATE_GETCAL,
   STATE_HELP,
   NUM_STATES  // Sentinal value lets us get the total number of states without manually counting. Do not forget this value, it is important for correct function
 } StateType;
@@ -75,6 +78,9 @@ char stateNames[][20] = {
   "STATE_SNAPTIME",
   "STATE_PING",
   "STATE_OFFSET",
+  "STATE_SETSECRET",
+  "STATE_SETCAL",
+  "STATE_GETCAL",
   "STATE_HELP"
 };
 
@@ -101,6 +107,9 @@ void sm_state_snapshot(void);
 void sm_state_snaptime(jsonStateData stateData);
 void sm_state_ping(void);
 void sm_state_offset(jsonStateData stateData);
+void sm_state_setsecret(jsonStateData stateData);
+void sm_state_setcal(jsonStateData stateData);
+void sm_state_getcal(jsonStateData stateData);
 void sm_state_help(void);
 
 
@@ -164,12 +173,55 @@ void print_cmds() {
   Serial.println(F("   {\"print\": 1 to 50}   -> Set Print Rate in Hz (dflt: 50)"));
   Serial.println(F("   {\"stream\":\"\"}      -> Start Data Streaming    "));
   Serial.println(F("   {\"endst\":\"\"}       -> End Data Streaming      "));
-  Serial.println(F("   {\"snap\":\"\"}        -> Take Data Snapshot       "));             // Take a Snapshot of data
-  Serial.println(F("   {\"time\": 1 - 250000 }-> Set Time for Data Snapshot (mS)  "));     // Change the time over which the data snapshot is taken
-  Serial.println(F("   {\"ping\":\"\"}        -> Ping Servo               "));             // Ping the wobble-shaft with the servo
-  Serial.println(F("   {\"offset\":\"-32768 to 32768\"} -> NOT CURRENTLY USED"));          // Print commands list
+  Serial.println(F("   {\"snap\":\"\"}        -> Take Data Snapshot       "));          // Take a Snapshot of data
+  Serial.println(F("   {\"time\": 1 - 250000 }-> Set Time for Data Snapshot (mS)  "));  // Change the time over which the data snapshot is taken
+  Serial.println(F("   {\"ping\":\"\"}        -> Ping Servo               "));          // Ping the wobble-shaft with the servo
+  Serial.println(F("   {\"offset\":\"-32768 to 32768\"} -> NOT CURRENTLY USED"));       // Print commands list
+  Serial.println(F("   {\"secret\":\"XXXXXXXX\"-> Set 8 character secret     "));
+  Serial.println(F("   {\"setcal\":\"0 - 32768\", \"auth\":\"XXXXXXXX\"} -> Set calibration offset"));
+  Serial.println(F("   {\"getcal\":\"XXXXXXXX\"-> Get calibration offset (requires secret) "));
   Serial.println(F("   {\"help\":\"\"}        -> Print Commands to Serial Monitor    "));  // Print commands list
 }
+
+void sm_state_setsecret(jsonStateData stateData) {
+#if DEBUG_STATES == true
+  Serial.println(F("state: SECRET"));
+#endif
+  lastState = smState;
+  // code here
+  Serial.print("secret: ");
+  Serial.println(stateData.msg);
+  smState = STATE_WAIT;
+}
+
+
+void sm_state_setcal(jsonStateData stateData) {
+#if DEBUG_STATES == true
+  Serial.println(F("state: SETCAL"));
+#endif
+  lastState = smState;
+  // code here
+  Serial.print("cal data: ");
+  Serial.print(stateData.numeric);
+  Serial.print(" auth: ");
+  Serial.println(stateData.msg);
+  smState = STATE_WAIT;
+}
+
+
+
+void sm_state_getcal(jsonStateData stateData) {
+#if DEBUG_STATES == true
+  Serial.println(F("state: GETCAL"));
+#endif
+  lastState = smState;
+  // code here
+  Serial.print(" auth: ");
+  Serial.println(stateData.msg);
+  smState = STATE_WAIT;
+}
+
+
 
 
 // State Wait is the default state for this program
@@ -331,12 +383,12 @@ void sm_state_home(void) {
     lastState = smState;
     currentAngle = stepper.encoder.getAngle();
     float angle_error = 0 - currentAngle;
-    motorState = RUNNING;
     //  Serial.print("current angle: ");
     //  Serial.print(currentAngle);
     //  Serial.print(" angle_error: ");
     //  Serial.println(angle_error);
     stepper.moveAngle(angle_error);
+    motorState = RUNNING;
   }
   currentAngle = stepper.encoder.getAngle();
   if ((currentAngle < 0.2) || (currentAngle > 359.8)) {
@@ -553,8 +605,8 @@ void sm_state_move(jsonStateData stateData) {
       return;
     }
     motorState = MOMENTARY;
-    Serial.print("move angle: ");
-    Serial.println(angle);
+    // Serial.print("move angle: ");
+    // Serial.println(angle);
     stepper.moveAngle(angle);
   }
   smState = STATE_WAIT;
@@ -794,9 +846,6 @@ void sm_Run(jsonStateData stateData) {
       case STATE_PING:
         sm_state_ping();
         break;
-      case STATE_HELP:
-        sm_state_help();
-        break;
       case STATE_SNAPSHOT:
         sm_state_snapshot();
         break;
@@ -805,6 +854,18 @@ void sm_Run(jsonStateData stateData) {
         break;
       case STATE_OFFSET:
         sm_state_offset(stateData);
+        break;
+      case STATE_SETSECRET:
+        sm_state_setsecret(stateData);
+        break;
+      case STATE_SETCAL:
+        sm_state_setcal(stateData);
+        break;
+      case STATE_GETCAL:
+        sm_state_getcal(stateData);
+        break;
+      case STATE_HELP:
+        sm_state_help();
         break;
       default:
         sm_state_stop();

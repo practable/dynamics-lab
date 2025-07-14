@@ -158,6 +158,23 @@ jsonStateData jsonMessenger::jsonReadSerialLoop() {
 #if DEBUG_JSON_MESSENGER == true
           Serial.print(jsonRX_data.msg);
 #endif
+        } else if (jsonRX_data.data_type == AUTH) {  // if auth then two datas must be extracted
+          const char *extract_secret;
+          if (set_keyword_used) {
+            jsonRX_data.numeric = jsonRXdoc["to"].as<int16_t>();
+          } else {
+            jsonRX_data.numeric = jsonRXdoc[jsonCommandKeys[i]].as<int16_t>();
+          }
+          extract_secret = jsonRXdoc["auth"].as<const char *>();  // this will always use auth keyword
+          memcpy(jsonRX_data.msg, extract_secret, JSON_MSG_LENGTH);
+          jsonRX_data.msg[8] = '\0';
+
+#if DEBUG_JSON_MESSENGER == true
+          Serial.print("data: ");
+          Serial.print(jsonRX_data.numeric);
+          Serial.print(" auth: ");
+          Serial.print(jsonRX_data.msg);
+#endif
         } else {
 #if DEBUG_JSON_MESSENGER == true
           Serial.println(F("dataType-exception"));
