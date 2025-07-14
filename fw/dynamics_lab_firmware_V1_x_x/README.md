@@ -20,7 +20,8 @@ _Verbose Command Structure_
    {"set":"endst"}                   -> End Data Streaming      
    {"set":"snap"}                    -> Take Data Snapshot       
    {"set":"time","to": 1 - 250000 }  -> Set Time for Data Snapshot (mS)  
-   {"set":"ping"}                    -> Ping Servo               
+   {"set":"ping"}                    -> Ping Servo 
+   {"set":"setcal", "to":"0 - 32768", "auth":"XXXXXXXX"} -> Set calibration offset"));              
    {"set":"help"}                    -> Print Commands to Serial Monitor 
 
 
@@ -29,23 +30,27 @@ _Verbose Command Structure_
 
 _Succinct Command Structure_
 ```
-   {"start":}          -> Start/Update Motor Speed
-   {"stop":}           -> Stop Motor              
-   {"hz": -20 to 20}    -> Set Motor Speed in Hz   
-   {"rpm": -200 to 200} -> Set Motor Speed in RPM  
-   {"home":}        -> Move Motor to home pos (test) 
-   {"cal":}         -> Run Calibration to home motor 
-   {"free":}        -> Set freewheel brake mode (test)
-   {"brake":}       -> Set coolbrake brake mode (test)
-   {"goto": -360 to 360}-> Goto Angle (test)              
-   {"sample": 1 to 40}  -> Set Samplerate in Hz         
-   {"stream":}      -> Start Data Streaming    
-   {"endst":}       -> End Data Streaming      
-   {"snap":}        -> Take Data Snapshot       
-   {"time": 1 - 250000 }-> Set Time for Data Snapshot (mS)  
-   {"ping":}        -> Ping Servo               
-   {"help":}        -> Print Commands to Serial Monitor 
-
+{"start":0}          -> Start/Update Motor Speed"));
+{"stop":0}           -> Stop Motor              "));
+{"hz": -20 to 20}    -> Set Motor Speed in Hz   "));
+{"rpm": -200 to 200} -> Set Motor Speed in RPM  "));
+{"home":" "}        -> Move Motor to home pos (test) "));
+{"cal":" "}         -> DEPRECIATED for now "));
+{"free":" "}        -> Set freewheel brake mode (test)"));
+{"brake":" "}       -> Set coolbrake brake mode (test)"));
+{"goto": -360 to 360}-> Goto Angle (test)              "));
+{"sample": 1 to 200} -> Set Samplerate in Hz (dflt: 200)"));  // Note, when changing print & sample rates, the size of the JSON doc may not be able to handle additional data. Max number of samples is governed by JSON doc size
+{"print": 1 to 50}   -> Set Print Rate in Hz (dflt: 50)"));
+{"stream":" "}      -> Start Data Streaming    "));
+{"endst":" "}       -> End Data Streaming      "));
+{"snap":" "}        -> Take Data Snapshot       "));          // Take a Snapshot of data
+{"time": 1 - 250000 }-> Set Time for Data Snapshot (mS)  "));  // Change the time over which the data snapshot is taken
+{"ping":" "}        -> Ping Servo               "));          // Ping the wobble-shaft with the servo
+{"offset":"-32768 to 32768"} -> NOT CURRENTLY USED"));       // Print commands list
+{"secret":"XXXXXXXX"-> Set 8 character secret     "));
+{"setcal":"0 - 32768", "auth":"XXXXXXXX"} -> Set calibration offset"));
+{"getcal":"XXXXXXXX"-> Get calibration offset (requires secret) "));
+{"help":""}        -> Print Commands to Serial Monitor    "));  // Print commands list
 ```
 
 

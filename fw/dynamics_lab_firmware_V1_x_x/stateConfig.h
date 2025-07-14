@@ -188,9 +188,13 @@ void sm_state_setsecret(jsonStateData stateData) {
   Serial.println(F("state: SECRET"));
 #endif
   lastState = smState;
-  // code here
   Serial.print("secret: ");
   Serial.println(stateData.msg);
+  if (stateData.msg[0] == '\0') {      //empty string
+    smState = STATE_WAIT;
+    return;
+  }
+
   smState = STATE_WAIT;
 }
 
