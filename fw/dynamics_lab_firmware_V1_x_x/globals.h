@@ -43,6 +43,7 @@ const int RUNNING_MODE_TIMEOUT_S = 300;     // Times out running mode/movement a
 const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;  // times out the brake mode and prevents motor heating when not in use
 
 
+
 #define STREAMING_DEFAULT_ACTIVE false
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
 #define STEPPER_HOLD_CURRENT 10  // percent
@@ -121,7 +122,8 @@ typedef enum {  // enum to pass variable types between functions
   STOPPED,
   RUNNING,
   STALLED,
-  FREE
+  FREE,
+  MOMENTARY      // momentary state to timeout after 10 seconds, ignores stall warning
 } stepState;
 
 stepState motorState = STOPPED;
@@ -141,10 +143,12 @@ uint32_t last_stall_time_mS;
 #define STALL_TIME_OUT_mS 2000
 #define STALL_HIT_DECAY_mS 200
 
-float goto_target = 0;  // goto state sets global var then uses this while remaining in goto state until target position has been reached
-bool goto_triggered = false;  // DONT THINK THIS IS NEEDED
+float goto_target = 0;                      // goto state sets global var then uses this while remaining in goto state until target position has been reached
+const float GOTO_TARGET_HYSTERESIS = 0.15;  // <- Asperational  // working & reliable -> 0.41
+bool goto_triggered = false;                // DONT THINK THIS IS NEEDED
 float target_lower;
 float target_higher;
+int16_t origional_target;                       // just used to check result later in cycle
 
 //EEprom Variables
 const int WRITTEN_SIGNATURE = 0x98C7AB1E;  // Arbitary signature to check for existing encoder offset value in persistant memory (practable)

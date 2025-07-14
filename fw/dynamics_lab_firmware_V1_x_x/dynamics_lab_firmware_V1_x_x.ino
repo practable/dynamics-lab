@@ -159,6 +159,8 @@ void loop() {
       smState = STATE_BRAKE;
     } else if (nextState_data.cmdState == GOTO) {
       smState = STATE_GOTO;
+    } else if (nextState_data.cmdState == MOVE) {
+      smState = STATE_MOVE;
     } else if (nextState_data.cmdState == SAMPLERATE) {
       smState = STATE_SAMPLERATE;
     } else if (nextState_data.cmdState == PRINTRATE) {
@@ -244,6 +246,13 @@ void loop() {
       Serial.println(F("{\"WARNING\":\"Running Mode - Time Out\"}"));
       beacon.callBlink(8, 500, 500);
       smState = STATE_STOP;
+    }
+  }
+
+  if (motorState == MOMENTARY){
+    if (millis() - last_command_rx_mS >= 10000){
+      Serial.println(F("{\"INFO\":\"Momentary state ended\"}"));
+      motorState = STOPPED;
     }
   }
 
