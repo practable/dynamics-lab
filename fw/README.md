@@ -5,7 +5,7 @@
 
 ## Calibration Procedure: Setting home position (V1.0.0 - Beta Firmware)
 #### Setting Secret
-_Secret must be set before calibration data can be entered. Once set, a finite (20) number of calibrations are permitted. To calibrate after this point, secret must be reset using `#### Resetting Secret` procedure_
+_Secret must be set before calibration data can be entered. Once set, a finite number (20) of calibrations are permitted. To calibrate after this point, secret must be reset using `#### Resetting Secret` procedure_
 - Enter new 8-character secret using command `{"set":"secret","to":"XXXXXXXX"}`
 - Once set this is persistant and will require re-programming firmware to reset
 <br><br>
