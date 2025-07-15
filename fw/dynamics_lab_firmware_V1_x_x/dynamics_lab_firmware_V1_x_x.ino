@@ -95,10 +95,18 @@ void setup() {
 
   jsonRX.jsonBegin();  // Start the json library to accept commands over serial connection
   mpu_setup();
-  get_offset_from_memory();  // get encoder_offset from persistant memory before stepper setup (does nothing atm)
-  stepper_setup(false);      // if true run old homing scripts
+  //get_offset_from_memory();  // get encoder_offset from persistant memory before stepper setup (does nothing atm)
+  stepper_setup(false);  // if true run old homing scripts
 
-  stepper.encoder.setHomeActual(ENCODER_HOME_OFFSET);
+
+  cal = memory.get_cal();
+  if (cal.calValid) {
+    persistant_encoder_offset = cal.calData;
+  } else {
+    persistant_encoder_offset = 0;
+  }
+
+  stepper.encoder.setHomeActual(persistant_encoder_offset);  //  fixed value -> ENCODER_HOME_OFFSET
 
   servo_pos = false;
   // fix for resetting servo at startup

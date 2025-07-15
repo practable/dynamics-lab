@@ -2,6 +2,8 @@
 
 #include "globals.h"
 
+//depreciated -> use secretObject.h
+
 
 // Gets value from emulated EEProm and updates global val
 // -> Returns value

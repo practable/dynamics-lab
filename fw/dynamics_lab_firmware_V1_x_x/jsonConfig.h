@@ -20,7 +20,7 @@ for the existance of matching keys, and ignore anything else.
 
 
 Please see: https://github.com/ImogenWren/jsonMessenger_library for latest version and usage instructions, or follow the numbered comments for an
-explanation of how to modify this template for other uses. 
+explanation of how to modify this template for other uses.
 
 All modifications should be carried out in this header file `jsonConfig.h`, please do not modify jsonMessenger.h or jsonMessenger.cpp!
 
@@ -136,7 +136,7 @@ const uint16_t jsonStateMap[NUM_VALUES][2] = {
   { jsonStates::SET_SPEED_HZ, dataTypes::FLOAT },
   { jsonStates::SET_SPEED_RPM, dataTypes::FLOAT },
   { jsonStates::HOME, dataTypes::EMPTY },
-  { jsonStates::CALIBRATE, dataTypes::EMPTY },
+  { jsonStates::CALIBRATE, dataTypes::INTEGER },
   { jsonStates::FREEWHEEL, dataTypes::EMPTY },
   { jsonStates::BRAKE, dataTypes::EMPTY },
   { jsonStates::GOTO, dataTypes::INTEGER },

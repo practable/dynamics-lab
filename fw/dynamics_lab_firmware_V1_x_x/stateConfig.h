@@ -94,7 +94,7 @@ void sm_state_start(void);
 void sm_state_set_speed_hz(jsonStateData stateData);
 void sm_state_set_speed_rpm(jsonStateData stateData);
 void sm_state_home(void);
-void sm_state_calibrate(void);
+void sm_state_calibrate(jsonStateData stateData);
 void sm_state_freewheel(void);
 void sm_state_brake(void);
 void sm_state_goto(jsonStateData stateData);
@@ -160,27 +160,27 @@ void sm_state_init() {
 
 // Not a state, but function called by "help" state to print commands list to users
 void print_cmds() {
-  Serial.println(F("   {\"start\":0}          -> Start/Update Motor Speed"));
-  Serial.println(F("   {\"stop\":0}           -> Stop Motor              "));
-  Serial.println(F("   {\"hz\": -20 to 20}    -> Set Motor Speed in Hz   "));
-  Serial.println(F("   {\"rpm\": -200 to 200} -> Set Motor Speed in RPM  "));
-  Serial.println(F("   {\"home\":\"\"}        -> Move Motor to home pos (test) "));
-  Serial.println(F("   {\"cal\":\"\"}         -> DEPRECIATED for now "));
-  Serial.println(F("   {\"free\":\"\"}        -> Set freewheel brake mode (test)"));
-  Serial.println(F("   {\"brake\":\"\"}       -> Set coolbrake brake mode (test)"));
-  Serial.println(F("   {\"goto\": -360 to 360}-> Goto Angle (test)              "));
-  Serial.println(F("   {\"sample\": 1 to 200} -> Set Samplerate in Hz (dflt: 200)"));  // Note, when changing print & sample rates, the size of the JSON doc may not be able to handle additional data. Max number of samples is governed by JSON doc size
-  Serial.println(F("   {\"print\": 1 to 50}   -> Set Print Rate in Hz (dflt: 50)"));
-  Serial.println(F("   {\"stream\":\"\"}      -> Start Data Streaming    "));
-  Serial.println(F("   {\"endst\":\"\"}       -> End Data Streaming      "));
-  Serial.println(F("   {\"snap\":\"\"}        -> Take Data Snapshot       "));          // Take a Snapshot of data
-  Serial.println(F("   {\"time\": 1 - 250000 }-> Set Time for Data Snapshot (mS)  "));  // Change the time over which the data snapshot is taken
-  Serial.println(F("   {\"ping\":\"\"}        -> Ping Servo               "));          // Ping the wobble-shaft with the servo
-  Serial.println(F("   {\"offset\":\"-32768 to 32768\"} -> NOT CURRENTLY USED"));       // Print commands list
-  Serial.println(F("   {\"secret\":\"XXXXXXXX\"-> Set 8 character secret     "));
-  Serial.println(F("   {\"setcal\":\"0 - 32768\", \"auth\":\"XXXXXXXX\"} -> Set calibration offset"));
-  Serial.println(F("   {\"getcal\":\"XXXXXXXX\"-> Get calibration offset (requires secret) "));
-  Serial.println(F("   {\"help\":\"\"}        -> Print Commands to Serial Monitor    "));  // Print commands list
+  Serial.println(F("   {\"start\":0}                -> Start/Update Motor Speed"));
+  Serial.println(F("   {\"stop\":0}                 -> Stop Motor              "));
+  Serial.println(F("   {\"hz\": -20 to 20}          -> Set Motor Speed in Hz   "));
+  Serial.println(F("   {\"rpm\": -200 to 200}       -> Set Motor Speed in RPM  "));
+  Serial.println(F("   {\"home\":0}                 -> Move Motor to home pos (test) "));
+  Serial.println(F("   {\"cal\":0-32768}            -> Set the home position offset calibration "));
+  Serial.println(F("   {\"free\":0}                 -> Set freewheel brake mode (test)"));
+  Serial.println(F("   {\"brake\":0}                -> Set coolbrake brake mode (test)"));
+  Serial.println(F("   {\"goto\": -360 to 360}      -> Goto Angle (test)              "));
+  Serial.println(F("   {\"sample\": 1 to 200}       -> Set Samplerate in Hz (dflt: 200)"));  // Note, when changing print & sample rates, the size of the JSON doc may not be able to handle additional data. Max number of samples is governed by JSON doc size
+  Serial.println(F("   {\"print\": 1 to 50}         -> Set Print Rate in Hz (dflt: 50)"));
+  Serial.println(F("   {\"stream\":0}               -> Start Data Streaming    "));
+  Serial.println(F("   {\"endst\":0}                -> End Data Streaming      "));
+  Serial.println(F("   {\"snap\":0}                 -> Take Data Snapshot       "));          // Take a Snapshot of data
+  Serial.println(F("   {\"time\": 1 - 250000 }      -> Set Time for Data Snapshot (mS)  "));  // Change the time over which the data snapshot is taken
+  Serial.println(F("   {\"ping\":0}                 -> Ping Servo               "));          // Ping the wobble-shaft with the servo
+  Serial.println(F("   {\"offset\":-32k to 32k}     -> DEPRECIATED"));       // Print commands list
+  Serial.println(F("   {\"secret\":\"XXXXXXXX\"}      -> Set 8 character secret     "));
+  Serial.println(F("   {\"setcal\":\"0 - 32k\", \"auth\":\"XXXXXXXX\"} -> Set calibration offset to memory"));
+  Serial.println(F("   {\"getcal\":0}               -> Load calibration from memory "));
+  Serial.println(F("   {\"help\":0}                 -> Print Commands to Serial Monitor    "));  // Print commands list
 }
 
 void sm_state_setsecret(jsonStateData stateData) {
@@ -188,12 +188,13 @@ void sm_state_setsecret(jsonStateData stateData) {
   Serial.println(F("state: SECRET"));
 #endif
   lastState = smState;
-  Serial.print("secret: ");
-  Serial.println(stateData.msg);
-  if (stateData.msg[0] == '\0') {      //empty string
+  // Serial.print("secret: ");
+  // Serial.println(stateData.msg);
+  if (stateData.msg[0] == '\0') {  //empty string
     smState = STATE_WAIT;
     return;
   }
+  memory.cal_set_secret(stateData.msg);
 
   smState = STATE_WAIT;
 }
@@ -209,6 +210,8 @@ void sm_state_setcal(jsonStateData stateData) {
   Serial.print(stateData.numeric);
   Serial.print(" auth: ");
   Serial.println(stateData.msg);
+
+  memory.cal_set_values(stateData.numeric, stateData.msg);
   smState = STATE_WAIT;
 }
 
@@ -219,9 +222,13 @@ void sm_state_getcal(jsonStateData stateData) {
   Serial.println(F("state: GETCAL"));
 #endif
   lastState = smState;
-  // code here
-  Serial.print(" auth: ");
-  Serial.println(stateData.msg);
+  cal = memory.get_cal();
+  if (cal.calValid) {
+    persistant_encoder_offset = cal.calData;
+  } else {
+    persistant_encoder_offset = 0;
+  }
+  stepper.encoder.setHomeActual(persistant_encoder_offset);  //  fixed value -> ENCODER_HOME_OFFSET
   smState = STATE_WAIT;
 }
 
@@ -405,17 +412,14 @@ void sm_state_home(void) {
 
 
 // Run motor home position calibration and homing scripts
-void sm_state_calibrate(void) {
+void sm_state_calibrate(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
     Serial.println(F("state: CALIBRATE"));
 #endif
     lastState = smState;
   }
-  motorState = RUNNING;
-  step_find_home();
-  step_move_home();
-  motorState = STOPPED;
+  stepper.encoder.setHomeActual(stateData.numeric);  //  fixed value -> ENCODER_HOME_OFFSET
   smState = STATE_WAIT;
 }
 
@@ -821,7 +825,7 @@ void sm_Run(jsonStateData stateData) {
         sm_state_home();
         break;
       case STATE_CALIBRATE:
-        sm_state_calibrate();
+        sm_state_calibrate(stateData);
         break;
       case STATE_FREEWHEEL:
         sm_state_freewheel();

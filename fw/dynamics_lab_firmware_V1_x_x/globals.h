@@ -22,8 +22,9 @@
 #include "errorRep.h"
 #include <ArduinoJson.h>  // installed version 6.21.5 [Arduino Library Manager]
 #include <ledObject.h>
+#include "secretObject.h"
 
-#include <FlashStorage_STM32.h>
+//#include <FlashStorage_STM32.h>
 
 // Program Attributes
 #define EXPERIMENT_NAME "dynamics-lab"
@@ -104,6 +105,9 @@ Adafruit_MPU6050 mpu;
 Servo servo;
 errorRep errors;
 ledObject beacon(LED_BEACON);
+secretObject memory;
+
+secretObject::calStruc cal;
 
 
 // why is this defined in globals?!?
