@@ -10,7 +10,7 @@ _Secret must be set before calibration data can be entered. Once set, a finite (
 - Once set this is persistant and will require re-programming firmware to reset
 <br><br>
 
-_All following steps should be carried out during runtime without powering off in between. If steps are missed and status is unknown, or system has run out of calibration memory, please see section `#### Resetting Secret`
+_All following steps should be carried out during runtime without powering off in between. If steps are missed and status is unknown, or system has run out of calibration memory, please see section `#### Resetting Secret`_
 
 #### Finding Home Position & Calibration Offset figure
 - `{"set":"cal","to":"0"} ` to remove any existing offset
