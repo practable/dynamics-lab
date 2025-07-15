@@ -45,7 +45,7 @@ const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;  // times out the brake mode and prev
 
 
 
-#define STREAMING_DEFAULT_ACTIVE false
+#define STREAMING_DEFAULT_ACTIVE true
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
 #define STEPPER_HOLD_CURRENT 10  // percent
 #define MAX_MOTOR_STEPS_S 800
@@ -81,7 +81,7 @@ const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;  // times out the brake mode and prev
 
 // Debugging Options
 #define DEBUG_STATES false        // not JSON safe
-#define DEBUG_STATE_MACHINE true  // JSON safe
+#define DEBUG_STATE_MACHINE false  // JSON safe
 #define COMMAND_HINTS false
 
 // Physics Constants

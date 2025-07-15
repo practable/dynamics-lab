@@ -164,20 +164,21 @@ void print_cmds() {
   Serial.println(F("   {\"stop\":0}                 -> Stop Motor              "));
   Serial.println(F("   {\"hz\": -20 to 20}          -> Set Motor Speed in Hz   "));
   Serial.println(F("   {\"rpm\": -200 to 200}       -> Set Motor Speed in RPM  "));
-  Serial.println(F("   {\"home\":0}                 -> Move Motor to home pos (test) "));
+  Serial.println(F("   {\"home\":0}                 -> Move Motor to home pos  "));
   Serial.println(F("   {\"cal\":0-32768}            -> Set the home position offset calibration "));
-  Serial.println(F("   {\"free\":0}                 -> Set freewheel brake mode (test)"));
-  Serial.println(F("   {\"brake\":0}                -> Set coolbrake brake mode (test)"));
-  Serial.println(F("   {\"goto\": -360 to 360}      -> Goto Angle (test)              "));
+  Serial.println(F("   {\"free\":0}                 -> Set freewheel brake mode "));
+  Serial.println(F("   {\"brake\":0}                -> Set coolbrake brake mode "));
+  Serial.println(F("   {\"goto\": -360 to 360}      -> Goto Angle (int value)    "));
+  Serial.println(F("   {\"move\": -360 to 360}      -> Move Angle (float value) "));
   Serial.println(F("   {\"sample\": 1 to 200}       -> Set Samplerate in Hz (dflt: 200)"));  // Note, when changing print & sample rates, the size of the JSON doc may not be able to handle additional data. Max number of samples is governed by JSON doc size
   Serial.println(F("   {\"print\": 1 to 50}         -> Set Print Rate in Hz (dflt: 50)"));
   Serial.println(F("   {\"stream\":0}               -> Start Data Streaming    "));
   Serial.println(F("   {\"endst\":0}                -> End Data Streaming      "));
   Serial.println(F("   {\"snap\":0}                 -> Take Data Snapshot       "));          // Take a Snapshot of data
   Serial.println(F("   {\"time\": 1 - 250000 }      -> Set Time for Data Snapshot (mS)  "));  // Change the time over which the data snapshot is taken
-  Serial.println(F("   {\"ping\":0}                 -> Ping Servo               "));          // Ping the wobble-shaft with the servo
+  Serial.println(F("   {\"ping\":0}                 -> Ping Servo   "));          // Ping the wobble-shaft with the servo
   Serial.println(F("   {\"offset\":-32k to 32k}     -> DEPRECIATED"));       // Print commands list
-  Serial.println(F("   {\"secret\":\"XXXXXXXX\"}      -> Set 8 character secret     "));
+  Serial.println(F("   {\"secret\":\"XXXXXXXX\"}      -> Set 8 character secret "));
   Serial.println(F("   {\"setcal\":\"0 - 32k\", \"auth\":\"XXXXXXXX\"} -> Set calibration offset to memory"));
   Serial.println(F("   {\"getcal\":0}               -> Load calibration from memory "));
   Serial.println(F("   {\"help\":0}                 -> Print Commands to Serial Monitor    "));  // Print commands list
