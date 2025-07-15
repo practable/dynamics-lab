@@ -4,13 +4,45 @@
 -> [dynamics-lab-firmware-V1.0.0](https://github.com/practable/dynamics-lab/tree/fw-dev/fw/dynamics_lab_firmware_V1_x_x)
 
 ## Calibration Procedure: Setting home position (V1.0.0 - Beta Firmware)
-- Set mode to "free" to remove the brake
-- `{"free":1}`
-- Spin blades to home position.
-- Note down "pos (raw)" value from Serial JSON message
-- enter offset into `  stepper.encoder.setHomeActual(30700);` function in setup()
-- Upload program and run, motor should home, if not offset value may need some adjustment
-- try increasing or decreasing offset value +-100 until desired home position is reached after sending `{"home":1}` command
+#### Setting Secret
+_Secret must be set before calibration data can be entered. Once set, a finite (20) number of calibrations are permitted. To calibrate after this point, secret must be reset using `#### Resetting Secret` procedure_
+- Enter new 8-character secret using command `{"set":"secret","to":"XXXXXXXX"}`
+- Once set this is persistant and will require re-programming firmware to reset
+<br><br>
+
+_All following steps should be carried out during runtime without powering off in between. If steps are missed and status is unknown, or system has run out of calibration memory, please see section `#### Resetting Secret`
+
+#### Finding Home Position & Calibration Offset figure
+- `{"set":"cal","to":"0"} ` to remove any existing offset
+- Use `{"set":goto","to":"X"}` and `{"set":"move","to":"X"}` to position weighted blade in the 12 o'clock or 0 position
+- Note down `"pos(raw)"` value from Serial JSON stream. Retain this value as it will be required later.
+- `{"set":"cal","to":"{pos(raw)}"} ` to apply offset.
+<br>
+
+#### Testing Calibration
+- Use `{"set":goto","to":"180"}` to position weighted blade away from home position.
+- Test coming function with `{"set":"home"}`. Weighted blade should return to the home position
+- If nessissary run complete experiment to check for any deviation from nominal data set.
+- Repeat untill happy with system calibration
+- When happy with calibration, move on to `#### Saving Calibration Data to Persistant Memory`
+- <br>
+
+#### Saving Calibration Data to Persistant Memory
+- use command ` {"set":"setcal","to":"0 - 32k", "auth":"XXXXXXXX"}` using the integer value previously noted down, and the secret entered into persistant memory in the first step. This will error if authorisation secret is incorrect, or the system has run out of available calibrations
+- Use command ` {"set":"getcal"} ` to check contents of persistant memory
+<br>
+
+##### Possible Errors
+- If error `signature did not match` secret may not have been entered
+<br>
+
+#### Resetting Secret
+- To reset secret firmware file must be modified.
+- In file `secretObject.h` find line `#define PROGRAM_SIGNATURE 0xXXXXXXXX`
+- This value is arbitary and simply validates the data stored in persistant memory with the currently installed firmware.
+- Change this value and re-Upload firmware.
+- On boot-up, system will not recognise previous signature and will allow entry of a new secret (though calibration data may still be visible having been recalled from persistant memory -> this will be overwritten when new secret is added)
+<br><br>
 
 _Verbose Command Structure_
 ```
