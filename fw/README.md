@@ -52,7 +52,8 @@ _Verbose Command Structure_
    {"set":"cal","to":0-32768}                         -> Set the home position offset calibration 
    {"set":"free"}                                     -> Set freewheel brake mode
    {"set":"brake"}                                    -> Set coolbrake brake mode 
-   {"set":"goto","to": -360 to 360}                   -> Goto Angle            
+   {"set":"goto","to": -360 to 360}                   -> Goto Angle (int val)
+   {"set":"move","to": -360 to 360}                   -> Move Angle  (float val)       
    {"set":"sample","to": 1 to 200}                    -> Set Samplerate in Hz (dflt: 200)
    {"set":"print","to": 1 to 50}                      -> Set Print Rate in Hz (dflt: 50)
    {"set":"stream"}                                   -> Start Data Streaming    
@@ -78,7 +79,8 @@ _Succinct Command Structure_
    {"cal":0-32768}                              -> Set the home position offset calibration 
    {"free":0}                                   -> Set freewheel brake mode 
    {"brake":0}                                  -> Set coolbrake brake mode 
-   {"goto": -360 to 360}                        -> Goto Angle             
+   {"goto": -360 to 360}                        -> Goto Angle (int val)
+   {"move", -360 to 360}                        -> Move Angle  (float val)             
    {"sample": 1 to 200}                         -> Set Samplerate in Hz (dflt: 200)
    {"print": 1 to 50}                           -> Set Print Rate in Hz (dflt: 50)
    {"stream":0}                                 -> Start Data Streaming    
