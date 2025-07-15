@@ -14,22 +14,25 @@
 
 _Verbose Command Structure_
 ```
-   {"set":"start"}                   -> Start/Update Motor Speed
-   {"set":"stop"}                    -> Stop Motor              
-   {"set":"hz","to": -20 to 20}      -> Set Motor Speed in Hz   
-   {"set":"rpm","to" -200 to 200}    -> Set Motor Speed in RPM  
-   {"set":"home"}                    -> Move Motor to home pos (test) 
-   {"set":"cal"}                     -> Run Calibration to home motor 
-   {"set":"free"}                    -> Set freewheel brake mode (test)
-   {"set":"brake"}                   -> Set coolbrake brake mode (test)
-   {"set":"goto","to": -360 to 360}  -> Goto Angle (test)              
-   {"set":"sample","to": 1 to 40}    -> Set Samplerate in Hz         
-   {"set":"stream"}                  -> Start Data Streaming    
-   {"set":"endst"}                   -> End Data Streaming      
-   {"set":"snap"}                    -> Take Data Snapshot       
-   {"set":"time","to": 1 - 250000 }  -> Set Time for Data Snapshot (mS)  
-   {"set":"ping"}                    -> Ping Servo               
-   {"set":"help"}                    -> Print Commands to Serial Monitor 
+   {"set":"hz","to": -20 to 20}                       -> Set Motor Speed in Hz   
+   {"set":"rpm","to": -200 to 200}                    -> Set Motor Speed in RPM  
+   {"set":"home"}                                     -> Move Motor to home pos  
+   {"set":"cal","to":0-32768}                         -> Set the home position offset calibration 
+   {"set":"free"}                                     -> Set freewheel brake mode
+   {"set":"brake"}                                    -> Set coolbrake brake mode 
+   {"set":"goto","to": -360 to 360}                   -> Goto Angle            
+   {"set":"sample","to": 1 to 200}                    -> Set Samplerate in Hz (dflt: 200)
+   {"set":"print","to": 1 to 50}                      -> Set Print Rate in Hz (dflt: 50)
+   {"set":"stream"}                                   -> Start Data Streaming    
+   {"set":"endst"}                                    -> End Data Streaming      
+   {"set":"snap"}                                     -> Take Data Snapshot       
+   {"set":"time","to": 1 to 250000 }                  -> Set Time for Data Snapshot (mS)  
+   {"set":"ping"}                                     -> Ping Servo               
+   {"set":"offset","to":-32k to 32k}                  -> DEPRECIATED
+   {"set":"secret","to":"XXXXXXXX"}                   -> Set 8 character secret     
+   {"set":"setcal","to":"0 - 32k", "auth":"XXXXXXXX"} -> Set calibration offset to memory
+   {"set":"getcal"}                                   -> Load calibration from memory 
+   {"set":"help"}                                     -> Print Commands to Serial Monitor    
 
 
 ```
@@ -39,11 +42,11 @@ _Succinct Command Structure_
 ```
    {"hz": -20 to 20}                            -> Set Motor Speed in Hz   
    {"rpm": -200 to 200}                         -> Set Motor Speed in RPM  
-   {"home":0}                                   -> Move Motor to home pos (test) 
+   {"home":0}                                   -> Move Motor to home pos 
    {"cal":0-32768}                              -> Set the home position offset calibration 
-   {"free":0}                                   -> Set freewheel brake mode (test)
-   {"brake":0}                                  -> Set coolbrake brake mode (test)
-   {"goto": -360 to 360}                        -> Goto Angle (test)              
+   {"free":0}                                   -> Set freewheel brake mode 
+   {"brake":0}                                  -> Set coolbrake brake mode 
+   {"goto": -360 to 360}                        -> Goto Angle             
    {"sample": 1 to 200}                         -> Set Samplerate in Hz (dflt: 200)
    {"print": 1 to 50}                           -> Set Print Rate in Hz (dflt: 50)
    {"stream":0}                                 -> Start Data Streaming    
