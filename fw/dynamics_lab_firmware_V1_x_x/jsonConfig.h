@@ -1,4 +1,4 @@
-/*  jsonConfig.h
+/*  jsonConfig.h 
 
 This header should be used with the jsonMessenger library to define all the working states & commands that can be decoded by the jsonMessenger system.
 
@@ -7,7 +7,7 @@ This library is designed to parse commands recieved via the Serial object in Ard
 Version 1 -> succinct command structure
 `{"CMD":"VALUE"}` -> for CMDs with passed values
 or
-`{"CMD":} -> for CMDs with no additional values
+`{"CMD":X} -> for CMDs with no additional values
 note: in the 2nd example, any data entered after : will be ignored, as we have already defined the datatypes that will be passed with each command to the parser
 
 Version 2 -> Verbose command structure

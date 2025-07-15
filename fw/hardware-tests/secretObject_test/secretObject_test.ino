@@ -16,7 +16,7 @@ void setup() {
   memory.cal_set_secret("deeznutz");
   global_cal = memory.get_cal();
 
-  memory.cal_set_values(5830, "deeznu");
+  memory.cal_set_values(5830, "deeznutz");
 
   global_cal = memory.get_cal();
 
