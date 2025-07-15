@@ -237,3 +237,4 @@ void switchVariables(float &varA, float &varB) {
 #include "stateConfig.h"
 #include "jsonReporter.h"
 #include "trackRAM_stm.h"
+#include "demo.h"
