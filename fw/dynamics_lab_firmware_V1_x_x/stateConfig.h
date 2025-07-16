@@ -787,14 +787,14 @@ void sm_state_demo(jsonStateData stateData) {
     Serial.println(F("state: DEMO"));
 #endif
     lastState = smState;
-   // beacon.startBlink(600, 100);
-   // stepper.setRPM(1);
-   // motorState == RUNNING;
+    // beacon.startBlink(600, 100);
+    // stepper.setRPM(1);
+    // motorState == RUNNING;
   }
-int16_t exit = demoSM(demoState);
-if (exit < 0){
-  smState = STATE_WAIT;
-}
+  int16_t exit = demoSM(demoState);
+  if (exit < 0) {
+    smState = STATE_WAIT;
+  }
 }
 
 
