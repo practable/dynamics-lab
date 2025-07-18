@@ -5,12 +5,12 @@
 
 ## Calibration Procedure: Setting home position (V1.0.0 - Beta Firmware)
 #### Setting Secret
-_Secret must be set before calibration data can be entered. Once set, a finite number (20) of calibrations are permitted. To calibrate after this point, secret must be reset using `#### Resetting Secret` procedure_
+_Secret must be set before calibration data can be entered. Once set, a finite number (20) of calibrations are permitted. To calibrate after this point, secret must be reset using `Resetting Secret` procedure_
 - Enter new 8-character secret using command `{"set":"secret","to":"XXXXXXXX"}`
 - Once set this is persistant and will require re-programming firmware to reset
 <br><br>
 
-_All following steps should be carried out during runtime without powering off in between. If steps are missed and status is unknown, or system has run out of calibration memory, please see section `#### Resetting Secret`_
+_All following steps should be carried out during runtime without powering off in between. If steps are missed and status is unknown, or system has run out of calibration memory, please see section `Resetting Secret`_
 
 #### Finding Home Position & Calibration Offset figure
 - `{"set":"cal","to":"0"} ` to remove any existing offset
@@ -24,7 +24,7 @@ _All following steps should be carried out during runtime without powering off i
 - Test homing function with `{"set":"home"}`. Weighted blade should return to the home position
 - If nessissary run complete experiment to check for any deviation from nominal data set.
 - Repeat untill happy with system calibration
-- When happy with calibration, move on to `#### Saving Calibration Data to Persistant Memory`
+- When happy with calibration, move on to `Saving Calibration Data to Persistant Memory`
 - <br>
 
 #### Saving Calibration Data to Persistant Memory
@@ -64,7 +64,8 @@ _Verbose Command Structure_
    {"set":"offset","to":-32k to 32k}                  -> DEPRECIATED
    {"set":"secret","to":"XXXXXXXX"}                   -> Set 8 character secret     
    {"set":"setcal","to":"0 - 32k", "auth":"XXXXXXXX"} -> Set calibration offset to memory
-   {"set":"getcal"}                                   -> Load calibration from memory 
+   {"set":"getcal"}                                   -> Load calibration from memory
+   {"set":"demo"}                                     -> Run Demo Mode (interrupted by any other command)
    {"set":"help"}                                     -> Print Commands to Serial Monitor    
 
 
@@ -91,7 +92,8 @@ _Succinct Command Structure_
    {"offset":-32k to 32k}                       -> DEPRECIATED
    {"secret":"XXXXXXXX"}                        -> Set 8 character secret     
    {"setcal":"0 - 32k", "auth":"XXXXXXXX"}      -> Set calibration offset to memory
-   {"getcal":0}                                 -> Load calibration from memory 
+   {"getcal":0}                                 -> Load calibration from memory
+   {"demo":0}                               -> Run Demo Mode (interrupted by any other command)
    {"help":0}                                   -> Print Commands to Serial Monitor    
 
 ```
