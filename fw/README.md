@@ -76,25 +76,26 @@ _Succinct Command Structure_
 ```
    {"hz": -20 to 20}                            -> Set Motor Speed in Hz   
    {"rpm": -200 to 200}                         -> Set Motor Speed in RPM  
-   {"home":0}                                   -> Move Motor to home pos 
+   {"home":0}*                                  -> Move Motor to home pos 
    {"cal":0-32768}                              -> Set the home position offset calibration 
-   {"free":0}                                   -> Set freewheel brake mode 
-   {"brake":0}                                  -> Set coolbrake brake mode 
+   {"free":0}*                                  -> Set freewheel brake mode 
+   {"brake":0}*                                 -> Set coolbrake brake mode 
    {"goto": -360 to 360}                        -> Goto Angle (int val)
    {"move", -360 to 360}                        -> Move Angle  (float val)             
    {"sample": 1 to 200}                         -> Set Samplerate in Hz (dflt: 200)
    {"print": 1 to 50}                           -> Set Print Rate in Hz (dflt: 50)
-   {"stream":0}                                 -> Start Data Streaming    
-   {"endst":0}                                  -> End Data Streaming      
-   {"snap":0}                                   -> Take Data Snapshot       
+   {"stream":0}*                                -> Start Data Streaming    
+   {"endst":0}*                                 -> End Data Streaming      
+   {"snap":0}*                                  -> Take Data Snapshot       
    {"time": 1 - 250000 }                        -> Set Time for Data Snapshot (mS)  
-   {"ping":0}                                   -> Ping Servo               
+   {"ping":0}*                                  -> Ping Servo               
    {"offset":-32k to 32k}                       -> DEPRECIATED
    {"secret":"XXXXXXXX"}                        -> Set 8 character secret     
    {"setcal":"0 - 32k", "auth":"XXXXXXXX"}      -> Set calibration offset to memory
-   {"getcal":0}                                 -> Load calibration from memory
-   {"demo":0}                               -> Run Demo Mode (interrupted by any other command)
-   {"help":0}                                   -> Print Commands to Serial Monitor    
+   {"getcal":0}*                                -> Load calibration from memory
+   {"demo":0}*                                  -> Run Demo Mode (interrupted by any other command)
+   {"help":0}*                                  -> Print Commands to Serial Monitor    
 
+* For single commands data value is ignored but required for valid JSON string
 ```
 
