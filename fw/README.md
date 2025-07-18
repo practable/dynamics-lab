@@ -14,7 +14,7 @@ _All following steps should be carried out during runtime without powering off i
 
 #### Finding Home Position & Calibration Offset figure
 - `{"set":"cal","to":"0"} ` to remove any existing offset
-- Use `{"set":goto","to":"X"}` and `{"set":"move","to":"X"}` to position weighted blade in the 12 o'clock or 0 degree position
+- Use `{"set":goto","to":"X"}` (int -> goto angle) and `{"set":"move","to":"X"}` (float -> move angle) to position weighted blade in the 12 o'clock or 0 degree position
 - Note down `"pos(raw)"` value from Serial JSON stream. Retain this value as it will be required later.
 - `{"set":"cal","to":"{pos(raw)}"} ` to apply offset.
 <br>
