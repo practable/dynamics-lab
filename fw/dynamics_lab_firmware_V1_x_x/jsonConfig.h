@@ -121,6 +121,7 @@ typedef enum {
   SETSECRET,
   SETCAL,
   GETCAL,
+  DEMO,
   HELP,
   NUM_VALUES  // Add sentinal NUM_VALUES to count number of elements, this is very important and will be used to size for loops inside the jsonMessenger object
 } jsonStates;
@@ -152,6 +153,7 @@ const uint16_t jsonStateMap[NUM_VALUES][2] = {
   { jsonStates::SETSECRET, dataTypes::CSTRING },
   { jsonStates::SETCAL, dataTypes::AUTH },
   { jsonStates::GETCAL, dataTypes::CSTRING },
+  { jsonStates::DEMO, dataTypes::CSTRING },
   { jsonStates::HELP, dataTypes::EMPTY }
 };
 
@@ -182,6 +184,7 @@ static char jsonCommandKeys[][7] = {
   "secret",
   "setcal",
   "getcal",
+  "demo",
   "help"
 };
 // NOTE, this can also be used to turn the enums above back into strings for human readability

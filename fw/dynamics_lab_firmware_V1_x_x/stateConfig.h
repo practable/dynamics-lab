@@ -184,6 +184,7 @@ void print_cmds() {
   Serial.println(F("   {\"secret\":\"XXXXXXXX\"}      -> Set 8 character secret "));
   Serial.println(F("   {\"setcal\":\"0 - 32k\", \"auth\":\"XXXXXXXX\"} -> Set calibration offset to memory"));
   Serial.println(F("   {\"getcal\":0}               -> Load calibration from memory "));
+  Serial.println(F("   {\"demo\":0}                 -> Run Demo Mode (ends on recieve any other command) "));
   Serial.println(F("   {\"help\":0}                 -> Print Commands to Serial Monitor    "));  // Print commands list
 }
 
@@ -790,10 +791,11 @@ void sm_state_demo(jsonStateData stateData) {
     // beacon.startBlink(600, 100);
     // stepper.setRPM(1);
     // motorState == RUNNING;
+    demoState = 1;
   }
-  int16_t exit = demoSM(demoState);
+  int16_t exit = demoSM();
   if (exit < 0) {
-    smState = STATE_WAIT;
+    smState = STATE_HOME;
   }
 }
 
@@ -893,6 +895,9 @@ void sm_Run(jsonStateData stateData) {
         break;
       case STATE_GETCAL:
         sm_state_getcal(stateData);
+        break;
+      case STATE_DEMO:
+        sm_state_demo(stateData);
         break;
       case STATE_HELP:
         sm_state_help();
