@@ -21,7 +21,7 @@ _All following steps should be carried out during runtime without powering off i
 
 #### Testing Calibration
 - Use `{"set":goto","to":"180"}` to position weighted blade away from home position.
-- Test coming function with `{"set":"home"}`. Weighted blade should return to the home position
+- Test homing function with `{"set":"home"}`. Weighted blade should return to the home position
 - If nessissary run complete experiment to check for any deviation from nominal data set.
 - Repeat untill happy with system calibration
 - When happy with calibration, move on to `#### Saving Calibration Data to Persistant Memory`
