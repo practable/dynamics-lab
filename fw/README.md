@@ -5,26 +5,26 @@
 
 ## Calibration Procedure: Setting home position (V1.0.0 - Beta Firmware)
 #### Setting Secret
-_Secret must be set before calibration data can be entered. Once set, a finite number (20) of calibrations are permitted. To calibrate after this point, secret must be reset using `#### Resetting Secret` procedure_
+_Secret must be set before calibration data can be entered. Once set, a finite number (20) of calibrations are permitted. To calibrate after this point, secret must be reset using `Resetting Secret` procedure_
 - Enter new 8-character secret using command `{"set":"secret","to":"XXXXXXXX"}`
 - Once set this is persistant and will require re-programming firmware to reset
 <br><br>
 
-_All following steps should be carried out during runtime without powering off in between. If steps are missed and status is unknown, or system has run out of calibration memory, please see section `#### Resetting Secret`_
+_All following steps should be carried out during runtime without powering off in between. If steps are missed and status is unknown, or system has run out of calibration memory, please see section `Resetting Secret`_
 
 #### Finding Home Position & Calibration Offset figure
 - `{"set":"cal","to":"0"} ` to remove any existing offset
-- Use `{"set":goto","to":"X"}` and `{"set":"move","to":"X"}` to position weighted blade in the 12 o'clock or 0 degree position
+- Use `{"set":goto","to":"X"}` (int -> goto angle) and `{"set":"move","to":"X"}` (float -> move angle) to position weighted blade in the 12 o'clock or 0 degree position
 - Note down `"pos(raw)"` value from Serial JSON stream. Retain this value as it will be required later.
 - `{"set":"cal","to":"{pos(raw)}"} ` to apply offset.
 <br>
 
 #### Testing Calibration
 - Use `{"set":goto","to":"180"}` to position weighted blade away from home position.
-- Test coming function with `{"set":"home"}`. Weighted blade should return to the home position
+- Test homing function with `{"set":"home"}`. Weighted blade should return to the home position
 - If nessissary run complete experiment to check for any deviation from nominal data set.
 - Repeat untill happy with system calibration
-- When happy with calibration, move on to `#### Saving Calibration Data to Persistant Memory`
+- When happy with calibration, move on to `Saving Calibration Data to Persistant Memory`
 - <br>
 
 #### Saving Calibration Data to Persistant Memory
@@ -64,7 +64,8 @@ _Verbose Command Structure_
    {"set":"offset","to":-32k to 32k}                  -> DEPRECIATED
    {"set":"secret","to":"XXXXXXXX"}                   -> Set 8 character secret     
    {"set":"setcal","to":"0 - 32k", "auth":"XXXXXXXX"} -> Set calibration offset to memory
-   {"set":"getcal"}                                   -> Load calibration from memory 
+   {"set":"getcal"}                                   -> Load calibration from memory
+   {"set":"demo"}                                     -> Run Demo Mode (interrupted by any other command)
    {"set":"help"}                                     -> Print Commands to Serial Monitor    
 
 
@@ -75,24 +76,26 @@ _Succinct Command Structure_
 ```
    {"hz": -20 to 20}                            -> Set Motor Speed in Hz   
    {"rpm": -200 to 200}                         -> Set Motor Speed in RPM  
-   {"home":0}                                   -> Move Motor to home pos 
+   {"home":0}*                                  -> Move Motor to home pos 
    {"cal":0-32768}                              -> Set the home position offset calibration 
-   {"free":0}                                   -> Set freewheel brake mode 
-   {"brake":0}                                  -> Set coolbrake brake mode 
+   {"free":0}*                                  -> Set freewheel brake mode 
+   {"brake":0}*                                 -> Set coolbrake brake mode 
    {"goto": -360 to 360}                        -> Goto Angle (int val)
    {"move", -360 to 360}                        -> Move Angle  (float val)             
    {"sample": 1 to 200}                         -> Set Samplerate in Hz (dflt: 200)
    {"print": 1 to 50}                           -> Set Print Rate in Hz (dflt: 50)
-   {"stream":0}                                 -> Start Data Streaming    
-   {"endst":0}                                  -> End Data Streaming      
-   {"snap":0}                                   -> Take Data Snapshot       
+   {"stream":0}*                                -> Start Data Streaming    
+   {"endst":0}*                                 -> End Data Streaming      
+   {"snap":0}*                                  -> Take Data Snapshot       
    {"time": 1 - 250000 }                        -> Set Time for Data Snapshot (mS)  
-   {"ping":0}                                   -> Ping Servo               
+   {"ping":0}*                                  -> Ping Servo               
    {"offset":-32k to 32k}                       -> DEPRECIATED
    {"secret":"XXXXXXXX"}                        -> Set 8 character secret     
    {"setcal":"0 - 32k", "auth":"XXXXXXXX"}      -> Set calibration offset to memory
-   {"getcal":0}                                 -> Load calibration from memory 
-   {"help":0}                                   -> Print Commands to Serial Monitor    
+   {"getcal":0}*                                -> Load calibration from memory
+   {"demo":0}*                                  -> Run Demo Mode (interrupted by any other command)
+   {"help":0}*                                  -> Print Commands to Serial Monitor    
 
+* For single commands data value is ignored but required for valid JSON string
 ```
 

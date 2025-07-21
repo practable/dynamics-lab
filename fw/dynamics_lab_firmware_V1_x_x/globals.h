@@ -24,6 +24,7 @@
 #include <ledObject.h>
 #include "secretObject.h"
 
+
 //#include <FlashStorage_STM32.h>
 
 // Program Attributes
@@ -80,7 +81,7 @@ const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;  // times out the brake mode and prev
 
 
 // Debugging Options
-#define DEBUG_STATES false        // not JSON safe
+#define DEBUG_STATES false         // not JSON safe
 #define DEBUG_STATE_MACHINE false  // JSON safe
 #define COMMAND_HINTS false
 
@@ -127,7 +128,7 @@ typedef enum {  // enum to pass variable types between functions
   RUNNING,
   STALLED,
   FREE,
-  MOMENTARY      // momentary state to timeout after 10 seconds, ignores stall warning
+  MOMENTARY  // momentary state to timeout after 10 seconds, ignores stall warning
 } stepState;
 
 stepState motorState = STOPPED;
@@ -152,7 +153,7 @@ const float GOTO_TARGET_HYSTERESIS = 0.15;  // <- Asperational  // working & rel
 bool goto_triggered = false;                // DONT THINK THIS IS NEEDED
 float target_lower;
 float target_higher;
-int16_t origional_target;                       // just used to check result later in cycle
+int16_t origional_target;  // just used to check result later in cycle
 
 //EEprom Variables
 const int WRITTEN_SIGNATURE = 0x98C7AB1E;  // Arbitary signature to check for existing encoder offset value in persistant memory (practable)
@@ -234,6 +235,7 @@ void switchVariables(float &varA, float &varB) {
 #include "persistantMemory.h"
 #include "stepperFunctions.h"
 #include "mpuFunctions.h"
+#include "demo.h"
 #include "stateConfig.h"
 #include "jsonReporter.h"
 #include "trackRAM_stm.h"
