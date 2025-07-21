@@ -211,10 +211,10 @@ void sm_state_setcal(jsonStateData stateData) {
 #endif
   lastState = smState;
   // code here
-  Serial.print("cal data: ");
-  Serial.print(stateData.numeric);
-  Serial.print(" auth: ");
-  Serial.println(stateData.msg);
+//  Serial.print("cal data: ");
+ // Serial.print(stateData.numeric);
+ // Serial.print(" auth: ");
+ // Serial.println(stateData.msg);
 
   memory.cal_set_values(stateData.numeric, stateData.msg);
   smState = STATE_WAIT;
