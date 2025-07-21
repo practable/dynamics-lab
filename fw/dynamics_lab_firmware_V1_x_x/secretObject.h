@@ -30,7 +30,7 @@ Author: Imogen Wren
 #define FLASH_WRITES_MAX 20        // define number of writes untill firmware must be re-programmed
 #define SECRET_LEN_MAX 9
 
-#define PROGRAM_SIGNATURE 0x98C7AB1E   //0x97B69A0D  // change this when re-writing firmware to enable overwrite of calibration data
+#define PROGRAM_SIGNATURE 0x87B69A0D   //0x97B69A0D  // change this when re-writing firmware to enable overwrite of calibration data
 
 //#define MEMORY_OBJECT FlashStorage_STM32  // might actually just be EEPROM  // replace with suitable persistant memory object for platform
 // Arduino SAMD21: FlashStorage    // untested

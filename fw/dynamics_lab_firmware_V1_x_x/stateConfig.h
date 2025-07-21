@@ -42,6 +42,7 @@ typedef enum {
   STATE_SETSECRET,
   STATE_SETCAL,
   STATE_GETCAL,
+  STATE_DEMO,
   STATE_HELP,
   NUM_STATES  // Sentinal value lets us get the total number of states without manually counting. Do not forget this value, it is important for correct function
 } StateType;
@@ -81,6 +82,7 @@ char stateNames[][20] = {
   "STATE_SETSECRET",
   "STATE_SETCAL",
   "STATE_GETCAL",
+  "STATE_DEMO",
   "STATE_HELP"
 };
 
@@ -110,6 +112,7 @@ void sm_state_offset(jsonStateData stateData);
 void sm_state_setsecret(jsonStateData stateData);
 void sm_state_setcal(jsonStateData stateData);
 void sm_state_getcal(jsonStateData stateData);
+void sm_state_demo(jsonStateData stateData);
 void sm_state_help(void);
 
 
@@ -176,11 +179,12 @@ void print_cmds() {
   Serial.println(F("   {\"endst\":0}                -> End Data Streaming      "));
   Serial.println(F("   {\"snap\":0}                 -> Take Data Snapshot       "));          // Take a Snapshot of data
   Serial.println(F("   {\"time\": 1 - 250000 }      -> Set Time for Data Snapshot (mS)  "));  // Change the time over which the data snapshot is taken
-  Serial.println(F("   {\"ping\":0}                 -> Ping Servo   "));          // Ping the wobble-shaft with the servo
-  Serial.println(F("   {\"offset\":-32k to 32k}     -> DEPRECIATED"));       // Print commands list
+  Serial.println(F("   {\"ping\":0}                 -> Ping Servo   "));                      // Ping the wobble-shaft with the servo
+  Serial.println(F("   {\"offset\":-32k to 32k}     -> DEPRECIATED"));                        // Print commands list
   Serial.println(F("   {\"secret\":\"XXXXXXXX\"}      -> Set 8 character secret "));
   Serial.println(F("   {\"setcal\":\"0 - 32k\", \"auth\":\"XXXXXXXX\"} -> Set calibration offset to memory"));
   Serial.println(F("   {\"getcal\":0}               -> Load calibration from memory "));
+  Serial.println(F("   {\"demo\":0}                 -> Run Demo Mode (ends on recieve any other command) "));
   Serial.println(F("   {\"help\":0}                 -> Print Commands to Serial Monitor    "));  // Print commands list
 }
 
@@ -207,10 +211,10 @@ void sm_state_setcal(jsonStateData stateData) {
 #endif
   lastState = smState;
   // code here
-  Serial.print("cal data: ");
-  Serial.print(stateData.numeric);
-  Serial.print(" auth: ");
-  Serial.println(stateData.msg);
+//  Serial.print("cal data: ");
+ // Serial.print(stateData.numeric);
+ // Serial.print(" auth: ");
+ // Serial.println(stateData.msg);
 
   memory.cal_set_values(stateData.numeric, stateData.msg);
   smState = STATE_WAIT;
@@ -777,6 +781,25 @@ void sm_state_offset(jsonStateData stateData) {
 
 
 
+
+void sm_state_demo(jsonStateData stateData) {
+  if (lastState != smState) {
+#if DEBUG_STATES == true
+    Serial.println(F("state: DEMO"));
+#endif
+    lastState = smState;
+    // beacon.startBlink(600, 100);
+    // stepper.setRPM(1);
+    // motorState == RUNNING;
+    demoState = 1;
+  }
+  int16_t exit = demoSM();
+  if (exit < 0) {
+    smState = STATE_HOME;
+  }
+}
+
+
 // Print the commands list to the Serial Output
 void sm_state_help(void) {
   if (lastState != smState) {
@@ -872,6 +895,9 @@ void sm_Run(jsonStateData stateData) {
         break;
       case STATE_GETCAL:
         sm_state_getcal(stateData);
+        break;
+      case STATE_DEMO:
+        sm_state_demo(stateData);
         break;
       case STATE_HELP:
         sm_state_help();

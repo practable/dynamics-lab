@@ -131,12 +131,17 @@ void loop() {
 
   if (nextState_data.cmd_received) {  // If command is receive   //delay(10);
 
+    if (smState == STATE_DEMO) {
+      end_demo();
+    }
+
     beacon.callBlink(4);
 
     last_command_rx_mS = millis();
 
     const char* cmd = jsonRX.getCMDkey(nextState_data.cmdState);  // I feel like the entire point of using ENUMs is being totally lost by doing this, but it is working
 
+    // This section here is mostly for debugging
     Serial.print("{\"rx-cmd\":\"");
     Serial.print(cmd);
     Serial.print("\",\"datatype\":\"");
@@ -149,55 +154,83 @@ void loop() {
     Serial.println("\"}");
 
     // This is the bit that parses the command recieved by user, and sets the state machine to go to the correct state
-    if (nextState_data.cmdState == STOP) {  // if fan speed change command received
-      smState = STATE_STOP;
-    } else if (nextState_data.cmdState == START) {
-      smState = STATE_START;
-    } else if (nextState_data.cmdState == SET_SPEED_HZ) {
-      smState = STATE_SET_SPEED_HZ;
-    } else if (nextState_data.cmdState == SET_SPEED_RPM) {
-      smState = STATE_SET_SPEED_RPM;
-    } else if (nextState_data.cmdState == HOME) {
-      smState = STATE_HOME;
-    } else if (nextState_data.cmdState == CALIBRATE) {
-      smState = STATE_CALIBRATE;
-    } else if (nextState_data.cmdState == FREEWHEEL) {
-      smState = STATE_FREEWHEEL;
-    } else if (nextState_data.cmdState == BRAKE) {
-      smState = STATE_BRAKE;
-    } else if (nextState_data.cmdState == GOTO) {
-      smState = STATE_GOTO;
-    } else if (nextState_data.cmdState == MOVE) {
-      smState = STATE_MOVE;
-    } else if (nextState_data.cmdState == SAMPLERATE) {
-      smState = STATE_SAMPLERATE;
-    } else if (nextState_data.cmdState == PRINTRATE) {
-      smState = STATE_PRINTRATE;
-    } else if (nextState_data.cmdState == STARTSTREAM) {
-      smState = STATE_STARTSTREAM;
-    } else if (nextState_data.cmdState == STOPSTREAM) {
-      smState = STATE_STOPSTREAM;
-    } else if (nextState_data.cmdState == SNAPSHOT) {
-      smState = STATE_SNAPSHOT;
-    } else if (nextState_data.cmdState == SNAPTIME) {
-      smState = STATE_SNAPTIME;
-    } else if (nextState_data.cmdState == PING) {
-      smState = STATE_PING;
-    } else if (nextState_data.cmdState == OFFSET) {
-      smState = STATE_OFFSET;
-    } else if (nextState_data.cmdState == SETSECRET) {
-      smState = STATE_SETSECRET;
-    } else if (nextState_data.cmdState == SETCAL) {
-      smState = STATE_SETCAL;
-    } else if (nextState_data.cmdState == GETCAL) {
-      smState = STATE_GETCAL;
-    } else if (nextState_data.cmdState == HELP) {
-      smState = STATE_HELP;
-    } else {
-      // std::cout << "{\"WARNING\":\"Unrecognised cmdState\"}" << std::endl;
-      Serial.println("{\"WARNING\":\"Unrecognised cmdState (loop)\"}");
+    switch (nextState_data.cmdState) {
+      case STOP:
+        smState = STATE_STOP;
+        break;
+      case START:
+        smState = STATE_START;
+        break;
+      case SET_SPEED_HZ:
+        smState = STATE_SET_SPEED_HZ;
+        break;
+      case SET_SPEED_RPM:
+        smState = STATE_SET_SPEED_RPM;
+        break;
+      case HOME:
+        smState = STATE_HOME;
+        break;
+      case CALIBRATE:
+        smState = STATE_CALIBRATE;
+        break;
+      case FREEWHEEL:
+        smState = STATE_FREEWHEEL;
+        break;
+      case BRAKE:
+        smState = STATE_BRAKE;
+        break;
+      case GOTO:
+        smState = STATE_GOTO;
+        break;
+      case MOVE:
+        smState = STATE_MOVE;
+        break;
+      case SAMPLERATE:
+        smState = STATE_SAMPLERATE;
+        break;
+      case PRINTRATE:
+        smState = STATE_PRINTRATE;
+        break;
+      case STARTSTREAM:
+        smState = STATE_STARTSTREAM;
+        break;
+      case STOPSTREAM:
+        smState = STATE_STOPSTREAM;
+        break;
+      case SNAPSHOT:
+        smState = STATE_SNAPSHOT;
+        break;
+      case SNAPTIME:
+        smState = STATE_SNAPTIME;
+        break;
+      case PING:
+        smState = STATE_PING;
+        break;
+      case OFFSET:
+        smState = STATE_OFFSET;
+        break;
+      case SETSECRET:
+        smState = STATE_SETSECRET;
+        break;
+      case SETCAL:
+        smState = STATE_SETCAL;
+        break;
+      case GETCAL:
+        smState = STATE_GETCAL;
+        break;
+      case DEMO:
+        smState = STATE_DEMO;
+        break;
+      case HELP:
+        smState = STATE_HELP;
+        break;
+      default:
+        // std::cout << "{\"WARNING\":\"Unrecognised cmdState\"}" << std::endl;
+        Serial.println("{\"WARNING\":\"Unrecognised cmdState (loop)\"}");
+        break;
     }
   }
+
 
 
   sm_Run(nextState_data);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
@@ -263,7 +296,7 @@ void loop() {
     }
   }
 
-  if (motorState == MOMENTARY) {
+  if (motorState == MOMENTARY && smState != STATE_DEMO) {
     if (millis() - last_command_rx_mS >= 10000) {
       Serial.println(F("{\"INFO\":\"Momentary state ended\"}"));
       motorState = STOPPED;

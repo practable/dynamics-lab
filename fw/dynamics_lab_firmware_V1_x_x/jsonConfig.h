@@ -1,4 +1,4 @@
-/*  jsonConfig.h
+/*  jsonConfig.h 
 
 This header should be used with the jsonMessenger library to define all the working states & commands that can be decoded by the jsonMessenger system.
 
@@ -7,7 +7,7 @@ This library is designed to parse commands recieved via the Serial object in Ard
 Version 1 -> succinct command structure
 `{"CMD":"VALUE"}` -> for CMDs with passed values
 or
-`{"CMD":} -> for CMDs with no additional values
+`{"CMD":X} -> for CMDs with no additional values
 note: in the 2nd example, any data entered after : will be ignored, as we have already defined the datatypes that will be passed with each command to the parser
 
 Version 2 -> Verbose command structure
@@ -121,6 +121,7 @@ typedef enum {
   SETSECRET,
   SETCAL,
   GETCAL,
+  DEMO,
   HELP,
   NUM_VALUES  // Add sentinal NUM_VALUES to count number of elements, this is very important and will be used to size for loops inside the jsonMessenger object
 } jsonStates;
@@ -152,6 +153,7 @@ const uint16_t jsonStateMap[NUM_VALUES][2] = {
   { jsonStates::SETSECRET, dataTypes::CSTRING },
   { jsonStates::SETCAL, dataTypes::AUTH },
   { jsonStates::GETCAL, dataTypes::CSTRING },
+  { jsonStates::DEMO, dataTypes::CSTRING },
   { jsonStates::HELP, dataTypes::EMPTY }
 };
 
@@ -182,6 +184,7 @@ static char jsonCommandKeys[][7] = {
   "secret",
   "setcal",
   "getcal",
+  "demo",
   "help"
 };
 // NOTE, this can also be used to turn the enums above back into strings for human readability

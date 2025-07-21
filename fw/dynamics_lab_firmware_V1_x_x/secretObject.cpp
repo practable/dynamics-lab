@@ -129,7 +129,7 @@ void secretObject::cal_set_values(int16_t calValue, const char *secret) {
   Serial.print(F("{\"INFO\":\"cal_set -> cal ok\",\"value\":\""));
   cal.data = calValue;
   Serial.print(cal.data);
-  Serial.print("\"},\"writes_remaining\":");
+  Serial.print("\",\"writes_remaining\":");
   Serial.print(cal.writes);
   Serial.println("}");
 
