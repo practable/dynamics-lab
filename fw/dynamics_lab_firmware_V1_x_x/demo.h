@@ -29,6 +29,8 @@ int16_t led_off_time = 1000;
 void end_demo() {
   motorState = STOPPED;
   stepper.stop(HARD);
+  stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);  // If these have been set higher elsewhere, make sure they are set back to normal here
+  stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
   beacon.stopBlink();
   demoState = -1;
 }
@@ -57,7 +59,7 @@ void demo_state_one() {
     if (led_off_time <= 0) {
       led_off_time = 400;
     }
-    beacon.startBlink(led_on_time,led_off_time );
+    beacon.startBlink(led_on_time, led_off_time);
     int randomNum = random(-360, 360);
     stepper.moveAngle(randomNum);
     Serial.print("ontime: ");

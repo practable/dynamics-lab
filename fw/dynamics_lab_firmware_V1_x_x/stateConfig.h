@@ -52,7 +52,7 @@ typedef enum {
 //    to see if it is the first time we have entered the state.
 
 StateType smState = STATE_INIT;
-StateType lastState;
+StateType lastState = NUM_STATES;
 
 
 
@@ -150,10 +150,10 @@ void sm_state_template(jsonStateData stateData) {
 void sm_state_init() {
   if (lastState != smState) {
 #if DEBUG_STATES == true
-    Serial.println(F("state: init"));
+    Serial.println(F("state: INIT"));
 #endif
   }
-  stepper.stop(HARD);
+  stepper.stop(SOFT);
   stepper.setRPM(0);
   step_rpm = 0;
   step_hz = 0;
@@ -211,10 +211,10 @@ void sm_state_setcal(jsonStateData stateData) {
 #endif
   lastState = smState;
   // code here
-//  Serial.print("cal data: ");
- // Serial.print(stateData.numeric);
- // Serial.print(" auth: ");
- // Serial.println(stateData.msg);
+  //  Serial.print("cal data: ");
+  // Serial.print(stateData.numeric);
+  // Serial.print(" auth: ");
+  // Serial.println(stateData.msg);
 
   memory.cal_set_values(stateData.numeric, stateData.msg);
   smState = STATE_WAIT;
@@ -244,23 +244,20 @@ void sm_state_getcal(jsonStateData stateData) {
 void sm_state_wait() {
   if (lastState != smState) {
     // If first iteration print state machine status
-
 #if DEBUG_STATES == true
     Serial.println(F("state: WAIT"));
 #endif
-
 #if COMMAND_HINTS == true  // print suggested commands
     Serial.println(F("\nEnter cmd in format:"));
     print_cmds();
 #endif
+    stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);  // If these have been set higher elsewhere, make sure they are set back to normal here
+    stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
     lastState = smState;
-  }
-
-
-
-  //
+  }  
   // smState = STATE_STOP;
 }
+
 
 /*
 	 *	param[in]	statusType - status flag to check. Possible values:
@@ -279,7 +276,7 @@ void sm_state_stop(void) {
     lastState = smState;
     motorState = STOPPED;
   }
-  // stepper.stop(HARD);
+ //  stepper.stop(HARD);
   stepper.setRPM(0);
   // step_rpm = 0;
   // step_hz = 0;
@@ -355,7 +352,7 @@ void sm_state_set_speed_rpm(jsonStateData stateData) {
 
 
 
-
+/*
 
 // Send motor to home position (without recalibrating -> not particularly accurate)
 void sm_state_home_old(void) {
@@ -385,7 +382,7 @@ void sm_state_home_old(void) {
     smState = STATE_WAIT;
   }
 }
-
+*/
 
 
 // Send motor to home position (without recalibrating -> not particularly accurate)
@@ -399,10 +396,10 @@ void sm_state_home(void) {
     lastState = smState;
     currentAngle = stepper.encoder.getAngle();
     float angle_error = 0 - currentAngle;
-    //  Serial.print("current angle: ");
-    //  Serial.print(currentAngle);
-    //  Serial.print(" angle_error: ");
-    //  Serial.println(angle_error);
+      Serial.print("current angle: ");
+      Serial.print(currentAngle);
+      Serial.print(" angle_error: ");
+      Serial.println(angle_error);
     stepper.moveAngle(angle_error);
     motorState = RUNNING;
   }
@@ -474,8 +471,8 @@ void sm_state_goto(jsonStateData stateData) {
     Serial.println(F("state: GOTO (new)"));
 #endif
     stepper.stop();
-    stepper.setMaxVelocity(800);
-    stepper.setMaxAcceleration(4000);
+    stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
+    stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
     // set up target bounds
     goto_target = stateData.numeric;
     if (goto_target > 720) {
@@ -522,7 +519,7 @@ void sm_state_goto(jsonStateData stateData) {
 }
 
 
-
+/*
 // Go to absolute angle (somewhat accurate if recently calibrated -> may take several rotations to find position)
 void sm_state_goto_OLD(jsonStateData stateData) {
 
@@ -532,8 +529,8 @@ void sm_state_goto_OLD(jsonStateData stateData) {
     Serial.println(F("state: GOTO"));
 #endif
     stepper.stop();
-    stepper.setMaxVelocity(800);
-    stepper.setMaxAcceleration(4000);
+    stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
+    stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
     // set up target bounds
     goto_target = stateData.numeric - 3;  // offset to account for overrun due to accelleration profile
     origional_target = stateData.numeric;
@@ -596,7 +593,7 @@ void sm_state_goto_OLD(jsonStateData stateData) {
     stepper.setRPM(50);
   }
 }
-
+*/
 
 
 
@@ -609,8 +606,8 @@ void sm_state_move(jsonStateData stateData) {
     Serial.println(F("state: MOVE"));
 #endif
     stepper.stop();
-    stepper.setMaxVelocity(800);
-    stepper.setMaxAcceleration(4000);
+    stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
+    stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
     // set up target bounds
     angle = stateData.floatData;
     if (angle == 0) {
@@ -767,7 +764,7 @@ void sm_state_ping(void) {
   smState = STATE_WAIT;
 }
 
-
+// depreciated state
 void sm_state_offset(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -775,7 +772,7 @@ void sm_state_offset(jsonStateData stateData) {
 #endif
     lastState = smState;
   }
-  put_offset_into_memory(stateData.numeric);
+ // put_offset_into_memory(stateData.numeric);
   smState = STATE_WAIT;
 }
 

@@ -29,7 +29,7 @@
 
 // Program Attributes
 #define EXPERIMENT_NAME "dynamics-lab"
-#define FIRMWARE_VERSION "V1.0.0"
+#define FIRMWARE_VERSION "V1.1.0"
 #define DEVELOPER "Imogen-Heard"
 
 // Hardware Definitions
@@ -46,11 +46,12 @@ const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;  // times out the brake mode and prev
 
 
 
-#define STREAMING_DEFAULT_ACTIVE true
+#define STREAMING_DEFAULT_ACTIVE false
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
 #define STEPPER_HOLD_CURRENT 10  // percent
 #define MAX_MOTOR_STEPS_S 800
-#define MAX_MOTOR_ACC_STEPS_S_S 300
+#define MAX_MOTOR_ACC_STEPS_S_S 300    // normal running mode accelleration
+#define MAX_MOTOR_ACC_SETUP 1000 // max accelleration during setup and calibrations
 #define HOMING_TIMEOUT_S 10  // homing algorithm exits if home not found within this timeframe
 
 #define ENCODER_HOME_OFFSET 5830
@@ -81,8 +82,8 @@ const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;  // times out the brake mode and prev
 
 
 // Debugging Options
-#define DEBUG_STATES false         // not JSON safe
-#define DEBUG_STATE_MACHINE false  // JSON safe
+#define DEBUG_STATES true         // not JSON safe
+#define DEBUG_STATE_MACHINE true  // JSON safe
 #define COMMAND_HINTS false
 
 // Physics Constants

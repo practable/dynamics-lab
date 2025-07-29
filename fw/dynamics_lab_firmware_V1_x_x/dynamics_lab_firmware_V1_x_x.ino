@@ -67,6 +67,13 @@ Global variables use 29864 bytes (45%) of dynamic memory, leaving 35672 bytes fo
 - Change GOTO state to work using encoder externally -> needs more work but is in progress
 
 
+Version V1.0.0
+- Production ready firmware, cleaned up goto and homing algorithms, added demo mode
+
+Version V1.1.0
+- Changed management of accelleration values for more consistant operation
+
+
 */
 
 
@@ -95,8 +102,8 @@ void setup() {
 
   jsonRX.jsonBegin();  // Start the json library to accept commands over serial connection
   mpu_setup();
-  //get_offset_from_memory();  // get encoder_offset from persistant memory before stepper setup (does nothing atm)
-  stepper_setup(false);  // if true run old homing scripts
+  //get_offset_from_memory(); // <-depreciated // get encoder_offset from persistant memory before stepper setup (does nothing atm)
+  stepper_setup();
 
 
   cal = memory.get_cal();
@@ -127,6 +134,7 @@ void loop() {
 
 
   jsonStateData nextState_data = jsonRX.jsonReadSerialLoop();
+
 
 
   if (nextState_data.cmd_received) {  // If command is receive   //delay(10);
@@ -233,7 +241,7 @@ void loop() {
 
 
 
-  sm_Run(nextState_data);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
+   sm_Run(nextState_data);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
 
 
 

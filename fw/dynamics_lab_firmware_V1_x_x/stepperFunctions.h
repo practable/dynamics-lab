@@ -19,6 +19,7 @@ float get_Hz_from_RPM(float rpm) {
 void home_position() {
 }
 
+/*
 // do one full revolution to find the lowest value reported by the hall effect sensor
 void step_find_home() {
   Serial.println(F("{\"mode\":\"finding-home-position\"}"));
@@ -106,6 +107,8 @@ int16_t step_move_home() {
   return 1;  // on success return 1
 }
 
+*/
+
 /* Stall Detection
 _Problem is its very hard to detect actual stalls and seperate them from "false stalls"_
 
@@ -129,23 +132,23 @@ bool check_for_stall() {
   uint16_t new_encoder_value = stepper.encoder.getAngleRaw();
   int16_t diff = new_encoder_value - last_encoder_value;
   last_encoder_value = new_encoder_value;
-  if (diff > 3 || diff < -3) {  //// Stall condition unlikely
-    if (stalls_detected > 0) {  // prevent stall_detected var from rolling over negative
-      if (millis() - last_stall_time_mS >= STALL_HIT_DECAY_mS) {   /// lets make this a timer instead
+  if (diff > 3 || diff < -3) {                                    //// Stall condition unlikely
+    if (stalls_detected > 0) {                                    // prevent stall_detected var from rolling over negative
+      if (millis() - last_stall_time_mS >= STALL_HIT_DECAY_mS) {  /// lets make this a timer instead
         stalls_detected--;
       }
     }
     return false;
-  } else {                                         //Likely stall condition detected
-    last_stall_time_mS = millis();                 // get the time of this stall
-//    if (stalls_detected == 0) {                    // if first time stall detected
-//      stall_trigger_time_mS = last_stall_time_mS;  // record time THIS DOES NOTHING
-//    }
+  } else {                                  //Likely stall condition detected
+    last_stall_time_mS = millis();          // get the time of this stall
+                                            //    if (stalls_detected == 0) {                    // if first time stall detected
+                                            //      stall_trigger_time_mS = last_stall_time_mS;  // record time THIS DOES NOTHING
+                                            //    }
     stalls_detected = stalls_detected + 1;  // make it accumilate faster than deaccumilate?
-//    Serial.print("stall limit: ");
-//    Serial.print(stall_limit);
-//    Serial.print(" Detected: ");
-//    Serial.println(stalls_detected);
+                                            //    Serial.print("stall limit: ");
+                                            //    Serial.print(stall_limit);
+                                            //    Serial.print(" Detected: ");
+                                            //    Serial.println(stalls_detected);
     if (stalls_detected > stall_limit) {
       stalls_detected = 0;
       Serial.println(F("{\"WARNING\":\"Motor may be stalled, stopping\"}"));
@@ -159,22 +162,31 @@ bool check_for_stall() {
 
 
 // wraps previous two functions together into a reliable structure
+// DEPRECIATED
+/*
 void run_stepper_calibration() {
   bool cal_complete;
-  while (!cal_complete) {
-    step_find_home();
-    cal_complete = step_move_home();
-  }
+ while (!cal_complete) {
+  step_find_home();
+   cal_complete = step_move_home();
+ }
   stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
   stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
 }
+*/
 
-
-void stepper_setup(bool run_calibration = true) {
+void stepper_setup() {
   stepper.setup(NORMAL, STEPPER_STEPS, 10, 0.2, 0.0, 16, true, false, 100, 1);  //Initialize uStepper S32
   stepper.setCurrent(100);                                                      // set motor current as percentage not useable unless current jumper placed in I-PWM position
   stepper.setHoldCurrent(STEPPER_HOLD_CURRENT);                                 // set holding current as percentage
-  if (run_calibration) {
+  stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
+  stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
+  stepper.stop();
+}
+
+// depreciated
+/*
+ if (run_calibration) {
     run_stepper_calibration();
     Serial.print(F("{\"mode\":\"init-encoder-pos\",\"raw\":\""));
     Serial.print(stepper.encoder.getAngleRaw());
@@ -182,5 +194,4 @@ void stepper_setup(bool run_calibration = true) {
     Serial.print(round(stepper.encoder.getAngle()));
     Serial.println(F("\"}"));
   }
-  stepper.stop();
-}
+*/
