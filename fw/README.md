@@ -1,4 +1,5 @@
-#Dynamics Lab Firmware
+# Dynamics Lab Firmware
+
 Please Note: This firmware relies on a MODIFIED version of the uStepperS32 library, please uninstall any version installed from the Arduino library manager and install [this](https://github.com/ImogenWren/uStepperS32) version available at [https://github.com/ImogenWren/uStepperS32](https://github.com/ImogenWren/uStepperS32)
 
 ## Current Version 
