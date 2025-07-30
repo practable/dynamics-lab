@@ -29,7 +29,7 @@
 // Program Attributes
 #define EXPERIMENT_NAME "dynamics-lab"
 #define FIRMWARE_VERSION "V1.2.0"
-#define DEVELOPER "Imogen-Heard"
+
 
 // Hardware Definitions
 #define HALL_SENSOR_PIN A4
