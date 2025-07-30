@@ -30,7 +30,7 @@ void end_demo() {
   motorState = STOPPED;
   stepper.stop(HARD);
   stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);  // If these have been set higher elsewhere, make sure they are set back to normal here
-  stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
+  stepper.setMaxAcceleration(MAX_MOTOR_ACCELLERATION);
   beacon.stopBlink();
   demoState = -1;
 }

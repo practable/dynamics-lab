@@ -312,7 +312,8 @@ void loop() {
   }
 
   // Check if motor is not in FREE state
-  if (!motorState == FREE) {
+  if (motorState != FREE) {
+   // Serial.println("motor not in free state");
     if (millis() - last_command_rx_mS >= FREEWHEEL_BRAKE_TIMEOUT_S * 1000) {  // makes sure brake mode is set to freewheel to avoid heating motor when not in use
       Serial.println(F("{\"INFO\":\"Freewheel Brake Mode Applied\"}"));
       smState = STATE_FREEWHEEL;
@@ -321,12 +322,5 @@ void loop() {
   }
 
   beacon.performBlink();  // loop function for the LED
-  // Is there any errors being used in this?
-  errors.clear_warning();  // clear JSON (move this to bottom of loop later)
-                           //  if (printDelay.millisDelay(20000)) {
-                           // std::cout << "alive" << std::endl;
-                           //Serial.println("Alive and Loop");
-                           // display_mallinfo();
-                           //  stepper.setRPM(0);
-                           //}
+
 }

@@ -19,7 +19,6 @@
 //#include "TinyMPU6050.h"  // Arduino Library Manager
 //#include <NewServo.h>     // Available @ https://github.com/GhassanYusuf/NewServo // NOTE ERRORS POSSIBLY CAUSED BY THIS LIBRARY
 #include <Servo.h>  // [Arduino Library Manager]
-#include "errorRep.h"
 #include <ArduinoJson.h>  // installed version 6.21.5 [Arduino Library Manager]
 #include <ledObject.h>
 #include "secretObject.h"
@@ -29,7 +28,7 @@
 
 // Program Attributes
 #define EXPERIMENT_NAME "dynamics-lab"
-#define FIRMWARE_VERSION "V1.1.0"
+#define FIRMWARE_VERSION "V1.2.0"
 #define DEVELOPER "Imogen-Heard"
 
 // Hardware Definitions
@@ -46,12 +45,12 @@ const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;  // times out the brake mode and prev
 
 
 
-#define STREAMING_DEFAULT_ACTIVE false
+#define STREAMING_DEFAULT_ACTIVE true
 #define ENCODE_RAW_ANGLE_OFFSET 0.0
 #define STEPPER_HOLD_CURRENT 10  // percent
 #define MAX_MOTOR_STEPS_S 800
-#define MAX_MOTOR_ACC_STEPS_S_S 300    // normal running mode accelleration
-#define MAX_MOTOR_ACC_SETUP 1000 // max accelleration during setup and calibrations
+#define MAX_MOTOR_ACCELLERATION 300    // normal running mode accelleration
+#define MAX_MOTOR_ACC_UTILITY 3000 // max accelleration during setup and calibrations
 #define HOMING_TIMEOUT_S 10  // homing algorithm exits if home not found within this timeframe
 
 #define ENCODER_HOME_OFFSET 5830
@@ -82,8 +81,8 @@ const int FREEWHEEL_BRAKE_TIMEOUT_S = 600;  // times out the brake mode and prev
 
 
 // Debugging Options
-#define DEBUG_STATES true         // not JSON safe
-#define DEBUG_STATE_MACHINE true  // JSON safe
+#define DEBUG_STATES false         // not JSON safe
+#define DEBUG_STATE_MACHINE false  // JSON safe
 #define COMMAND_HINTS false
 
 // Physics Constants
@@ -105,7 +104,6 @@ UstepperS32 stepper;   // uStepper32 control for stepper motor
 //MPU6050 mpu;   /// replaced with Adafruit library
 Adafruit_MPU6050 mpu;
 Servo servo;
-errorRep errors;
 ledObject beacon(LED_BEACON);
 secretObject memory;
 
