@@ -7,6 +7,7 @@
 
 // Gets value from emulated EEProm and updates global val
 // -> Returns value
+/*
 int16_t get_offset_from_memory() {
   int signature;
   EEPROM.get(EEPROM_ENCODE_OFFSET_ADDRESS, signature);
@@ -50,3 +51,5 @@ int16_t put_offset_into_memory(int16_t new_offset) {
   persistant_encoder_offset = new_offset;  // make sure global is updated with new value written
   return 0;
 }
+
+*/

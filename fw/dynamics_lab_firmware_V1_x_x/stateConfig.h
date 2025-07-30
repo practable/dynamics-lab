@@ -52,7 +52,7 @@ typedef enum {
 //    to see if it is the first time we have entered the state.
 
 StateType smState = STATE_INIT;
-StateType lastState;
+StateType lastState = NUM_STATES;
 
 
 
@@ -150,10 +150,10 @@ void sm_state_template(jsonStateData stateData) {
 void sm_state_init() {
   if (lastState != smState) {
 #if DEBUG_STATES == true
-    Serial.println(F("state: init"));
+    Serial.println(F("state: INIT"));
 #endif
   }
-  stepper.stop(HARD);
+  stepper.stop(SOFT);
   stepper.setRPM(0);
   step_rpm = 0;
   step_hz = 0;
@@ -211,10 +211,10 @@ void sm_state_setcal(jsonStateData stateData) {
 #endif
   lastState = smState;
   // code here
-//  Serial.print("cal data: ");
- // Serial.print(stateData.numeric);
- // Serial.print(" auth: ");
- // Serial.println(stateData.msg);
+  //  Serial.print("cal data: ");
+  // Serial.print(stateData.numeric);
+  // Serial.print(" auth: ");
+  // Serial.println(stateData.msg);
 
   memory.cal_set_values(stateData.numeric, stateData.msg);
   smState = STATE_WAIT;
@@ -244,23 +244,20 @@ void sm_state_getcal(jsonStateData stateData) {
 void sm_state_wait() {
   if (lastState != smState) {
     // If first iteration print state machine status
-
 #if DEBUG_STATES == true
     Serial.println(F("state: WAIT"));
 #endif
-
 #if COMMAND_HINTS == true  // print suggested commands
     Serial.println(F("\nEnter cmd in format:"));
     print_cmds();
 #endif
+    //stepper.setMaxVelocity(MAX_MOTOR_STEPS_S, false);  //false ensures it doesnt apply to driver instantly If these have been set higher elsewhere, make sure they are set back to normal here
+    stepper.setMaxAcceleration(MAX_MOTOR_ACCELLERATION);
     lastState = smState;
   }
-
-
-
-  //
   // smState = STATE_STOP;
 }
+
 
 /*
 	 *	param[in]	statusType - status flag to check. Possible values:
@@ -279,10 +276,11 @@ void sm_state_stop(void) {
     lastState = smState;
     motorState = STOPPED;
   }
-  // stepper.stop(HARD);
+  //  stepper.stop(HARD);
   stepper.setRPM(0);
   // step_rpm = 0;
   // step_hz = 0;
+
   smState = STATE_WAIT;
 }
 
@@ -318,8 +316,7 @@ void sm_state_set_speed_hz(jsonStateData stateData) {
     lastState = smState;
   }
   if (stateData.floatData < (-1 * MAX_HZ) || stateData.floatData > MAX_HZ) {  // if value is out of range, reject
-    errors.set_error(false, -10, "Requested Hz value out of bounds", errors.WARNING, "set_speed_hz");
-    errors.print_json_status(true);
+    Serial.println(F("{\"WARNING\":\"Requested Hz value out of bounds\"}"));  
   } else {
     Serial.print("{\"hz-set-to\":\"");
     Serial.print(stateData.floatData);
@@ -340,8 +337,7 @@ void sm_state_set_speed_rpm(jsonStateData stateData) {
     lastState = smState;
   }
   if (stateData.floatData < (-1 * MAX_RPM) || stateData.floatData > MAX_RPM) {  // if value is out of range, reject
-    errors.set_error(false, -10, "Requested RPM value out of bounds", errors.WARNING, "set_speed_rpm");
-    errors.print_json_status(true);
+    Serial.println(F("{\"WARNING\":\"Requested RPM value out of bound\"}"));  
   } else {
     Serial.print("{\"rpm-set-to\":\"");
     Serial.print(stateData.floatData);
@@ -353,38 +349,6 @@ void sm_state_set_speed_rpm(jsonStateData stateData) {
 }
 
 
-
-
-
-
-// Send motor to home position (without recalibrating -> not particularly accurate)
-void sm_state_home_old(void) {
-  if (lastState != smState) {
-#if DEBUG_STATES == true
-    Serial.println(F("state: HOME"));
-#endif
-    lastState = smState;
-  }
-  //step_move_home();
-  stepper.setMaxVelocity(800);
-  stepper.setMaxAcceleration(4000);
-  float currentAngle = stepper.encoder.getAngle();
-#if PRINT_HOMING_RESULT == true
-  Serial.print(stepper.encoder.getAngleRaw());
-  Serial.print(" ");
-  Serial.println(currentAngle);
-#endif
-  motorState = RUNNING;
-  if (!(currentAngle < 0.4) && !(currentAngle > 359.6)) {
-    stepper.setRPM(50);
-  } else {
-    stepper.stop();
-    motorState = STOPPED;
-    stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
-    stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
-    smState = STATE_WAIT;
-  }
-}
 
 
 
@@ -400,9 +364,10 @@ void sm_state_home(void) {
     currentAngle = stepper.encoder.getAngle();
     float angle_error = 0 - currentAngle;
     //  Serial.print("current angle: ");
-    //  Serial.print(currentAngle);
+    ///  Serial.print(currentAngle);
     //  Serial.print(" angle_error: ");
-    //  Serial.println(angle_error);
+    //   Serial.println(angle_error);
+    stepper.setMaxAcceleration(MAX_MOTOR_ACC_UTILITY);
     stepper.moveAngle(angle_error);
     motorState = RUNNING;
   }
@@ -411,6 +376,7 @@ void sm_state_home(void) {
     Serial.print("{\"target\":\"0\", \"result\":\"");
     Serial.print(currentAngle);
     Serial.println("\"}");
+    stepper.setMaxAcceleration(MAX_MOTOR_ACCELLERATION);
     smState = STATE_STOP;
   }
 }
@@ -473,9 +439,8 @@ void sm_state_goto(jsonStateData stateData) {
 #if DEBUG_STATES == true
     Serial.println(F("state: GOTO (new)"));
 #endif
+    stepper.setMaxAcceleration(MAX_MOTOR_ACC_UTILITY);
     stepper.stop();
-    stepper.setMaxVelocity(800);
-    stepper.setMaxAcceleration(4000);
     // set up target bounds
     goto_target = stateData.numeric;
     if (goto_target > 720) {
@@ -517,85 +482,12 @@ void sm_state_goto(jsonStateData stateData) {
     Serial.print("\", \"result\":\"");
     Serial.print(currentAngle);
     Serial.println("\"}");
+    stepper.setMaxAcceleration(MAX_MOTOR_ACCELLERATION);
     smState = STATE_STOP;
   }
 }
 
 
-
-// Go to absolute angle (somewhat accurate if recently calibrated -> may take several rotations to find position)
-void sm_state_goto_OLD(jsonStateData stateData) {
-
-  if (lastState != smState) {
-    lastState = smState;
-#if DEBUG_STATES == true
-    Serial.println(F("state: GOTO"));
-#endif
-    stepper.stop();
-    stepper.setMaxVelocity(800);
-    stepper.setMaxAcceleration(4000);
-    // set up target bounds
-    goto_target = stateData.numeric - 3;  // offset to account for overrun due to accelleration profile
-    origional_target = stateData.numeric;
-    if (goto_target == 360 || goto_target == 0 || goto_target > 720) {  // avoid having to do the messy maths here
-      smState = STATE_HOME;
-      return;
-    }
-    if (goto_target > 360) {  // avoid having to do the messy maths here
-      goto_target -= 360;
-    }
-    if (goto_target < 0) {
-      goto_target += 360;
-    }
-    target_lower = goto_target - GOTO_TARGET_HYSTERESIS;
-    target_higher = goto_target + GOTO_TARGET_HYSTERESIS;
-    if (target_lower < 0) {
-      target_lower += 360;
-    }
-    if (target_higher > 360) {
-      Serial.println("this shouldnt be doing");
-      target_higher -= 360;
-    }
-    Serial.print("high: ");
-    Serial.print(target_higher);
-    Serial.print(" low: ");
-    Serial.println(target_lower);
-    if (target_higher < target_lower) {  // if the variables are the wrong way around for the logic to work, switch them
-      switchVariables(target_higher, target_lower);
-      Serial.print("high: ");
-      Serial.print(target_higher);
-      Serial.print(" low: ");
-      Serial.println(target_lower);
-    }
-  }
-  // find angle through movement
-  float currentAngle = stepper.encoder.getAngle();
-  //#if PRINT_HOMING_RESULT == true
-  //Serial.print(stepper.encoder.getAngleRaw());
-  // Serial.print(target_lower);
-  // Serial.print(" ");
-  // Serial.print(currentAngle);
-  // Serial.print(" ");
-  // Serial.println(target_higher);
-  //#endif
-  motorState = RUNNING;
-  if ((currentAngle < target_higher) && (currentAngle > target_lower)) {
-    stepper.stop();
-    motorState = STOPPED;
-    currentAngle = stepper.encoder.getAngle();
-    Serial.print("{\"target\":\"");
-    //Serial.print(goto_target);
-    Serial.print(origional_target);
-    Serial.print("\", \"result\":\"");
-    Serial.print(currentAngle);
-    Serial.println("\"}");
-    stepper.setMaxVelocity(MAX_MOTOR_STEPS_S);
-    stepper.setMaxAcceleration(MAX_MOTOR_ACC_STEPS_S_S);
-    smState = STATE_WAIT;
-  } else {
-    stepper.setRPM(50);
-  }
-}
 
 
 
@@ -608,9 +500,8 @@ void sm_state_move(jsonStateData stateData) {
 #if DEBUG_STATES == true
     Serial.println(F("state: MOVE"));
 #endif
+    stepper.setMaxAcceleration(MAX_MOTOR_ACC_UTILITY);
     stepper.stop();
-    stepper.setMaxVelocity(800);
-    stepper.setMaxAcceleration(4000);
     // set up target bounds
     angle = stateData.floatData;
     if (angle == 0) {
@@ -622,13 +513,11 @@ void sm_state_move(jsonStateData stateData) {
     // Serial.println(angle);
     stepper.moveAngle(angle);
   }
-  smState = STATE_WAIT;
+  if (!stepper.getMotorState(POSITION_REACHED)) {
+    stepper.setMaxAcceleration(MAX_MOTOR_ACCELLERATION);
+    smState = STATE_WAIT;
+  }
 }
-
-
-
-
-
 
 
 
@@ -641,11 +530,9 @@ void sm_state_samplerate(jsonStateData stateData) {
     lastState = smState;
   }
   if (stateData.numeric < 1 || stateData.numeric > 200) {
-    errors.set_error(false, -10, "Out of Bounds Sample Rate Commanded", errors.WARNING, "state-samplerate");
-    errors.print_json_status();
-  } else if (stateData.numeric < print_rate_Hz) {
-    errors.set_error(false, -10, "Cannot set sample rate less than print rate", errors.WARNING, "state-samplerate");
-    errors.print_json_status();
+    Serial.println(F("{\"WARNING\":\"Out of Bounds Sample Rate Commanded\"}"));  
+  } else if (stateData.numeric < print_rate_Hz) {    
+    Serial.println(F("{\"WARNING\":\"Cannot set sample rate less than print rate\"}"));      
   } else {
     sampleRate_Hz = stateData.numeric;
     // sampleDelay_mS = 1000 / sampleRate_Hz;
@@ -665,12 +552,10 @@ void sm_state_print_rate(jsonStateData stateData) {
 #endif
     lastState = smState;
   }
-  if (stateData.numeric < 1 || stateData.numeric > 50) {
-    errors.set_error(false, -10, "Out of Bounds Print Rate Commanded", errors.WARNING, "state-printrate");
-    errors.print_json_status();
-  } else if (stateData.numeric > sampleRate_Hz) {
-    errors.set_error(false, -10, "Cannot set print rate greater than sample rate", errors.WARNING, "state-printrate");
-    errors.print_json_status();
+  if (stateData.numeric < 1 || stateData.numeric > 50) {    
+    Serial.println(F("{\"WARNING\":\"Out of Bounds Print Rate Commanded\"}"));       
+  } else if (stateData.numeric > sampleRate_Hz) {    
+     Serial.println(F("{\"WARNING\":\"Cannot set print rate greater than sample rate\"}"));   
   } else {
     print_rate_Hz = stateData.numeric;
     print_delay_mS = 1000 / print_rate_Hz;
@@ -735,8 +620,9 @@ void sm_state_snaptime(jsonStateData stateData) {
     lastState = smState;
   }
   if (stateData.numeric < 1 || stateData.numeric > 250000) {
-    errors.set_error(false, -10, "Out of Bounds Snapshot Time Commanded", errors.WARNING, "state-snaptime");
-    errors.print_json_status();
+    //errors.set_error(false, -10, "Out of Bounds Snapshot Time Commanded", errors.WARNING, "state-snaptime");
+    Serial.println(F("{\"WARNING\":\"out of bounds snapshot time requested\"}"));
+    //errors.print_json_status();
   } else {
     snapshot_timer_mS = stateData.numeric;
   }
@@ -767,7 +653,7 @@ void sm_state_ping(void) {
   smState = STATE_WAIT;
 }
 
-
+// depreciated state
 void sm_state_offset(jsonStateData stateData) {
   if (lastState != smState) {
 #if DEBUG_STATES == true
@@ -775,7 +661,7 @@ void sm_state_offset(jsonStateData stateData) {
 #endif
     lastState = smState;
   }
-  put_offset_into_memory(stateData.numeric);
+  // put_offset_into_memory(stateData.numeric);
   smState = STATE_WAIT;
 }
 
