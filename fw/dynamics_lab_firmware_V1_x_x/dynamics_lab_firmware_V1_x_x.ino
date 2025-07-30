@@ -241,7 +241,7 @@ void loop() {
 
 
 
-   sm_Run(nextState_data);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
+  sm_Run(nextState_data);  // This Runs the state machine in the correct state, and is passed all of the data sent by the last command
 
 
 
