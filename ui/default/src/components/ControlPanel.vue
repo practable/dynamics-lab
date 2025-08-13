@@ -84,6 +84,9 @@
 
 	</div>
 
+	<!-- TEMP FOR DEBUGGING -->
+	<!-- <div><button id="force-reconnect-button" class="button-sm button-primary" aria-label="force a reconnect" @click="mockDroppedStreams">RECONNECT</button></div> -->
+
 	<div class="d-flex flex-row">
 		<popup-help class="me-2" id="popup-help-control-panel">
             <template v-slot:header>
@@ -335,6 +338,9 @@ export default {
 			let _store = this.$store;
 			let _this = this;
 
+			if(this.dataSocket != null){
+				this.dataSocket.disconnect();		//must disconnect from previous websocket connection or will duplicate data.
+			}
 			this.dataSocket = new WebSocket(this.url);
 			_store.dispatch('setDataSocket', this.dataSocket);
 			var delay = 0
@@ -382,8 +388,6 @@ export default {
 						let pos = obj.payload.encode.pos;		//float array pos in degrees
 						let acc = obj.payload.mpu.acc;		//object
 						//let gyro = obj.payload.mpu.gyro;	//object
-
-						
 
 						_this.setReportedDrivingFrequency(obj.payload.step);
 
@@ -437,13 +441,17 @@ export default {
 				}
 			}
 
-		_store.dispatch('setStartTime', new Date().getTime());
+		//_store.dispatch('setStartTime', new Date().getTime());
 		window.addEventListener('keydown', this.hotkey, false);
 		//window.addEventListener('pagehide', this.setModeAndCommandStop());				//closing window
 		//window.addEventListener('beforeunload', this.setModeAndCommandStop());			//refreshing page, changing URL
 		
 		
 		},
+		// mockDroppedStreams(){
+		// 	var reconnectEvent = new Event("streams:dropped");
+        // 	document.dispatchEvent(reconnectEvent);
+		// }
 
 	},
 }
