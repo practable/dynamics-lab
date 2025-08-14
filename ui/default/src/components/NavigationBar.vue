@@ -5,7 +5,7 @@
     <div class="container-fluid">
       <div class="navbar-brand">
           <img src="/images/practable-icon.png" width="30" height="30" alt="practable.io logo">
-          Dynamics Lab
+          {{ labName }}
       </div>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -13,14 +13,19 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto">
-             
-                <li class="nav-item">
-                    <clock class='nav-link' />
-                </li>
+
+            <li class="nav-item">
+                  <div class="nav-link">UUID: {{ getLogUUID }}</div>
+              </li>
+               
 
           </ul>
 
             <ul class="navbar-nav dropstart">
+
+               <li class="nav-item">
+                    <clock class='nav-link' />
+                </li>
 
               <li class="nav-item me-1">
                 <show-hardware-config-button />
@@ -64,8 +69,21 @@ export default {
   computed:{
       ...mapGetters([
         'getDarkTheme',
-        'getIsChatOn'
-      ])
+        'getIsChatOn',
+        'getLogUUID',
+        'getConfigJSON'
+      ]),
+      labName(){
+        return this.getLabID == '' ? 'Dynamics Lab': 'Dynamics Lab (' + this.getLabID + ')';
+      },
+      getLabID(){
+        let config = this.getConfigJSON;
+        if(config.parameters != undefined){
+          return config.name;
+        } else{
+          return '';
+        }
+      },
   },
   methods: {
       addTool(tool){
