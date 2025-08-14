@@ -417,6 +417,7 @@ export default {
                         type: 'linear',
                         position: 'left',
                         ticks: {
+                            precision: 2,
                             callback : (value,index,values) => {
                                 _this.updateYAxisMax(value, index);
                                 _this.updateYAxisMin(value, index, values);
@@ -439,6 +440,7 @@ export default {
                         type: 'linear',
                         position: 'right',
                         ticks: {
+                            precision: 2,
                             // callback : (value,index,values) => {
                             //     _this.updateYAxisMax(value, index);
                             //     _this.updateYAxisMin(value, index, values);
