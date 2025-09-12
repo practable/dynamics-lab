@@ -2,5 +2,6 @@
 
 The following user interfaces currently exist for the dynamics lab remote laboratory:
 
-- [default](./default/) - development version of the user interface, may ultimately become the student-facing version.
+- [default](./default/) - default version of the user interface, with all features, but no logging of interactions.
+- [analytics](./analytics/) - same as the default version + logging of interactions for analytics.
 

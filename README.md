@@ -31,9 +31,5 @@ Describe possible activities that can be performed with this remote laboratory. 
 
 # Versions
 
-A section should describe the release versions, e.g.:
-
-- v1.2.0: updated css style
-- v1.1.0: bug fix on graph tool
-- v1.0.0: first release version of spinner remote lab
+- v1.0.0: initial production release of dynamics lab
 
