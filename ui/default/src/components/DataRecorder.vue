@@ -51,7 +51,7 @@
                 <p>Clicking <b>Reset</b> will delete all recorded data, including clearing the graph component.</p>
                 <p>If you want to save data prior to resetting then click <b>Download CSV</b>
                 to save the data to your local computer.</p>  
-                <p>A maximum of 5000 data points can be recorded for download and 2000 for display in the graph component. It is recommended to perform
+                <p>A maximum of 5000 data points can be recorded for download. It is recommended to perform
                   runs in batches and download data in between.
                 </p>         
 

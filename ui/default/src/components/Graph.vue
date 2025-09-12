@@ -305,7 +305,7 @@ export default {
             YAxisMin: 0,
             XAxisMax: 0,
             XAxisMin: 0,
-            maxDataPoints: 2000,
+            maxDataPoints: 5000,
             current_data_index: 0,
             data_index_interval: 10,
             latest_index: 0,

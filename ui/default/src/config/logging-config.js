@@ -1,5 +1,6 @@
 const config = {
     //Most likely leave the below as is:
+    version: import.meta.env.VITE_APP_VERSION,
     logging_path: '/addLog',
     definitions_path: '/verbs',
 
@@ -18,7 +19,15 @@ const config = {
     
     //Add any hotkeys that you want to log
     hotkeys: [
-      
+      'd',
+      'u',
+      's',
+      'r',
+      'n',
+      'x',
+      'o',
+      'p'
+
     ],
     // If you include an object below, it will be sent on an interval
     interval_logs: [
