@@ -76,7 +76,7 @@ void mpu_setup() {
     }
   }
 
-  mpu.setAccelerometerRange(MPU6050_RANGE_4_G);
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);  // Changed from MPU6050_RANGE_4_G  2025-09-15 IWH
   mpu.setGyroRange(MPU6050_RANGE_250_DEG);
   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
   Serial.println("");
