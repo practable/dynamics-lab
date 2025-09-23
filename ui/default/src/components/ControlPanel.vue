@@ -103,7 +103,7 @@
 				to rotate at the set frequency. To update the driving frequency, first select a new frequency on the slider and then click <b>Run</b> 
 				again. <b>Stop</b> will stop the rotation.</p>
 			
-				<p>Driven and undriven modes can also be selected using the <b>d</b> and <b>u</b> keyboard keys respectively. Once in undriven mode <b>p</b> 
+				<p>Driven and undriven modes can also be selected using the <b>d</b> and <b>u</b> keyboard keys respectively. Once in undriven mode <b>n</b> 
 				can be used to run the ping function. In driven mode, <b>s</b> and <b>r</b> can be used to stop and run respectively. <b>x</b> will exit any mode. </p>
             </template>
         </popup-help>

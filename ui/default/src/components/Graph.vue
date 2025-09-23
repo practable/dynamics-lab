@@ -13,7 +13,7 @@
             <template v-slot:body>
                 <div class='row mb-2'>
                     <h5>Recording more than 5000 data points</h5>
-                    <p>For smooth running of the web app there is a limit of 5000 recorded data points and 2000 data points on the Graph tool. Please download this dataset or perform the necessary analysis
+                    <p>For smooth running of the web app there is a limit of 5000 recorded data points. Please download this dataset or perform the necessary analysis
                         and then reset the data and run again in order to collect more data.
                     </p>
                 </div>
