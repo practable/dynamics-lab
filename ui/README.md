@@ -5,6 +5,9 @@ The following user interfaces currently exist for the dynamics lab remote labora
 - [default](./default/) - default version of the user interface, with all features, but no logging of interactions.
 - [analytics](./analytics/) - same as the default version + logging of interactions for analytics.
 
+The user interface utilises [Bootstrap](https://getbootstrap.com/) for responsive design, to support student interactions on any internet connected device, including mobile phones, tablets and desktops. 
+
+<img src="../img/dynamics-ui-mobile-night.jpeg" alt="dynamics ui mobile" height="450"/>
 <img src="../img/dynamics-ui-screenshot.png" alt="dynamics ui" height="450"/>
 
 # Installation

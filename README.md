@@ -5,7 +5,7 @@ Dynamics experiment to investigate resonance of a mass-beam system. Free decay o
 Initial prototype designed as part of an undergraduate student project in the School of Engineering, University of Edinburgh. That design was modified and implemented in this remote laboratory for the Structural Mechanics and Dynamics 3 course in the same department. The experiments are on public display in the School of Engineering:
 
 <div>
-<img src="./img/dynamics-single-exp.jpeg" alt="atrium install" height="450"/>
+<img src="./img/dynamics-single-exp.jpeg" alt="single experiment" height="450"/>
 <img src="./img/atrium-install.jpeg" alt="atrium install" height="450"/>
 </div>
 
@@ -24,7 +24,10 @@ Details of the hardware, firmware and UI can be found in the following directori
 
 # Activities
 
-Describe possible activities that can be performed with this remote laboratory. This may include example activities for demonstrations or activities that connect with known learning objectives in undergraduate or secondary school courses.
+- Free decay in a mass-spring system
+- Damping ratio of free decay
+- Resonance curve for driven oscillations
+- Phase lag between driver and oscillator
 
 ## Version History
 
