@@ -1,24 +1,21 @@
-# project template
+# dynamics lab
 
-This is the README for the develop branch. See the [PROJECT.md](PROJECT.md) for details of how to branch from this for development work.
+Dynamics experiment to investigate resonance of a mass-beam system. Free decay or driven oscillations can be measured. Frequency of driven oscillation can be controlled using a stepper motor and the uStepper s32 driver board. 
 
-This is a template for practable remote lab projects. 
+Initial prototype designed as part of an undergraduate student project in the School of Engineering, University of Edinburgh. That design was modified and implemented in this remote laboratory for the Structural Mechanics and Dynamics 3 course in the same department. The experiments are on public display in the School of Engineering:
 
-Each project should include a general description here of the remote lab: what is the hardware in general how and where it is used and any associated resources or publications. For example, from spinner-amax:
+<div>
+<img src="./img/dynamics-single-exp.jpeg" alt="atrium install" height="450"/>
+<img src="./img/atrium-install.jpeg" alt="atrium install" height="450"/>
+</div>
 
-```
-Spinner experiment with Maxxon AMAX 32 motor, upgraded for 2022 usage by Controls and Instrumentation 3, School of Engineering, University of Edinburgh. This design has now been used for over 2,500 hours in total across 12 separate instances. We have now expanded the fleet to 48 experiments, with 12 different weights (four of each).
+If you are interested in adopting or designing a new remote laboratory based on this, or any, practable remote lab then please visit [www.practable.io](http://www.practable.io)
 
-You can cite the contents of this repo via this paper:
 
-D.Reid, J. Burridge, D. Lowe, T. Drysdale "Open-source remote laboratory experiments for controls engineering education," International Journal of Mechanical Engineering Education, February 2022, doi:10.1177/03064190221081451
-
-If you are interested in adopting or designing a new remote laboratory based on this, or any, practable remote lab then please contact: ....
-```
 
 # Contents
 
-Each project should then list the contents of the repo with links to associated README.md files for each component e.g.:
+Details of the hardware, firmware and UI can be found in the following directories:
 
 - [fw](./fw/README.md)
 - [hw](./hw/README.md)
@@ -29,7 +26,9 @@ Each project should then list the contents of the repo with links to associated 
 
 Describe possible activities that can be performed with this remote laboratory. This may include example activities for demonstrations or activities that connect with known learning objectives in undergraduate or secondary school courses.
 
-# Versions
+## Version History
 
-- v1.0.0: initial production release of dynamics lab
+| Date | Version      | Update notes    |
+| ------| ------------- | ------------- |
+| September 2025 | v1.0           | Initial production release of dynamics lab |
 
