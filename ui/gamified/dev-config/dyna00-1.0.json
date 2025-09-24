@@ -1,0 +1,25 @@
+{
+    "name": "dyna00",
+    "version": "1.0",
+    "date": 1739449599,
+    "aud": "https://app.practable.io/ed0/dynamics-default-1.0",
+    "images": [],
+    "parameters": {
+        "ui": {
+                "hardware": "Dynamics Lab",
+                "short": "dyna00",
+                "m": "452g",
+                "offset": "50mm",
+                "l": "400mm",
+                "w": "40mm",
+                "t": "3mm",
+                "density": "7850kg/m3"
+             },
+        "achievements": [
+        	{"name":"survey-response", "type": "input", "id": "survey-input", "verbose":"Respond to a survey question", "completed": false, "hidden": false},
+            {"name":"custom-ui", "type": "drop", "id": "", "verbose":"Customise the UI", "completed": true, "hidden": true},
+            {"name":"multiple-runs", "type": "click", "id": "update-driving-frequency-button", "verbose":"Run a step or ramp 10 times", "completed": false, "hidden": true, "required": 10, "n": 0},
+            {"name":"plot-graph", "type": "click", "id": "plotFunctionButton", "verbose":"Plot a linear graph", "completed": false, "hidden": true}
+        ]
+    }
+}

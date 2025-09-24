@@ -23,4 +23,25 @@ Hidden achievements added to the user experience in much the same way as achieve
 
 Like Logging, this component should be added to the UI without the need to make any changes to other components - except adding the HTML component to the appropriate location (e.g. to the navigation bar for achievements).
 
-The remote lab config file should have an achievements key added to it. This is where the specific achievements are configured. The Achievements.vue component should access that config file on DOM load and populate the achievementStore.js vuex store. Saved achievements from previous sessions should be loaded and achievements accomplished during a session should be saved to localStorage.
+The remote lab config file should have an achievements key added to it. This is where the specific achievements are configured. 
+The Achievements.vue component should access that config file once it has been loaded and populate the achievementStore.js vuex store. 
+Saved achievements from previous sessions should be loaded and achievements accomplished during a session should be saved to localStorage.
+
+To enable tracking of achievements without having to add code to other components, like Logging, the achievements component must use the config file to add events to the appropriate components.
+
+### Achievements list
+
+- send driven command
+- send undriven command
+- send home command
+- send all commands
+- update frequency
+- record a dataset
+- download a dataset
+- download an image of the dynamics lab
+- plot a curve over your data
+- toggle dark mode
+- re-configure the UI
+- send 50 commands
+- download 10 datasets
+- complete a whole session

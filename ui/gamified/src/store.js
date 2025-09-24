@@ -6,6 +6,7 @@ import commandStore from './modules/commandStore.js'
 import chatStore from './modules/chatStore.js'
 import loggingStore from './modules/logging.js'
 import smoothieStore from './modules/smoothie.js'
+import achievementStore from './modules/achievementStore.js'
 
 const store = createStore({
     modules:{
@@ -15,7 +16,8 @@ const store = createStore({
         command: commandStore,
         chat: chatStore,
         logging: loggingStore,
-        smoothie: smoothieStore
+        smoothie: smoothieStore,
+        achievements: achievementStore
     }
 })
 

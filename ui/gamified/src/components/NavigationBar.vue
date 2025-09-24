@@ -39,6 +39,10 @@
                   </button>
               </li>
 
+              <li class="nav-item me-1">
+                <achievements id="achievements" />
+              </li>
+
             </ul>
 
       </div>
@@ -52,6 +56,7 @@
 import Clock from "./Clock.vue";
 import { mapGetters } from 'vuex';
 import ShowHardwareConfigButton from "./elements/ShowHardwareConfigButton.vue";
+import Achievements from "./Achievements.vue"
 
 export default {
 
@@ -64,7 +69,8 @@ export default {
   },
   components: {
     Clock,
-    ShowHardwareConfigButton
+    ShowHardwareConfigButton,
+    Achievements
   },
   computed:{
       ...mapGetters([
