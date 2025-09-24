@@ -4,6 +4,7 @@ The following user interfaces currently exist for the dynamics lab remote labora
 
 - [default](./default/) - default version of the user interface, with all features, but no logging of interactions.
 - [analytics](./analytics/) - same as the default version + logging of interactions for analytics.
+- [gamified](./gamified/) - analytics UI + gamified components for research on student interaction and engagement.
 
 The user interface utilises [Bootstrap](https://getbootstrap.com/) for responsive design, to support student interactions on any internet connected device, including mobile phones, tablets and desktops. 
 
