@@ -16,7 +16,7 @@
                 "density": "7850kg/m3"
              },
         "achievements": [
-        	{"name":"driven-command", "type": "click", "id": "update-driving-frequency-button", "title":"Start driving", "verbose":"Set your first driven frequency", "completed": false, "hidden": true},
+        	{"name":"driven-command", "type": "click", "id": "update-driving-frequency-button", "title":"Learner driver", "verbose":"Set your first driven frequency", "completed": true, "hidden": true},
         	{"name":"undriven-command", "type": "click", "id": "undriven-ping-button", "title":"First time pinger","verbose":"Ping the oscillator for the first time", "completed": false, "hidden": true},
         	{"name":"home-command", "type": "click", "id": "home-button", "title":"Home sweet home", "verbose":"Send the home position command", "completed": false, "hidden": true},
         	{"name":"command-all", "type": "click", "title":"Commander in chief", "verbose":"Send all hardware commands by clicking", "completed": false, "hidden": true, "fractional": [
@@ -31,7 +31,7 @@
 				{"name":"freq-step-positive-small", "id": "frequency-step-positive-001", "completed": false},
 				{"name":"freq-step-negative-small", "id": "frequency-step-negative-001", "completed": false}
             		], "required": 1, "n": 0},
-        	{"name":"record-click", "type": "click", "id":"record-data-button", "title":"Data collector", "verbose":"Record a dataset using the UI", "completed": false, "hidden": true},
+        	{"name":"record-click", "type": "click", "id":"record-data-button", "title":"Data collector", "verbose":"Record a dataset using the UI", "completed": true, "hidden": true},
         	{"name":"record-hotkey", "type": "hotkey", "hotkey": "o", "title":"Keyboard recorderist", "verbose":"Record data using the keyboard", "completed": false, "hidden": true},
         	{"name":"download-data", "type": "click", "id":"download-data-button", "title":"Offline analyst", "verbose":"Download a dataset", "completed": false, "hidden": true},
         	{"name":"download-image", "type": "click", "id":"download-image-webcam", "title":"One for the photo album", "verbose":"Download a picture of your experiment", "completed": false, "hidden": true},

@@ -6,10 +6,14 @@ This interface has the same core functionality as the analytics UI, but includes
 
 ### Completed
 
+
 ### ToDo
 
-- Achievements
+- Achievements - need to add localStorage and loading from localStorage
 - Interaction modes - game controller, touchscreen
+
+If time:
+
 - AR/Simulation - 3D CAD model of setup, support for AR or simply a model to interact with in the interface.
 - Circuit puzzle - need to correctly connect the pins on a simulated version of the control electronics before interaction can take place.
 - Group role UIs - different user interfaces that provide a single role to each user (e.g. controller, visualiser/validator (check when recording should take place), data gatherer)
@@ -86,6 +90,14 @@ Below is an example configuration file for setting the achievements. It contains
     }
 }
 ```
+
+## GamePad
+
+For haptic feedback likely want to use Chrome browser as it better supports the GamePad API.
+
+Gamepad for controlling experiment. 
+
+Haptic feedback on reaching large measured accelerations.
 
 # Development
 

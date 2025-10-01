@@ -59,20 +59,17 @@
                             <label :for="item.name" class="form-label">{{item.title}}</label>
                             <input class="form-check-input" type="checkbox" value="" :id="item.name" :checked='item.completed' disabled>
                             
-                            <!-- <button class="button-expand" @click="item.id">
+                            <button class="button-expand" type="button" data-bs-toggle="collapse" :data-bs-target="'#expand'+item.name" aria-expanded="false" aria-controls="collapseExample">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
                                     <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
                                 </svg>
                             </button>
-                            <a href="#Foo" class="btn btn-default" data-toggle="collapse">Toggle Foo</a>
-                            <button href="#Bar" class="btn btn-default" data-toggle="collapse">Toggle Bar</button>
-                            <div id="Foo" class="collapse">
-                                This div (Foo) is hidden by default
+                            
+                            <div class="collapse" :id="'expand'+item.name">
+                                <div :class="getDarkTheme ? 'card card-body text-dark' : 'card card-body text-dark'">
+                                    {{ item.verbose }}
+                                </div>
                             </div>
-                            <div id="Bar" class="collapse in">
-                                This div (Bar) is shown by default and can toggle
-                            </div> -->
-                            <!-- <label v-if="" :for="item.name" class="form-label">{{item.verbose}}</label> -->
                         </div>
                         <div v-else-if="!item.hidden" class='form-check'>
                             <label :for="item.name" class="form-label">{{item.title}}</label>
@@ -84,10 +81,7 @@
                             <input class="form-check-input" type="checkbox" value="" :id="item.name" :checked='item.completed' disabled>
                             <label v-if='"n" in item' :for="item.name" class="form-label"> {{ item.n }}/{{ item.required }} </label>
                         </div>
-
                     </div>
-
-                  
                 </div>
 
                 <div class="modal-footer">

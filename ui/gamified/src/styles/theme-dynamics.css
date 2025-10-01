@@ -205,6 +205,19 @@ body.dark-theme {
     top: 0; 
 }
 
+.button-xlg{
+    border: none;
+    border-radius: 8px;
+    padding: 8px 8px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 2rem;
+    margin: 8px 4px;
+    transition-duration: 0.2s;
+    cursor: pointer;
+}
+
 .button-lg{
     border: none;
     border-radius: 8px;
@@ -263,8 +276,35 @@ body.dark-theme {
     padding: 0px 0px;
 }
 
+.button-gamepad{
+    border: none;
+    border-radius: 4px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1rem;
+    margin: 0px 0px;
+    transition-duration: 0.2s;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    max-height: 40px;
+    max-width: 40px;
+    padding: 0px 0px;
+}
+
 .button-primary{
     background-color: var(--background-color-secondary);
+    color: var(--text-color);
+    border-width: 3px;
+    border-style: solid;
+    border-color: var(--button-color-primary);
+}
+
+.button-pressed{
+    background-color: greenyellow;
     color: var(--text-color);
     border-width: 3px;
     border-style: solid;

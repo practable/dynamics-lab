@@ -19,6 +19,10 @@
                 <div class='drop-area drop-area-two-fifths' id='drop_2_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><data-panel id='data-panel' /></div>
               </div>
 
+            <div class='d-flex' id='third-row'>
+                <div class='drop-area drop-area-full' id='drop_0_2' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><gamepad id='gamepad' /></div>
+             </div>
+
         </div>
 
         <div v-else class='d-flex flex-column' id='component-grid'>
@@ -46,6 +50,7 @@ import ControlPanel from "./components/ControlPanel.vue";
 import DataRecorder from "./components/DataRecorder.vue"
 import Graph from "./components/Graph.vue"
 import DataPanel from "./components/DataPanel.vue";
+import Gamepad from "./components/Gamepad.vue";
 
 import { mapGetters } from 'vuex'
 
@@ -60,7 +65,8 @@ export default {
     ControlPanel,
     DataRecorder,
     Graph,
-    DataPanel
+    DataPanel,
+    Gamepad
 
   },
   mounted(){
