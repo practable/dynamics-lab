@@ -160,4 +160,8 @@ export default {
   opacity: 0;
 }
 
+button > svg {
+  pointer-events: none;
+}
+
 </style>

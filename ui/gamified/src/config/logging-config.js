@@ -26,7 +26,8 @@ const config = {
       'n',
       'x',
       'o',
-      'p'
+      'p',
+      'h'
 
     ],
     // If you include an object below, it will be sent on an interval

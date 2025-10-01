@@ -16,10 +16,42 @@
                 "density": "7850kg/m3"
              },
         "achievements": [
-        	{"name":"survey-response", "type": "input", "id": "survey-input", "verbose":"Respond to a survey question", "completed": false, "hidden": false},
-            {"name":"custom-ui", "type": "drop", "id": "", "verbose":"Customise the UI", "completed": true, "hidden": true},
-            {"name":"multiple-runs", "type": "click", "id": "update-driving-frequency-button", "verbose":"Run a step or ramp 10 times", "completed": false, "hidden": true, "required": 10, "n": 0},
-            {"name":"plot-graph", "type": "click", "id": "plotFunctionButton", "verbose":"Plot a linear graph", "completed": false, "hidden": true}
+        	{"name":"driven-command", "type": "click", "id": "update-driving-frequency-button", "title":"Start driving", "verbose":"Set your first driven frequency", "completed": false, "hidden": true},
+        	{"name":"undriven-command", "type": "click", "id": "undriven-ping-button", "title":"First time pinger","verbose":"Ping the oscillator for the first time", "completed": false, "hidden": true},
+        	{"name":"home-command", "type": "click", "id": "home-button", "title":"Home sweet home", "verbose":"Send the home position command", "completed": false, "hidden": true},
+        	{"name":"command-all", "type": "click", "title":"Commander in chief", "verbose":"Send all hardware commands by clicking", "completed": false, "hidden": true, "fractional": [
+				{"name":"driven-command-all", "id": "update-driving-frequency-button", "completed": false},
+				{"name":"undriven-command-all", "id": "undriven-ping-button", "completed": false},
+				{"name":"home-command-all", "id": "home-button", "completed": false},
+				{"name":"stop-command-all", "id": "driven-stop-button", "completed": false}
+            		], "required": 4, "n": 0},
+            	{"name":"update-frequency", "type": "click", "title":"Tuning the frequency", "verbose":"Update the driven frequency", "completed": false, "hidden": true, "fractional": [
+				{"name":"freq-step-positive-big", "id": "frequency-step-positive-01", "completed": false},
+				{"name":"freq-step-negative-big", "id": "frequency-step-negative-01", "completed": false},
+				{"name":"freq-step-positive-small", "id": "frequency-step-positive-001", "completed": false},
+				{"name":"freq-step-negative-small", "id": "frequency-step-negative-001", "completed": false}
+            		], "required": 1, "n": 0},
+        	{"name":"record-click", "type": "click", "id":"record-data-button", "title":"Data collector", "verbose":"Record a dataset using the UI", "completed": false, "hidden": true},
+        	{"name":"record-hotkey", "type": "hotkey", "hotkey": "o", "title":"Keyboard recorderist", "verbose":"Record data using the keyboard", "completed": false, "hidden": true},
+        	{"name":"download-data", "type": "click", "id":"download-data-button", "title":"Offline analyst", "verbose":"Download a dataset", "completed": false, "hidden": true},
+        	{"name":"download-image", "type": "click", "id":"download-image-webcam", "title":"One for the photo album", "verbose":"Download a picture of your experiment", "completed": false, "hidden": true},
+        	{"name":"plot-graph", "type": "click", "id": "plotFunctionButton", "title":"Online analyst", "verbose":"Plot a curve over your dataset", "completed": false, "hidden": true},
+        	{"name":"toggle-theme", "type": "click", "id": "toggle-theme-button", "title":"Turn to the dark side!", "verbose":"Toggle the dark theme", "completed": false, "hidden": true},
+        	{"name":"multiple-runs", "type": "click", "id": "update-driving-frequency-button", "title":"You've had a good run.", "verbose":"Run driven mode 50 times", "completed": false, "hidden": true, "required": 50, "n": 0},
+        	{"name":"multiple-downloads", "type": "click", "id":"download-data-button", "title":"Data hoarder!", "verbose":"Download datasets 10 times", "completed": false, "hidden": true, "required": 10, "n":0},
+        	
+        	{"name":"command-keyboard", "type": "hotkey", "title":"Keyboard warrior", "verbose":"Send all hardware commands using the keyboard", "completed": false, "hidden": true, "fractional": [
+				{"name":"undriven-keyboard", "hotkey": "n", "completed": false},
+				{"name":"driven-keyboard", "hotkey": "r", "completed": false},
+				{"name":"home-keyboard", "hotkey": "h", "completed": false},
+				{"name":"stop-keyboard", "hotkey": "s", "completed": false}
+            		], "required": 4, "n": 0},
+            	{"name":"info-hoarder", "type": "click", "title":"Information overload!", "verbose":"Read all information popups", "completed": false, "hidden": true, "fractional": [
+				{"name":"streams-info", "id": "popup-help-streams-button", "completed": false},
+				{"name":"graph-info", "id": "popup-help-graph-button", "completed": false},
+				{"name":"control-info", "id": "popup-help-control-panel-button", "completed": false},
+				{"name":"recorder-info", "id": "popup-help-data-recorder-button", "completed": false}
+            		], "required": 4, "n": 0}
         ]
     }
 }
