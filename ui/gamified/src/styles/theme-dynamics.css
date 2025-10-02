@@ -76,6 +76,7 @@ body.dark-theme {
 
     #third-row{
         overflow: auto;
+        height: 50dvh;
         max-height: 100dvh;
         min-height: 20dvh;
         max-width: 100dvw;
@@ -276,7 +277,7 @@ body.dark-theme {
     padding: 0px 0px;
 }
 
-.button-gamepad{
+.button-gamepad-temp{
     border: none;
     border-radius: 4px;
     text-align: center;
@@ -295,16 +296,21 @@ body.dark-theme {
     padding: 0px 0px;
 }
 
-.button-primary{
-    background-color: var(--background-color-secondary);
+.button-pressed{
+    background-color: greenyellow;
     color: var(--text-color);
     border-width: 3px;
     border-style: solid;
     border-color: var(--button-color-primary);
 }
 
-.button-pressed{
+.button-gamepad-pressed{
     background-color: greenyellow;
+    color: var(--text-color);
+}
+
+.button-primary{
+    background-color: var(--background-color-secondary);
     color: var(--text-color);
     border-width: 3px;
     border-style: solid;

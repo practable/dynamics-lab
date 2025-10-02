@@ -99,9 +99,18 @@ Gamepad for controlling experiment.
 
 Haptic feedback on reaching large measured accelerations.
 
+
+
 # Development
 
 During development use:
 
 http://localhost:5173?config=./dev-config/dyna00-1.0.json 
 
+# Attribution
+
+The icons used on this version of the user interface are predominantly from the Bootstrap Icons open source SVG icon library.
+
+The Xbox [LT](https://commons.wikimedia.org/wiki/File:Xbox_LT_trigger.svg) and [RT](https://commons.wikimedia.org/wiki/File:Xbox_RT_trigger.svg) icons: Credit to user Mliu92 from Wikimedia.
+
+The Xbox [A](https://commons.wikimedia.org/wiki/File:Xbox_button_A.svg), [X](https://commons.wikimedia.org/wiki/File:Xbox_button_X.svg), [B](https://commons.wikimedia.org/wiki/File:Xbox_button_B.svg) and [Y](https://commons.wikimedia.org/wiki/File:Xbox_button_Y.svg) icons credit to Wikimedia user Pduive.
