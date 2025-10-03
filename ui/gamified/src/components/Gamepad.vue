@@ -46,6 +46,20 @@
             </menu>
 
         </div>
+
+        <div id="driveModePopup" class="drive-mode-popup">
+            <a class="floating-btn">
+                <!-- <img src="/images/Xbox_LT_trigger.svg" alt="LT trigger button" width="35" height="35"> -->
+            </a>
+
+            <menu class="items-wrapper">
+                <a href="#" v-show="getCurrentMode == 'driven'" class="menu-item" id="set_frequency_text_gamepad"><label id="driving-frequency-slider-label-gamepad" for="driving-frequency-slider-gampad">Set to: {{ driving_frequency.toFixed(2) }}Hz</label></a>
+                <a href="#" v-show="getCurrentMode == 'driven'" class="menu-item" id="read_frequency_text_gamepad"><label id="driving-frequency-slider-label-gamepad" for="driving-frequency-slider-gamepad">Current: {{ getReportedDrivingFrequencyHz.toFixed(2) }}Hz</label></a>
+                <a href="#" v-show="getCurrentMode == 'driven'" class="menu-item" id="frequency_slider_input_gamepad"><input class="" type="range" :min="getDrivingFrequencyMin" :max="getDrivingFrequencyMax" :step="getDrivingFrequencyStep" v-model="driving_frequency" id="driving-frequency-slider-gamepad"></a>
+            </menu>
+
+        </div>
+
     </div>
     
 
@@ -264,19 +278,28 @@ function cancelHapticResponse(gamepad, buttonsCache, buttonIndex){
 }
 
 function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
+    //left trigger pressed
     if(buttonIndex == 6){
         document.getElementById('circularMenu1').classList.add('active');
+        //if in driven mode then also make the drive mode popup active
+        if(window.gamepadComponent.getCurrentMode == 'driven' && !buttonsCache[buttonIndex].pressed){
+            document.getElementById('driveModePopup').classList.add('active');
+        }
         document.getElementById('circularMenu').classList.remove('active');
-        selectedMode = -1;   //LT
+        selectedMode = -1;
+    //right trigger pressed
     } else if(buttonIndex == 7){
         document.getElementById('circularMenu1').classList.remove('active');
+        document.getElementById('driveModePopup').classList.remove('active');
         document.getElementById('circularMenu').classList.add('active');
-        selectedMode = 1;   //RT
+        selectedMode = 1;
     } 
+    //menu button closes all
     else if(buttonIndex == 16){
         document.getElementById('circularMenu1').classList.remove('active');
+        document.getElementById('driveModePopup').classList.remove('active');
         document.getElementById('circularMenu').classList.remove('active');
-        selectedMode = 0;   //no trigger
+        selectedMode = 0;
     } 
     else if(buttonIndex == 0){
         //A button pressed
@@ -299,6 +322,7 @@ function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
         //Y button pressed
         if(selectedMode == -1){
             document.getElementById('LT_Y_Button').classList.add('active');
+            document.getElementById('driveModePopup').classList.add('active');  //additional popup menu for drive mode
             document.getElementById('LT_A_Button_text').innerText = 'Run';
             document.getElementById('LT_X_Button_text').innerText = 'Stop';
             document.getElementById('LT_Y_Button_text').innerText = '';
@@ -321,6 +345,11 @@ function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
                 document.getElementById('circularMenu1').classList.remove('active');
                 document.getElementById('circularMenu').classList.remove('active');
                 selectedMode = 0;   //no trigger
+            }
+
+            //if in drive mode then the additional drive popup should be deactivated
+            if(window.gamepadComponent.getCurrentMode == 'driven' && !buttonsCache[buttonIndex].pressed){
+                document.getElementById('driveModePopup').classList.remove('active');
             }
             
         } else if(selectedMode == 1){
@@ -907,5 +936,110 @@ created(){
   /* transform: translate3d(7em,1em,0); */
   transform: translate3d(10em,1em,0);
 }
+
+/**
+ * Driven mode parameters popup
+ */
+
+.drive-mode-popup {
+  position: fixed;
+  bottom: -1em;
+  right: auto; 
+  left: -1em;
+}
+
+/* .drive-mode-popup .floating-btn {
+  display: none;
+  width: 3.5em;
+  height: 3.5em;
+  border-radius: 50%;
+  background-color: hsl(4, 98%, 60%);
+  box-shadow: 0 2px 5px 0 hsla(0, 0%, 0%, .26);  
+  color: hsl(0, 0%, 100%);
+  text-align: center;
+  line-height: 3.9;
+  cursor: pointer;
+  outline: 0;
+}
+
+.drive-mode-popup.active .floating-btn {
+  box-shadow: inset 0 0 3px hsla(0, 0%, 0%, .3);
+}
+
+.drive-mode-popup .floating-btn:active {
+  box-shadow: 0 4px 8px 0 hsla(0, 0%, 0%, .4);
+} */
+
+.drive-mode-popup:after {
+  display: block;
+  content: ' ';
+  width: 3.5em;
+  height: 3.5em;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: -2;
+  background-color: hsl(4, 98%, 60%);
+  transition: all .3s ease;
+}
+
+.drive-mode-popup.active:after {
+  transform: translate3d(19em,-12.5em,0) scale3d(4, 4, 1);
+  transition-timing-function: cubic-bezier(.68, 1.55, .265, 1);
+}
+
+.drive-mode-popup .items-wrapper {
+  padding: 0;
+  margin: 0;
+}
+
+.drive-mode-popup .menu-item {
+  position: absolute;
+  top: .2em;
+  right: .2em;
+  z-index: -1;
+  display: block;
+  text-decoration: none;
+  color: hsl(0, 0%, 100%);
+  font-size: 1em;
+  width: 3em;
+  height: 3em;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 3;
+  background-color: hsla(0, 0%, 0%, 0);
+  transition: transform .3s ease, background .2s ease;
+}
+/* .drive-mode-popup .menu-item.active {
+  background-color: hsl(120, 100%, 50%);
+  transition: background-color 1000ms linear;
+}
+
+.drive-mode-popup .menu-item:hover {
+  background-color: hsla(0,0%,0%,.3);
+} */
+
+.drive-mode-popup.active .menu-item {
+  transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.drive-mode-popup.active .menu-item:nth-child(1) {
+  /* transform: translate3d(1em,-7em,0); */
+  transform: translate3d(17em,-16em,0);
+  
+}
+
+.drive-mode-popup.active .menu-item:nth-child(2) {
+    transform: translate3d(21em,-16em,0);
+}
+
+.drive-mode-popup.active .menu-item:nth-child(3) {
+    transform: translate3d(17em,-10em,0);
+}
+
+/* .drive-mode-popup.active .menu-item:nth-child(4) {
+  transform: translate3d(-6.5em,1em,0);
+} */
 
 </style>

@@ -97,7 +97,8 @@
 <script>
 import { mapGetters } from 'vuex';
 import { mapActions } from 'vuex';
-import config from '../config/logging-config'
+//import config from '../config/logging-config'
+import achievements from '../config/achievement-config.json';
 
 export default {
     name: 'Achievements',
@@ -118,7 +119,7 @@ export default {
                 this.handleHotkeyPress(event);
             });
         
-
+        this.getAchievementsFromConfig(achievements);   //get the achievements from config file in config folder not from remote config file
 
     },
     computed:{
@@ -164,12 +165,12 @@ export default {
         }
     },
     watch:{
-        getConfigJSON(config){
-            this.getAchievementsFromConfig(config);   //get the achievements from config file
-            //this.loadAchievements();                    //load any saved achievements from localStorage
+        // getConfigJSON(config){
+        //     this.getAchievementsFromConfig(config);   //get the achievements from config file
+        //     //this.loadAchievements();                    //load any saved achievements from localStorage
 
             
-        },
+        // },
         getSessionExpired(expired){
           if(expired){
             //create a session expired achievement

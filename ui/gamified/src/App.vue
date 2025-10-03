@@ -14,9 +14,9 @@
             </div>
 
             <div class='d-flex' id='second-row'>
-                <div class='drop-area drop-area-two-fifths' id='drop_0_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><control-panel id='control-panel' :url="getDataURL"/></div>
-                <div class='drop-area drop-area-one-fifth' id='drop_1_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><data-recorder v-if='isDataRecorderOn' id='data-recorder' /></div>
-                <div class='drop-area drop-area-two-fifths' id='drop_2_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><data-panel id='data-panel' /></div>
+                <div v-show="!getControlPadConnected" class='drop-area drop-area-two-fifths' id='drop_0_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><control-panel id='control-panel' :url="getDataURL"/></div>
+                <div v-show="!getControlPadConnected" class='drop-area drop-area-one-fifth' id='drop_1_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><data-recorder v-if='isDataRecorderOn' id='data-recorder' /></div>
+                <div :class="getControlPadConnected ? 'drop-area drop-area-full': 'drop-area drop-area-two-fifths'" id='drop_2_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><data-panel id='data-panel' /></div>
               </div>
 
             <div class='d-flex' id='third-row'>
@@ -89,7 +89,8 @@ export default {
       'getDraggable',
       'getUsesLocalStorage',
       'getIsLoggingOn',
-      'getDataURL'
+      'getDataURL',
+      'getControlPadConnected'
     ]),
     isMobile(){
       if(window.screen.width < 992){

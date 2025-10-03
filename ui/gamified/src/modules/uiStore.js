@@ -6,7 +6,8 @@ const uiStore = {
        isDraggable: true,
        usesLocalStorage: false,        //can only use localStorage if the browser allows it.
        config_json: '',  
-       darkTheme: document.body.classList.contains('dark-theme') ? true : false
+       darkTheme: document.body.classList.contains('dark-theme') ? true : false,
+       controlPadConnected: true,
        }),
        mutations:{
          SET_DRAGGABLE(state, draggable){
@@ -21,6 +22,9 @@ const uiStore = {
          SET_CONFIG_JSON(state, json){
             state.config_json = json;
          },
+         SET_CONTROL_PAD_CONNECTED(state, set){
+            state.controlPadConnected = set;
+         }
          
 
        },
@@ -37,6 +41,9 @@ const uiStore = {
          setConfigJSON(context, json){
             context.commit('SET_CONFIG_JSON', json);
          },
+         setControlPadConnected(context, set){
+            context.commit('SET_CONTROL_PAD_CONNECTED', set);
+         }
 
 
        },
@@ -52,7 +59,10 @@ const uiStore = {
          },
         getConfigJSON(state){
          return state.config_json;
-      },
+         },
+         getControlPadConnected(state){
+            return state.controlPadConnected;
+         }
          
          
        },  
