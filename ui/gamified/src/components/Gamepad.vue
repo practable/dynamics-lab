@@ -560,8 +560,8 @@ function doHapticUpdateBasedOnHardwareState(){
                     gamepad.vibrationActuator.playEffect("dual-rumble", {
                     startDelay: 0,
                     duration: 200,
-                    weakMagnitude: Math.min(window.gamepadComponent.getCurrentAcceleration.x/window.gamepadComponent.maxVibrationAcceleration, 1.0),
-                    strongMagnitude: Math.min(window.gamepadComponent.getCurrentAcceleration.x/window.gamepadComponent.maxVibrationAcceleration, 1.0),
+                    weakMagnitude: Math.min(window.gamepadComponent.getCurrentAcceleration.x[0]/window.gamepadComponent.maxVibrationAcceleration, 1.0),
+                    strongMagnitude: Math.min(window.gamepadComponent.getCurrentAcceleration.x[0]/window.gamepadComponent.maxVibrationAcceleration, 1.0),
                 });
             } else if(gamepad.hapticActuators){
                 //firefox, but no hapticActuators are registered with the control I am using
