@@ -58,7 +58,7 @@ body.dark-theme {
 @media only screen and (min-width: 992px){
     #first-row{
         overflow: auto;
-        height: 65dvh;
+        height: 67.5dvh;
         max-height: 100dvh;
         min-height: 20dvh;
         max-width: 100dvw;
@@ -67,7 +67,7 @@ body.dark-theme {
 
     #second-row{
         overflow: auto;
-        height: 27.5dvh;
+        height: 25dvh;
         max-height: 100dvh;
         min-height: 20dvh;
         max-width: 100dvw;
@@ -76,7 +76,7 @@ body.dark-theme {
 
     #third-row{
         overflow: auto;
-        height: 50dvh;
+        height: 20dvh;
         max-height: 100dvh;
         min-height: 20dvh;
         max-width: 100dvw;

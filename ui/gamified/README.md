@@ -6,14 +6,10 @@ This interface has the same core functionality as the analytics UI, but includes
 
 ### Completed
 
-
 ### ToDo
 
-- Achievements - need to add localStorage and loading from localStorage
+- Achievements
 - Interaction modes - game controller, touchscreen
-
-If time:
-
 - AR/Simulation - 3D CAD model of setup, support for AR or simply a model to interact with in the interface.
 - Circuit puzzle - need to correctly connect the pins on a simulated version of the control electronics before interaction can take place.
 - Group role UIs - different user interfaces that provide a single role to each user (e.g. controller, visualiser/validator (check when recording should take place), data gatherer)
@@ -27,7 +23,7 @@ Hidden achievements added to the user experience in much the same way as achieve
 
 Like Logging, this component should be added to the UI without the need to make any changes to other components - except adding the HTML component to the appropriate location (e.g. to the navigation bar for achievements).
 
-The remote lab config file should have an achievements key added to it. This is where the specific achievements are configured. 
+Achievements are configured much like logging, with an achievements-config file located in the config directory. 
 The Achievements.vue component should access that config file once it has been loaded and populate the achievementStore.js vuex store. 
 Saved achievements from previous sessions should be loaded and achievements accomplished during a session should be saved to localStorage.
 
@@ -91,26 +87,3 @@ Below is an example configuration file for setting the achievements. It contains
 }
 ```
 
-## GamePad
-
-For haptic feedback likely want to use Chrome browser as it better supports the GamePad API.
-
-Gamepad for controlling experiment. 
-
-Haptic feedback on reaching large measured accelerations.
-
-
-
-# Development
-
-During development use:
-
-http://localhost:5173?config=./dev-config/dyna00-1.0.json 
-
-# Attribution
-
-The icons used on this version of the user interface are predominantly from the Bootstrap Icons open source SVG icon library.
-
-The Xbox [LT](https://commons.wikimedia.org/wiki/File:Xbox_LT_trigger.svg) and [RT](https://commons.wikimedia.org/wiki/File:Xbox_RT_trigger.svg) icons: Credit to user Mliu92 from Wikimedia.
-
-The Xbox [A](https://commons.wikimedia.org/wiki/File:Xbox_button_A.svg), [X](https://commons.wikimedia.org/wiki/File:Xbox_button_X.svg), [B](https://commons.wikimedia.org/wiki/File:Xbox_button_B.svg) and [Y](https://commons.wikimedia.org/wiki/File:Xbox_button_Y.svg) icons credit to Wikimedia user Pduive.

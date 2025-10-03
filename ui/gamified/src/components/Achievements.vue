@@ -97,7 +97,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { mapActions } from 'vuex';
-//import config from '../config/logging-config'
+import config from '../config/logging-config';
 import achievements from '../config/achievement-config.json';
 
 export default {

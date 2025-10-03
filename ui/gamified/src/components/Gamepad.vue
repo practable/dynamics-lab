@@ -1,12 +1,7 @@
 <template>
     <div class="d-flex flex-column">
-        <div class="d-flex" id="gamepadInfo" ref="gamepadInfo">
+        <!-- <div class="d-flex" id="gamepadInfo" ref="gamepadInfo">
 
-        </div>
-
-        <!-- <div class="d-flex" id="gampadDisplay" ref="gamepadDisplay">
-            <button class="button-xlg button-primary" id="leftTriggerPressedAlert" hidden="true">Left trigger</button>
-            <button class="button-xlg button-primary" id="rightTriggerPressedAlert" hidden="true">Right trigger</button>
         </div> -->
 
         <div id="circularMenu" class="circular-menu">
@@ -74,7 +69,7 @@ let loopStarted = false;
 let selectedMode = 0;       //LT = -1, RT = 1, unselected = 0
 let buttonsCache = []       //stores previous state of each button
 
-function addGamepad(gamepad, infoElement) {
+function addGamePadWithAllButtons(gamepad, infoElement) {
   const d = document.createElement("div");
   d.setAttribute("id", `controller${gamepad.index}`);
 
@@ -121,13 +116,23 @@ function addGamepad(gamepad, infoElement) {
   }
 }
 
+function addGamepad(gamepad, infoElement) {
+  
+
+    if (!loopStarted) {
+        requestAnimationFrame(updateStatus);
+        loopStarted = true;
+    }
+  
+}
+
 function removeGamepad(gamepad) {
   document.querySelector(`#controller${gamepad.index}`).remove();
 }
 
 function updateStatus() {
 
-    doUpdateOfTempButtons();
+    //doUpdateOfTempButtons();
     doUpdateOfGamePadButtons();
 
     doHapticUpdateBasedOnHardwareState();
@@ -595,7 +600,9 @@ created(){
     window.addEventListener("DOMContentLoaded", (event) => {
         window.addEventListener("gamepadconnected", (evt) => {
             // console.log(this.$refs.gamepadInfo);
+            //addGamePadWithAllButtons(evt.gamepad, this.$refs.gamepadInfo);  //shows all available buttons and responds on button presses
             addGamepad(evt.gamepad, this.$refs.gamepadInfo);
+
             buttonsCache = evt.gamepad.buttons;     //initialise the buttonCache
             //console.log(buttonsCache)
         });

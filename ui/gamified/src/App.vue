@@ -9,8 +9,8 @@
         <div v-if='!isMobile' class='row' id='component-grid'>
 
             <div class='d-flex' id='first-row'>
-                <div class='drop-area drop-area-one-third' id='drop_0_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><webcam-stream id='webcam-stream' /></div>
-                <div class='drop-area drop-area-two-thirds' id='drop_1_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><graph v-if='isGraphOn' id='graph' /></div>
+                <div class='drop-area drop-area-two-fifths' id='drop_0_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><webcam-stream id='webcam-stream' /></div>
+                <div class='drop-area drop-area-three-fifths' id='drop_1_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><graph v-if='isGraphOn' id='graph' /></div>
             </div>
 
             <div class='d-flex' id='second-row'>
