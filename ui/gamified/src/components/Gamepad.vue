@@ -585,7 +585,7 @@ export default {
   name: 'Gamepad',
   data () {
     return {
-        maxVibrationAcceleration: 4,
+        maxVibrationAcceleration: 2,
     }
   },
   components: {
