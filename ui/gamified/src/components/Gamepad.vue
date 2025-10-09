@@ -456,6 +456,26 @@ function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
             selectedMode = 0;   //no trigger
         }
     }
+    //D-pad up
+    else if(buttonIndex == 12 && !buttonsCache[buttonIndex].pressed){
+      let activeElement = document.activeElement;
+      if(activeElement.tagName.toLowerCase() == 'input'){
+        if(activeElement.type == 'number'){
+          activeElement.valueAsNumber += 1; 
+          activeElement.dispatchEvent(new Event('input')); 
+        }
+      }
+    }
+    //d-pad down
+    else if(buttonIndex == 13 && !buttonsCache[buttonIndex].pressed){
+      let activeElement = document.activeElement;
+      if(activeElement.tagName.toLowerCase() == 'input'){
+        if(activeElement.type == 'number'){
+          activeElement.valueAsNumber -= 1; 
+          activeElement.dispatchEvent(new Event('input'));
+        }
+      }
+    }
    
     // else{
     //     // this.leftTriggerPressed = false;

@@ -28,6 +28,19 @@
                 </li>
 
               <li class="nav-item me-1">
+                <popup-controller-layout id="controller-layout">
+                  <template v-slot:header>
+                    <h5> Controller layout </h5>
+                  </template>
+
+                  <template v-slot:body>
+                          <img id='controller-layout-image' src='/images/xbox_control_layout_dynamics.png' alt='controller layout' width="100%">
+                    </template>
+
+                </popup-controller-layout>
+              </li>
+
+              <li class="nav-item me-1">
                 <show-hardware-config-button />
               </li>
   
@@ -57,6 +70,7 @@ import Clock from "./Clock.vue";
 import { mapGetters } from 'vuex';
 import ShowHardwareConfigButton from "./elements/ShowHardwareConfigButton.vue";
 import Achievements from "./Achievements.vue"
+import PopupControllerLayout from "./elements/PopupControllerLayout.vue";
 
 export default {
 
@@ -70,7 +84,8 @@ export default {
   components: {
     Clock,
     ShowHardwareConfigButton,
-    Achievements
+    Achievements,
+    PopupControllerLayout
   },
   computed:{
       ...mapGetters([
