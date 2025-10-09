@@ -1,8 +1,8 @@
 <template>
     <div class="d-flex flex-column">
-        <!-- <div class="d-flex" id="gamepadInfo" ref="gamepadInfo">
+        <div class="d-flex" id="gamepadInfo" ref="gamepadInfo">
 
-        </div> -->
+        </div>
 
         <div id="circularMenu" class="circular-menu">
             <a class="floating-btn" onclick="document.getElementById('circularMenu').classList.toggle('active');">
@@ -132,7 +132,7 @@ function removeGamepad(gamepad) {
 
 function updateStatus() {
 
-    //doUpdateOfTempButtons();
+    doUpdateOfTempButtons();
     doUpdateOfGamePadButtons();
 
     doHapticUpdateBasedOnHardwareState();
@@ -282,6 +282,86 @@ function cancelHapticResponse(gamepad, buttonsCache, buttonIndex){
     return
 }
 
+//from https://thecodersblog.com/simulating-tab-enter-key-press-events-browser-console
+//reverse = true will cycle backwards through tabs
+function simulateTab(reverse = false) {
+  const event = new KeyboardEvent("keydown", {
+    key: "Tab",
+    code: "Tab",
+    keyCode: 9,
+    shiftKey: reverse, // Shift+Tab for reverse navigation
+    bubbles: true,
+    cancelable: true
+  });
+
+  document.activeElement.dispatchEvent(event);
+
+  // If default behavior wasn't prevented, manually move focus
+  if (!event.defaultPrevented) {
+    const focusableElements = Array.from(
+      document.querySelectorAll(
+        'button, input, select, [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter((el) => !el.disabled && el.offsetParent !== null);
+
+    const currentIndex = focusableElements.indexOf(document.activeElement);
+    const nextIndex = reverse
+      ? (currentIndex - 1 + focusableElements.length) % focusableElements.length
+      : (currentIndex + 1) % focusableElements.length;
+
+    focusableElements[nextIndex].focus();
+  }
+}
+
+//from https://thecodersblog.com/simulating-tab-enter-key-press-events-browser-console
+// Intelligent Enter simulation that considers context
+function simulateEnter(targetElement = document.activeElement) {
+  const event = new KeyboardEvent("keydown", {
+    key: "Enter",
+    code: "Enter",
+    keyCode: 13,
+    bubbles: true,
+    cancelable: true
+  });
+
+  targetElement.dispatchEvent(event);
+
+  // Handle specific element types if default behavior wasn't triggered
+  if (!event.defaultPrevented) {
+    const tagName = targetElement.tagName.toLowerCase();
+    const type = targetElement.type?.toLowerCase();
+
+    switch (tagName) {
+      case "button":
+        targetElement.click();
+        break;
+      case "input":
+        if (type === "submit") {
+          targetElement.click();
+        } else if (type === "text" || type === "email" || type === "password") {
+          // Find and submit parent form
+          const form = targetElement.closest("form");
+          if (form) {
+            const submitButton = form.querySelector(
+              'input[type="submit"], button[type="submit"]'
+            );
+            if (submitButton) {
+              submitButton.click();
+            } else {
+              form.submit();
+            }
+          }
+        }
+        break;
+      case "a":
+        if (targetElement.href) {
+          targetElement.click();
+        }
+        break;
+    }
+  }
+}
+
 function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
     //left trigger pressed
     if(buttonIndex == 6){
@@ -299,6 +379,14 @@ function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
         document.getElementById('circularMenu').classList.add('active');
         selectedMode = 1;
     } 
+    //left bumper should act as a forward tab for navigation
+    else if(buttonIndex == 4 && !buttonsCache[buttonIndex].pressed){
+      simulateTab(true);
+    }
+    //right bumper should act as a backward tab for navigation
+    else if(buttonIndex == 5 && !buttonsCache[buttonIndex].pressed){
+      simulateTab();
+    }
     //menu button closes all
     else if(buttonIndex == 16){
         document.getElementById('circularMenu1').classList.remove('active');
@@ -312,6 +400,10 @@ function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
             document.getElementById('LT_A_Button').classList.add('active');
         } else if(selectedMode == 1){
             document.getElementById('RT_A_Button').classList.add('active');
+        } 
+        //else simulate pressing enter
+        else if(!buttonsCache[buttonIndex].pressed){
+          simulateEnter();
         }
     }
     else if(buttonIndex == 2){
@@ -561,13 +653,24 @@ function doHapticUpdateBasedOnHardwareState(){
 
             //only do this if an acceleration value actually exists
             if(gamepad.vibrationActuator && 'x' in window.gamepadComponent.getCurrentAcceleration){
-                //widely supported but not firefox and perhaps not safari
+              if(window.gamepadComponent.getCurrentMode != 'driven'){
+                  //widely supported but not firefox and perhaps not safari
+                    gamepad.vibrationActuator.playEffect("dual-rumble", {
+                    startDelay: 0,
+                    duration: 100,
+                    weakMagnitude: Math.min(window.gamepadComponent.getCurrentAcceleration.x[0]/window.gamepadComponent.maxVibrationAcceleration_driven, 1.0),
+                    strongMagnitude: Math.min(window.gamepadComponent.getCurrentAcceleration.x[0]/window.gamepadComponent.maxVibrationAcceleration_driven, 1.0),
+                });
+              } else if(window.gamepadComponent.getCurrentMode != 'undriven'){
+                  //widely supported but not firefox and perhaps not safari
                     gamepad.vibrationActuator.playEffect("dual-rumble", {
                     startDelay: 0,
                     duration: 200,
-                    weakMagnitude: Math.min(window.gamepadComponent.getCurrentAcceleration.x[0]/window.gamepadComponent.maxVibrationAcceleration, 1.0),
-                    strongMagnitude: Math.min(window.gamepadComponent.getCurrentAcceleration.x[0]/window.gamepadComponent.maxVibrationAcceleration, 1.0),
+                    weakMagnitude: Math.min(window.gamepadComponent.getCurrentAcceleration.x[0]/window.gamepadComponent.maxVibrationAcceleration_undriven, 1.0),
+                    strongMagnitude: Math.min(window.gamepadComponent.getCurrentAcceleration.x[0]/window.gamepadComponent.maxVibrationAcceleration_undriven, 1.0),
                 });
+              }
+                
             } else if(gamepad.hapticActuators){
                 //firefox, but no hapticActuators are registered with the control I am using
                 for(const actuator of gamepad.hapticActuators){
@@ -585,7 +688,8 @@ export default {
   name: 'Gamepad',
   data () {
     return {
-        maxVibrationAcceleration: 2,
+        maxVibrationAcceleration_undriven: 2,
+        maxVibrationAcceleration_driven: 0.5,
     }
   },
   components: {
@@ -600,8 +704,8 @@ created(){
     window.addEventListener("DOMContentLoaded", (event) => {
         window.addEventListener("gamepadconnected", (evt) => {
             // console.log(this.$refs.gamepadInfo);
-            //addGamePadWithAllButtons(evt.gamepad, this.$refs.gamepadInfo);  //shows all available buttons and responds on button presses
-            addGamepad(evt.gamepad, this.$refs.gamepadInfo);
+            addGamePadWithAllButtons(evt.gamepad, this.$refs.gamepadInfo);  //shows all available buttons and responds on button presses
+            //addGamepad(evt.gamepad, this.$refs.gamepadInfo);
 
             buttonsCache = evt.gamepad.buttons;     //initialise the buttonCache
             //console.log(buttonsCache)
