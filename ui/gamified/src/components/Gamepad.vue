@@ -67,9 +67,152 @@ import config from '../config/logging-config';
 
 let loopStarted = false;
 let selectedMode = 0;       //LT = -1, RT = 1, unselected = 0
-let buttonsCache = []       //stores previous state of each button
+let buttonsCache = {}       //stores previous state of each button for each gamepad {0:[buttonsCache]}
+let axesCache = {}       //stores previous state of each axis for each gamepad {0:[axisCache]}
+
+function getGamepadButtonMapping(gamepad_id, button_string){
+  /**
+   * Returns the mapped button int depending on the type of gamepad. Only gamepads defined below will work and defined on Google Chrome browser only.
+   * gamepad_id (string): the id of the gamepad connected, this is the same for multiples of the same gamepad. 
+   *      Standard Xbox 360 control on Chrome - "©Microsoft Corporation Controller (STANDARD GAMEPAD Vendor: 045e Product: 028e)"
+   *      Power A Xbox one controller on Chrome - "PowerA Xbox Series X Wired Controller Black (Vendor: 20d6 Product: 2062)"
+   * button_string (string): Xbox style button string - A, B, X, Y, RT, LT, RB, LB, D-Left, D-Right, D-Up, D-Down, Start, Back, Menu
+   * 
+   * RETURNS the button id or 'axis' if an axis rather than a button
+   */
+  //Xbox 360 controller
+  if(gamepad_id.includes('045e') && gamepad_id.includes('028e')){
+    switch(button_string) {
+      case 'A':
+        return 0
+      case 'X':
+        return 2
+      case 'Y':
+        return 3
+      case 'B':
+        return 1
+      case 'LT':
+        return 6
+      case 'RT':
+        return 7
+      case 'LB':
+        return 4
+      case 'RB':
+        return 5
+      case 'D-Left':
+        return 14
+      case 'D-Right':
+        return 15
+      case 'D-Up':
+        return 12
+      case 'D-Down':
+        return 13
+      case 'Start':
+        return 9
+      case 'Back':
+        return 8
+      case 'Menu':
+        return 16
+      default:
+        return ''
+    }
+  } 
+  //Xbox One controller
+  else if(gamepad_id.includes('20d6') && gamepad_id.includes('2062')){
+    switch(button_string) {
+      case 'A':
+        return 0
+      case 'X':
+        return 2
+      case 'Y':
+        return 3
+      case 'B':
+        return 1
+      case 'LT':
+        return 'axis'
+      case 'RT':
+        return 'axis'
+      case 'LB':
+        return 4
+      case 'RB':
+        return 5
+      case 'D-Left':
+        return 'axis'
+      case 'D-Right':
+        return 'axis'
+      case 'D-Up':
+        return 'axis'
+      case 'D-Down':
+        return 'axis'
+      case 'Start':
+        return 7
+      case 'Back':
+        return 6
+      case 'Menu':
+        return 8
+      default:
+        return ''
+    }
+  }
+}
+
+function getGamepadAxisMapping(gamepad_id, button_string){
+  /**
+   * Different gamepads and browser combinations have different axes on different indices
+   * gamepad_id (string): the id of the gamepad connected, this is the same for multiples of the same gamepad
+   * axis_string (string): Xbox style axis string
+   * RETURNS the axis id or 'button' if a button rather than an axis
+   */
+  //Xbox 360 controller
+  if(gamepad_id.includes('045e') && gamepad_id.includes('028e')){
+    switch(button_string) {
+      case 'LT':
+        return 'button'
+      case 'RT':
+        return 'button'
+      case 'D-Horizontal':
+        return 'button'
+      case 'D-Vertical':
+        return 'button'
+      case 'Left-Stick-Horizontal':
+        return 0
+      case 'Left-Stick-Vertical':
+        return 1
+      case 'Right-Stick-Horizontal':
+        return 2
+      case 'Right-Stick-Vertical':
+        return 3
+      default:
+        return ''
+    }
+  } 
+  //Xbox One controller
+  else if(gamepad_id.includes('20d6') && gamepad_id.includes('2062')){
+    switch(button_string) {
+      case 'LT':
+        return 2
+      case 'RT':
+        return 5
+      case 'D-Horizontal':
+        return 6
+      case 'D-Vertical':
+        return 7
+      case 'Left-Stick-Horizontal':
+        return 0
+      case 'Left-Stick-Vertical':
+        return 1
+      case 'Right-Stick-Horizontal':
+        return 3
+      case 'Right-Stick-Vertical':
+        return 4
+      default:
+        return ''
+    }
+  }
+}
 
 function addGamePadWithAllButtons(gamepad, infoElement) {
+  console.log(gamepad);
   const d = document.createElement("div");
   d.setAttribute("id", `controller${gamepad.index}`);
 
@@ -191,15 +334,15 @@ function doUpdateOfGamePadButtons(){
     //   el.style.backgroundSize = `${pct} ${pct}`;
       if (button.pressed) {
         //console.log(gamepad);
-        triggerHapticResponse(gamepad, buttonsCache, i);
-        triggerGUIUpdate(gamepad, buttonsCache, i);
-        triggerCommand(gamepad, buttonsCache, i);     //may merge these functions later
+        triggerHapticResponse(gamepad, buttonsCache[gamepad.index], i);
+        triggerGUIUpdate(gamepad, buttonsCache[gamepad.index], i);
+        triggerCommand(gamepad, buttonsCache[gamepad.index], i);     //may merge these functions later
         // el.textContent = `${i}`;
         // el.className = "button-gamepad-temp button-pressed align-content-center me-2";
       } 
       else {
-        cancelHapticResponse(gamepad, buttonsCache, i);
-        cancelGUIUpdate(gamepad, buttonsCache, i);
+        cancelHapticResponse(gamepad, buttonsCache[gamepad.index], i);
+        cancelGUIUpdate(gamepad, buttonsCache[gamepad.index], i);
         // el.textContent = `${i}`;
         // el.className = "button-gamepad-temp button-secondary align-content-center me-2";
       }
@@ -209,16 +352,17 @@ function doUpdateOfGamePadButtons(){
     //update axes
     for (const [i, axis] of gamepad.axes.entries()) {
       
-        TriggerAxisUpdate(gamepad, axis, i);
+        TriggerAxisUpdate(gamepad, axis, i, axesCache[gamepad.index]);
       
     }
 
-    buttonsCache = gamepad.buttons;       //store the state of the buttons
+    buttonsCache[gamepad.index] = gamepad.buttons;       //store the state of the buttons
+    axesCache[gamepad.index] = gamepad.axes;       //store the state of the buttons
   }
 }
 
 function triggerHapticResponse(gamepad, buttonsCache, buttonIndex){
-    if(buttonIndex == 16){
+    if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'Menu')){
         if(gamepad.vibrationActuator){
             //widely supported but not firefox and perhaps not safari
                 gamepad.vibrationActuator.playEffect("dual-rumble", {
@@ -236,7 +380,7 @@ function triggerHapticResponse(gamepad, buttonsCache, buttonIndex){
             
         }
     }
-     else if(buttonIndex == 6){
+     else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'LT')){
         if(gamepad.vibrationActuator){
             //widely supported but not firefox and perhaps not safari
                 gamepad.vibrationActuator.playEffect("trigger-rumble", {
@@ -256,7 +400,7 @@ function triggerHapticResponse(gamepad, buttonsCache, buttonIndex){
             
         }
     }
-    else if(buttonIndex == 7){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'RT')){
         if(gamepad.vibrationActuator){
             //widely supported but not firefox and perhaps not safari
                 gamepad.vibrationActuator.playEffect("trigger-rumble", {
@@ -363,8 +507,8 @@ function simulateEnter(targetElement = document.activeElement) {
 }
 
 function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
-    //left trigger pressed
-    if(buttonIndex == 6){
+    //left trigger pressed - this can be a button on some controller and an axis on others so also deal with this in the triggerAxisUpdate function
+    if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'LT')){
         document.getElementById('circularMenu1').classList.add('active');
         //if in driven mode then also make the drive mode popup active
         if(window.gamepadComponent.getCurrentMode == 'driven' && !buttonsCache[buttonIndex].pressed){
@@ -373,28 +517,29 @@ function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
         document.getElementById('circularMenu').classList.remove('active');
         selectedMode = -1;
     //right trigger pressed
-    } else if(buttonIndex == 7){
+    } else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'RT')){
         document.getElementById('circularMenu1').classList.remove('active');
         document.getElementById('driveModePopup').classList.remove('active');
         document.getElementById('circularMenu').classList.add('active');
         selectedMode = 1;
     } 
     //left bumper should act as a forward tab for navigation
-    else if(buttonIndex == 4 && !buttonsCache[buttonIndex].pressed){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'LB') && !buttonsCache[buttonIndex].pressed){
+      console.log('LB')
       simulateTab(true);
     }
     //right bumper should act as a backward tab for navigation
-    else if(buttonIndex == 5 && !buttonsCache[buttonIndex].pressed){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'RB') && !buttonsCache[buttonIndex].pressed){
       simulateTab();
     }
     //menu button closes all
-    else if(buttonIndex == 16){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'Menu')){
         document.getElementById('circularMenu1').classList.remove('active');
         document.getElementById('driveModePopup').classList.remove('active');
         document.getElementById('circularMenu').classList.remove('active');
         selectedMode = 0;
     } 
-    else if(buttonIndex == 0){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'A')){
         //A button pressed
         if(selectedMode == -1){
             document.getElementById('LT_A_Button').classList.add('active');
@@ -406,7 +551,7 @@ function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
           simulateEnter();
         }
     }
-    else if(buttonIndex == 2){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'X')){
         //X button pressed
         if(selectedMode == -1){
             document.getElementById('LT_X_Button').classList.add('active');
@@ -415,7 +560,7 @@ function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
             document.getElementById('RT_X_Button').classList.add('active');
         }
     }
-    else if(buttonIndex == 3){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'Y')){
         //Y button pressed
         if(selectedMode == -1){
             document.getElementById('LT_Y_Button').classList.add('active');
@@ -428,7 +573,7 @@ function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
             document.getElementById('RT_Y_Button').classList.add('active');
         }
     }
-    else if(buttonIndex == 1){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'B')){
         //B button pressed
         if(selectedMode == -1){
             document.getElementById('LT_B_Button').classList.add('active');
@@ -457,7 +602,7 @@ function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
         }
     }
     //D-pad up
-    else if(buttonIndex == 12 && !buttonsCache[buttonIndex].pressed){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'D-Up') && !buttonsCache[buttonIndex].pressed){
       let activeElement = document.activeElement;
       if(activeElement.tagName.toLowerCase() == 'input'){
         if(activeElement.type == 'number'){
@@ -467,7 +612,7 @@ function triggerGUIUpdate(gamepad, buttonsCache, buttonIndex){
       }
     }
     //d-pad down
-    else if(buttonIndex == 13 && !buttonsCache[buttonIndex].pressed){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'D-Down') && !buttonsCache[buttonIndex].pressed){
       let activeElement = document.activeElement;
       if(activeElement.tagName.toLowerCase() == 'input'){
         if(activeElement.type == 'number'){
@@ -496,7 +641,7 @@ function cancelGUIUpdate(gamepad, buttonsCache, buttonIndex){
     //     document.getElementById('circularMenu').classList.remove('active');
     //     //selectedMode = 0;   //RT
     // } 
-    if(buttonIndex == 0){
+    if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'A')){
         //A button pressed
         if(selectedMode == -1){
             document.getElementById('LT_A_Button').classList.remove('active');
@@ -504,7 +649,7 @@ function cancelGUIUpdate(gamepad, buttonsCache, buttonIndex){
             document.getElementById('RT_A_Button').classList.remove('active');
         }
     }
-    else if(buttonIndex == 2){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'X')){
         //X button pressed
         if(selectedMode == -1){
             document.getElementById('LT_X_Button').classList.remove('active');
@@ -512,7 +657,7 @@ function cancelGUIUpdate(gamepad, buttonsCache, buttonIndex){
             document.getElementById('RT_X_Button').classList.remove('active');
         }
     }
-    else if(buttonIndex == 3){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'Y')){
         //Y button pressed
         if(selectedMode == -1){
             document.getElementById('LT_Y_Button').classList.remove('active');
@@ -520,7 +665,7 @@ function cancelGUIUpdate(gamepad, buttonsCache, buttonIndex){
             document.getElementById('RT_Y_Button').classList.remove('active');
         }
     }
-    else if(buttonIndex == 1){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'B')){
         //B button pressed
         if(selectedMode == -1){
             document.getElementById('LT_B_Button').classList.remove('active');
@@ -533,7 +678,7 @@ function cancelGUIUpdate(gamepad, buttonsCache, buttonIndex){
 function triggerCommand(gamepad, buttonsCache, buttonIndex){
 
     //A button pressed
-    if(buttonIndex == 0 && !buttonsCache[buttonIndex].pressed){
+    if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'A') && !buttonsCache[buttonIndex].pressed){
         //hardware trigger mode
         if(selectedMode == -1){
             if(window.gamepadComponent.getCurrentMode == 'driven'){
@@ -557,7 +702,7 @@ function triggerCommand(gamepad, buttonsCache, buttonIndex){
     }
 
     //X button pressed
-    else if(buttonIndex == 2 && !buttonsCache[buttonIndex].pressed){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'X') && !buttonsCache[buttonIndex].pressed){
         //hardware trigger mode
         if(selectedMode == -1){
             if(window.gamepadComponent.getCurrentMode == 'driven'){
@@ -581,7 +726,7 @@ function triggerCommand(gamepad, buttonsCache, buttonIndex){
     }
 
     //Y button pressed
-    else if(buttonIndex == 3 && !buttonsCache[buttonIndex].pressed){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'Y') && !buttonsCache[buttonIndex].pressed){
         if(selectedMode == -1){
             //hardware trigger mode
             console.log('driven mode');
@@ -598,7 +743,7 @@ function triggerCommand(gamepad, buttonsCache, buttonIndex){
     }
 
     //B button pressed
-    else if(buttonIndex == 1 && !buttonsCache[buttonIndex].pressed){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'B') && !buttonsCache[buttonIndex].pressed){
         //hardware trigger mode
         if(selectedMode == -1){
             if(window.gamepadComponent.getCurrentMode == 'driven'){
@@ -624,11 +769,11 @@ function triggerCommand(gamepad, buttonsCache, buttonIndex){
     }
 
     //D-Pad RIGHT pressed
-    else if(buttonIndex == 15 && !buttonsCache[buttonIndex].pressed){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'D-Right') && !buttonsCache[buttonIndex].pressed){
         //D-Pad should only function when hardware functions selected and in driven mode
         if(selectedMode == -1 && window.gamepadComponent.getCurrentMode == 'driven'){
             //hardware trigger mode
-            window.gamepadComponent.driving_frequency += 0.1;
+            window.gamepadComponent.driving_frequency += 0.01;
         } 
         else if(selectedMode == 1){
             return
@@ -636,11 +781,11 @@ function triggerCommand(gamepad, buttonsCache, buttonIndex){
         }
     }
     //D-Pad LEFT pressed
-    else if(buttonIndex == 14 && !buttonsCache[buttonIndex].pressed){
+    else if(buttonIndex == getGamepadButtonMapping(gamepad.id, 'D-Left') && !buttonsCache[buttonIndex].pressed){
         //D-Pad should only function when hardware functions selected and in driven mode
         if(selectedMode == -1 && window.gamepadComponent.getCurrentMode == 'driven'){
             //hardware trigger mode
-            window.gamepadComponent.driving_frequency -= 0.1;
+            window.gamepadComponent.driving_frequency -= 0.01;
         } 
         else if(selectedMode == 1){
             return
@@ -649,8 +794,8 @@ function triggerCommand(gamepad, buttonsCache, buttonIndex){
     }
 }
 
-function TriggerAxisUpdate(gamepad, axis, axesIndex){
-    if(axesIndex == 0){
+function TriggerAxisUpdate(gamepad, axis, axesIndex, axisCache){
+    if(axesIndex == getGamepadAxisMapping(gamepad.id, 'Left-Stick-Horizontal')){
         if(selectedMode == -1 && window.gamepadComponent.getCurrentMode == 'driven'){
             //hardware trigger mode
             if(axis > 0.9){
@@ -663,7 +808,70 @@ function TriggerAxisUpdate(gamepad, axis, axesIndex){
             
         }
     }
-    
+    //some gamepads consider LT as a trigger so active menu on LT if appropriate
+    else if(axesIndex == getGamepadAxisMapping(gamepad.id, 'LT')){
+      if(axis > 0.5){
+        document.getElementById('circularMenu1').classList.add('active');
+        //if in driven mode then also make the drive mode popup active
+        if(window.gamepadComponent.getCurrentMode == 'driven'){
+            document.getElementById('driveModePopup').classList.add('active');
+        }
+        document.getElementById('circularMenu').classList.remove('active');
+        selectedMode = -1;
+      }
+        
+    }
+    //some gamepads consider RT as a trigger so active menu on LT if appropriate
+    else if(axesIndex == getGamepadAxisMapping(gamepad.id, 'RT')){
+      if(axis > 0.5){
+        document.getElementById('circularMenu1').classList.remove('active');
+        document.getElementById('driveModePopup').classList.remove('active');
+        document.getElementById('circularMenu').classList.add('active');
+        selectedMode = 1;
+      }
+    }
+    //some gamepads consider D-Pad as a trigger
+    else if(axesIndex == getGamepadAxisMapping(gamepad.id, 'D-Horizontal')){
+      if(axis > 0.9 && axisCache[axesIndex] == 0){  //gives behaviour of a single button press
+         if(selectedMode == -1 && window.gamepadComponent.getCurrentMode == 'driven'){
+            //hardware trigger mode
+            window.gamepadComponent.driving_frequency += 0.01;
+        } 
+        else {
+            return
+            
+        }
+      } else if(axis < -0.9 && axisCache[axesIndex] == 0){  //gives behaviour of a single button press
+         if(selectedMode == -1 && window.gamepadComponent.getCurrentMode == 'driven'){
+            //hardware trigger mode
+            window.gamepadComponent.driving_frequency -= 0.01;
+        } 
+        else {
+            return
+            
+        }
+      }
+    }
+    //some gamepads consider D-Pad as a trigger
+    else if(axesIndex == getGamepadAxisMapping(gamepad.id, 'D-Vertical')){
+      if(axis > 0.9 && axisCache[axesIndex] == 0){  //gives behaviour of a single button press
+          let activeElement = document.activeElement;
+          if(activeElement.tagName.toLowerCase() == 'input'){
+            if(activeElement.type == 'number'){
+              activeElement.valueAsNumber -= 1; 
+              activeElement.dispatchEvent(new Event('input')); 
+            }
+          }
+      } else if(axis < -0.9 && axisCache[axesIndex] == 0){  //gives behaviour of a single button press
+         let activeElement = document.activeElement;
+          if(activeElement.tagName.toLowerCase() == 'input'){
+            if(activeElement.type == 'number'){
+              activeElement.valueAsNumber += 1; 
+              activeElement.dispatchEvent(new Event('input')); 
+            }
+          }
+      }
+    }
 }
 
 function doHapticUpdateBasedOnHardwareState(){
@@ -727,7 +935,7 @@ created(){
             addGamePadWithAllButtons(evt.gamepad, this.$refs.gamepadInfo);  //shows all available buttons and responds on button presses
             //addGamepad(evt.gamepad, this.$refs.gamepadInfo);
 
-            buttonsCache = evt.gamepad.buttons;     //initialise the buttonCache
+            buttonsCache[evt.gamepad.index] = evt.gamepad.buttons;     //initialise the buttonCache
             //console.log(buttonsCache)
         });
 
