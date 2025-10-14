@@ -1,9 +1,5 @@
 # user interface
 
-<<<<<<< HEAD
-
-
-=======
 The following user interfaces currently exist for the dynamics lab remote laboratory:
 
 - [default](./default/) - default version of the user interface, with all features, but no logging of interactions.
@@ -51,4 +47,3 @@ And copy the files in the generated `dist` directory to the host location.
 ```
 npm run lint
 ```
->>>>>>> develop
