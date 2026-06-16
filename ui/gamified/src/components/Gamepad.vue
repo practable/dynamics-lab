@@ -119,6 +119,8 @@ function getGamepadButtonMapping(gamepad_id, button_string){
   } 
   //Xbox One controller
   else if(gamepad_id.includes('20d6') && gamepad_id.includes('2062')){
+    console.log('Xbox One controller')
+    console.log(button_string)
     switch(button_string) {
       case 'A':
         return 0
