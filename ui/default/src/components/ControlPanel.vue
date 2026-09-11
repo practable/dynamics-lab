@@ -141,6 +141,10 @@ export default {
 	created(){
 		
 	},
+	beforeUnmount(){                  
+		this.disconnect();
+		window.removeEventListener('keydown', this.hotkey, false);
+  	},
 	mounted(){
 		
 	},
@@ -246,6 +250,7 @@ export default {
 					this.connect();								
 				} else{
 					console.log('disconnecting');
+					this.disconnect();
 				}
 				
 			} catch(e){
@@ -333,14 +338,24 @@ export default {
 			this.message = '';
 			this.error = '';
 		},
+		disconnect(){
+			const ws = this.dataSocket;
+			this.dataSocket = null;
+			if (!ws) return;
+
+			ws.onopen = null;
+			ws.onmessage = null;
+			ws.onclose = null;
+			ws.onerror = null;
+
+			try { ws.close(); } catch(e) { /* already closing */ }
+		},
 		connect(){
+			this.disconnect();
 
 			let _store = this.$store;
 			let _this = this;
 
-			if(this.dataSocket != null){
-				this.dataSocket.disconnect();		//must disconnect from previous websocket connection or will duplicate data.
-			}
 			this.dataSocket = new WebSocket(this.url);
 			_store.dispatch('setDataSocket', this.dataSocket);
 			var delay = 0

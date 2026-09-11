@@ -1,8 +1,7 @@
 <template>
-<div class='container-fluid practable-component'>
-	<div class='d-flex flex-column' id="video">
-		
-		<div class="d-flex flex-row text-center">
+
+ <div class="container-fluid practable-component webcam-stream" id="video">
+	<div class="d-flex flex-row text-center">
 			<canvas class="" id="smoothie-chart-acceleration"></canvas>
 			<p class="rotate-90">acc [g]</p>
 		</div>
@@ -15,7 +14,8 @@
 
 		<video-element :url="url" />
 
-		<div class="d-flex flex-row toolbar-bottom">
+		<div class="d-flex flex-row sticky-wrap">
+			<div class="toolbar-bottom">
 			<download-image-button class="me-2" id="download-image-webcam" parentCanvasID="video-canvas" parentComponentName="webcam"></download-image-button>
 			
 			<options-tool id="options-live-stream" @mousedown="setDraggable(false)" @mouseup="setDraggable(true)" @mouseleave="setDraggable(true)">
@@ -67,11 +67,10 @@
 					</p>
 				</template>
 			</popup-help>
-
+			</div>
 		</div>
-		
-	</div>
-</div>
+  </div>
+
 </template>
 
 <script>
@@ -93,7 +92,7 @@ export default {
     data(){
         return{
 			// player: null,
-			stream: Object,
+			stream: {},
         }
     },
     computed:{
@@ -149,19 +148,25 @@ export default {
 		}
 		
 	},
+	beforeUnmount() { 
+        document.removeEventListener("streams:dropped", this.reconnect);
+    },
 	mounted(){
-		var _this = this;
-		var reconnect = function () {
-			_this.accessVideo();
-		};
+		// var _this = this;
+		// var reconnect = function () {
+		// 	_this.accessVideo();
+		// };
 		//make second and subsequent connections
-		document.addEventListener("streams:dropped", reconnect);
+		document.addEventListener("streams:dropped", this.reconnect);
 	},
 	methods:{
 		...mapActions([
 			'setDraggable',
 			'resetSmoothieSettings'
 		]),
+		reconnect(){
+			this.accessVideo();
+		},
 		accessVideo(){
 			this.stream = this.$store.getters.getStream("video");
 				var accessURL = this.stream.url;
@@ -197,9 +202,17 @@ export default {
 </script>
 
 <style scoped>
-#video-canvas{
-	width:80%;
-	height: 100%;
+.webcam-stream {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0.5rem;
+}
+
+.webcam-stream :deep(.video-element-root),
+.webcam-stream :deep(.session-end-root) {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 #smoothie-chart-acceleration{

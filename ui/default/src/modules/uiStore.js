@@ -6,7 +6,8 @@ const uiStore = {
        isDraggable: true,
        usesLocalStorage: false,        //can only use localStorage if the browser allows it.
        config_json: '',  
-       darkTheme: document.body.classList.contains('dark-theme') ? true : false
+       darkTheme: document.body.classList.contains('dark-theme') ? true : false,
+       windowWidth: window.innerWidth
        }),
        mutations:{
          SET_DRAGGABLE(state, draggable){
@@ -21,6 +22,9 @@ const uiStore = {
          SET_CONFIG_JSON(state, json){
             state.config_json = json;
          },
+         SET_WINDOW_WIDTH(state, val){
+            state.windowWidth = val;
+         }
          
 
        },
@@ -37,6 +41,9 @@ const uiStore = {
          setConfigJSON(context, json){
             context.commit('SET_CONFIG_JSON', json);
          },
+         setWindowWidth(context, val){
+            context.commit('SET_WINDOW_WIDTH', val);
+         }
 
 
        },
@@ -50,9 +57,19 @@ const uiStore = {
          getDarkTheme(state){
             return state.darkTheme;
          },
-        getConfigJSON(state){
-         return state.config_json;
-      },
+         getConfigJSON(state){
+            return state.config_json;
+         },
+           getWindowWidth(state){
+            return state.windowWidth;
+         },
+         isMobile(state){
+            if(state.windowWidth < 992){
+               return true;
+            } else{
+               return false;
+            }
+         },
          
          
        },  

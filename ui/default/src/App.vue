@@ -6,7 +6,28 @@
         <data-stream id="data-stream" />
         <logging v-if="getIsLoggingOn" id='logging' />
 
-        <div v-if='!isMobile' class='row' id='component-grid'>
+
+        <div :class="isMobile ? 'd-flex flex-column' : 'row'" id='component-grid'>
+        <!-- first-row etc only exist as styles when large screen -->
+            <div :class="isMobile ? '' : 'd-flex'" id='first-row'>
+              <div :class="isMobile ? 'drop-area drop-area-mobile' : 'drop-area drop-area-one-third'" id='drop_0_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><webcam-stream id='webcam-stream' /></div>
+              <div :class="isMobile ? 'drop-area drop-area-mobile' : 'drop-area drop-area-two-thirds'" id='drop_0_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><graph v-if='isGraphOn' id='graph' /></div>
+            </div>
+
+            <div :class="isMobile ? '' : 'd-flex'" id='second-row'>
+              <div :class="isMobile ? 'drop-area drop-area-mobile' : 'drop-area drop-area-two-fifths'" id='drop_1_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><control-panel id='control-panel' :url="getDataURL"/></div>
+              <div :class="isMobile ? 'drop-area drop-area-mobile' : 'drop-area drop-area-one-fifth'" id='drop_1_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><data-recorder v-if='isDataRecorderOn' id='data-recorder' /></div>
+              <div :class="isMobile ? 'drop-area drop-area-mobile' : 'drop-area drop-area-two-fifths'" id='drop_1_2' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><data-panel id='data-panel' /></div>
+            </div>
+
+            <div :class="isMobile ? '' : 'd-flex'" id='third-row'>
+              <div :class="isMobile ? 'drop-area drop-area-mobile' : 'drop-area drop-area-half'" id='drop_2_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"></div>
+              <div :class="isMobile ? 'drop-area drop-area-mobile' : 'drop-area drop-area-half'" id='drop_2_1' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"></div>
+            </div>
+        </div>
+
+
+        <!-- <div v-if='!isMobile' class='row' id='component-grid'>
 
             <div class='d-flex' id='first-row'>
                 <div class='drop-area drop-area-one-third' id='drop_0_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><webcam-stream id='webcam-stream' /></div>
@@ -29,7 +50,7 @@
             <div class='drop-area drop-area-mobile' id='drop_3_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><data-panel id='data-panel' /></div>
             <div class='drop-area drop-area-mobile' id='drop_4_0' :draggable='getDraggable' @dragstart="dragComponent" @drop='dropComponent' @dragover.prevent @dragenter='dragEnter' @dragleave="dragLeave"><graph v-if='isGraphOn' id='graph' /></div>
            
-        </div>
+        </div> -->
      
    
   </div>
@@ -47,7 +68,7 @@ import DataRecorder from "./components/DataRecorder.vue"
 import Graph from "./components/Graph.vue"
 import DataPanel from "./components/DataPanel.vue";
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'App',
@@ -63,9 +84,6 @@ export default {
     DataPanel
 
   },
-  mounted(){
-    
-  },
   data() {
     return {
       isDataRecorderOn: true,
@@ -77,23 +95,33 @@ export default {
   },
   mounted(){
     this.updateUUID();
+
+    window.onresize = () => {this.setWindowWidth(window.innerWidth)};
   },
   computed:{
     ...mapGetters([
       'getDraggable',
       'getUsesLocalStorage',
       'getIsLoggingOn',
-      'getDataURL'
+      'getDataURL',
+      'isMobile'
     ]),
-    isMobile(){
-      if(window.screen.width < 992){
-        return true;
-      } else{
-        return false;
-      }
-    }
+  },
+  watch: {
+    isMobile() {
+      this.$nextTick(() => {
+        document.querySelectorAll('#component-grid > div, .drop-area')
+        .forEach((el) => {
+          el.style.width = '';
+          el.style.height = '';
+        });
+      });
+    },
   },
   methods:{
+    ...mapActions([
+        'setWindowWidth'
+    ]),
     dragComponent(event){
         event.dataTransfer.effectAllowed = 'move';
          let element = event.target;

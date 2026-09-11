@@ -43,16 +43,22 @@ export default {
         }
 		
 	},
+	beforeUnmount() { 
+        document.removeEventListener("streams:dropped", this.reconnect);
+    },
 	mounted(){
-		var _this = this;
-		var reconnect = function () {
-			console.log("RECONNECT EVENT");
-			_this.getWebsocketConnection();
-		};
+		// var _this = this;
+		// var reconnect = function () {
+		// 	console.log("RECONNECT EVENT");
+		// 	_this.getWebsocketConnection();
+		// };
 		//make second and subsequent connections
-		document.addEventListener("streams:dropped", reconnect);
+		document.addEventListener("streams:dropped", this.reconnect);
 	},
 	methods:{
+		reconnect(){
+			this.getWebsocketConnection();
+		},
 		getWebsocketConnection(){
 			this.stream = this.$store.getters.getStream("data");
 				var accessURL = this.stream.url;

@@ -1,22 +1,22 @@
 <template>
 
-<div v-if='getSessionExpired' class='row'>
-  <div class='col-12'>
+<div v-if='getSessionExpired' class='session-end-root'>
+  <div class="media-frame">
+    <div class='media-inner'>
         <img id='session-end-image' src='https://app.practable.io/ed0/static/images/common/thank-you-screen.svg' alt='session ended'>
     </div>
+  </div>
+  
 </div>
-<div v-else>
-  <div class='row'>
-      <div class='col-12'>
+<div v-else class="video-element-root">
+  <div class='media-frame'>
+      <div class='media-inner'>
         <canvas id="video-canvas"></canvas>
       </div>
     </div>
-      
     
-</div>    
-    
-    
-    <!-- <div id='videoWrapper'></div> -->
+</div>  
+
 </template>
 
 <script>
@@ -41,49 +41,88 @@ export default {
       ]),
     },
     watch:{
-        url(){
-            let canvas = document.getElementById("video-canvas");
-            this.player = new JSMpeg.Player(this.url, {canvas: canvas, preserveDrawingBuffer: true});
-            // let url = this.$store.getters.getVideoURL;
-            // this.player = new JSMpeg.VideoElement("#videoWrapper", url, {
-            //     autoplay: true,
-            //     chunkSize: 10 * 1024 * 1024,
-            // });
-        }
+        url:{
+            // let canvas = document.getElementById("video-canvas");
+            // this.player = new JSMpeg.Player(this.url, {canvas: canvas, preserveDrawingBuffer: true});
+           immediate: true,
+            handler(newUrl, oldUrl) {
+              if (newUrl === oldUrl) return;
+              this.destroyPlayer();
+              if (!newUrl) return;                  
+              this.createPlayer(newUrl);
+            }
+         }
     },
     created(){
   
     },
-  mounted() {
-    //only for debugging
-    //let canvas = document.getElementById("video-canvas");
-		//let playerUrl = 'wss://video.practable.io:443/out/dpr/video0';		//for robot arm
-		//let playerUrl = 'wss://video.practable.io:443/out/dpr/video1';		//for variable governor
-		//let playerUrl = 'wss://video.practable.io:443/out/dpr/video2';		//for spinner
-		
-    // new JSMpeg.Player(playerUrl, {canvas: canvas});
+    beforeUnmount() { 
+      this.destroyPlayer();
+    },
+    mounted() {
     
-      //let canvas = document.getElementById("video-canvas");
-      
-      //this.player = new JSMpeg.Player(this.url, {canvas: canvas});
-    // this.player = new JSMpeg.VideoElement("#videoWrapper", this.url, {
-    //   autoplay: true,
-    //   chunkSize: 10 * 1024 * 1024,
-    // });
-  },
+    },
+    methods:{
+      destroyPlayer() {
+        if (!this.player) return;
+        try {
+          this.player.destroy();
+        } catch (e) {
+          console.warn('player destroy failed', e);
+        }
+        this.player = null;
+      },
+       createPlayer(url) {
+        this.destroyPlayer();
+        let canvas = document.getElementById("video-canvas");
+        if (!canvas || !url) return;
+
+        this.player = new JSMpeg.Player(this.url, {
+          canvas: canvas, 
+          preserveDrawingBuffer: true
+        });
+      }
+  }
 };
 
 
 </script>
 
-<style>
-    #video-canvas {
-      width: 100%;
-      /* height: 100%; */
-    }
+<style scoped>
+.video-element-root,
+.session-end-root {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
 
-    #session-end-image {
-      width: 100%;
-      /* height: 100%; */
-    }
-</style>
+.media-frame {
+  position: relative;   /* containing block for .media-inner */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.media-inner {
+  position: absolute;
+  inset: 0;             /* definite height, no percentage involved */
+}
+
+#session-end-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;     /* now resolves — .media-inner is definite */
+}
+
+#video-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+ </style>
